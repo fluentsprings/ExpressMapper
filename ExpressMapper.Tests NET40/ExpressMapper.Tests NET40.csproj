@@ -62,6 +62,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ExpressMapper NET40\ExpressMapper NET40.csproj">
+      <Project>{E701191E-BF2E-41B8-A4F0-3D8954E3DD58}</Project>
+      <Name>ExpressMapper NET40</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ExpressMapper.Tests.Model\ExpressMapper.Tests.Model.csproj">
       <Project>{9170a04c-8d4b-47a7-a6e3-7fc0f24244dd}</Project>
       <Name>ExpressMapper.Tests.Model</Name>
