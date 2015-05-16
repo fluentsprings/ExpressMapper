@@ -232,6 +232,10 @@ namespace ExpressMapper
 
         public TN MapTo(T obj)
         {
+            if (_mapFunc == null)
+            {
+                Compile();
+            }
             return _mapFunc(obj);
         }
 

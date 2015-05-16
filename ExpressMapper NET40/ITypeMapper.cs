@@ -16,6 +16,11 @@ namespace ExpressMapper
         void Compile();
     }
 
+    /// <summary>
+    /// Interface that implements internals of mapping
+    /// </summary>
+    /// <typeparam name="T">source</typeparam>
+    /// <typeparam name="TN">destination</typeparam>
     public interface ITypeMapper<T, TN> : ITypeMapper
     {
         TN MapTo(T obj);

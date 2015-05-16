@@ -3,6 +3,11 @@ using System.Linq.Expressions;
 
 namespace ExpressMapper
 {
+    /// <summary>
+    /// Interface to extend the mapping
+    /// </summary>
+    /// <typeparam name="T">source</typeparam>
+    /// <typeparam name="TN">destination</typeparam>
     public interface IMemberConfiguration<T, TN>
     {
         IMemberConfiguration<T, TN> Instantiate(Func<T, TN> constructor);

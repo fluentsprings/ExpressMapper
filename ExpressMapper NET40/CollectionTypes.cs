@@ -1,5 +1,8 @@
 ﻿namespace ExpressMapper
 {
+    /// <summary>
+    /// Enumeration for determining collection type
+    /// </summary>
     public enum CollectionTypes
     {
         None = 0,

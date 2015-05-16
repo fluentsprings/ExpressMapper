@@ -13,6 +13,20 @@ namespace ExpressMapper.Tests
     public class BasicTests : BaseTestClass
     {
         [Test]
+        public void CompilelessMap()
+        {
+            Mapper.Register<TestModel, TestViewModel>();
+            Mapper.Register<Size, SizeViewModel>();
+            Mapper.Register<Country, CountryViewModel>();
+
+            var test = Functional.AutoMemberMap();
+
+            var testViewModel = test.Key.MapTo<TestModel, TestViewModel>();
+
+            Assert.AreEqual(testViewModel, test.Value);
+        }
+
+        [Test]
         public void AutoMemberMap()
         {
             Mapper.Register<TestModel, TestViewModel>();

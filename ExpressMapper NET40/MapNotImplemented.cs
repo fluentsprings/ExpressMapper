@@ -2,6 +2,9 @@
 
 namespace ExpressMapper
 {
+    /// <summary>
+    /// Not implemented exception
+    /// </summary>
     public class MapNotImplemented : Exception
     {
         public MapNotImplemented(Type src, Type dest, string message) : base(message)
