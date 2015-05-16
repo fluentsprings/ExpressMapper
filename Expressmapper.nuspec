@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Expressmapper</id>
+    <version>0.9.0</version>
+    <authors>George Anisimov</authors>
+    <owners>George Anisimov</owners>
+    <licenseUrl>https://github.com/expressmapper/ExpressMapper/blob/master/LICENSE</licenseUrl>
+    <projectUrl>http://expressmapper.org</projectUrl>
+    <iconUrl>http://expressmapper.org/favicon.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>ExpressMapper it is a lightweight, fast and easy to use .Net mapper to map one type of object(s) to another. ExpressMapper relies completely on the expression trees. </description>
+    <releaseNotes>Initial beta version</releaseNotes>
+    <copyright>Copyright 2015 ExpressMapper</copyright>
+    <tags>Mapper .Net-Mapper Mapping Map</tags>
+  </metadata>
+</package>
