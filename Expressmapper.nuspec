@@ -12,6 +12,6 @@
     <description>ExpressMapper it is a lightweight, fast and easy to use .Net mapper to map one type of object(s) to another. ExpressMapper relies completely on the expression trees. </description>
     <releaseNotes>Initial beta version</releaseNotes>
     <copyright>Copyright 2015 ExpressMapper</copyright>
-    <tags>Mapper .Net-Mapper Mapping Map</tags>
+    <tags>Mapper .Net-Mapper Mapping</tags>
   </metadata>
 </package>
