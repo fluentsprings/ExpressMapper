@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
+using Mapster;
+using Nelibur.ObjectMapper;
 using PerformanceTest.Generators;
 using PerformanceTest.Mapping;
 using PerformanceTest.Models;
+using PerformanceTest.ViewModels;
 
 namespace PerformanceTest.Tests
 {
@@ -22,6 +25,26 @@ namespace PerformanceTest.Tests
             ExpressMapperMapping.Init();
         }
 
+        protected override void InitOoMapper()
+        {
+            OoMapperMappings.Init();
+        }
+
+        protected override void InitValueInjectorMapper()
+        {
+            ValueInjectorMappings.Init();
+        }
+
+        protected override void InitMapsterMapper()
+        {
+            MapsterMapperMappings.Init();
+        }
+
+        protected override void InitTinyMapper()
+        {
+            TinyMapperMappings.Init();
+        }
+
         protected override void InitNativeMapper()
         {
         }
@@ -34,6 +57,36 @@ namespace PerformanceTest.Tests
         protected override List<NewsViewModel> ExpressMapperMap(List<News> src)
         {
             return ExpressMapper.Mapper.Map<List<News>, List<NewsViewModel>>(src);
+        }
+
+        protected override List<NewsViewModel> OoMapperMap(List<News> src)
+        {
+            return OoMapper.Mapper.Map<List<News>, List<NewsViewModel>>(src);
+        }
+
+        protected override List<NewsViewModel> ValueInjectorMap(List<News> src)
+        {
+            var list = new List<NewsViewModel>();
+            foreach (var item in src)
+            {
+                list.Add(Omu.ValueInjecter.Mapper.Map<News, NewsViewModel>(item));
+            }
+            return list;
+        }
+
+        protected override List<NewsViewModel> MapsterMap(List<News> src)
+        {
+            return TypeAdapter.Adapt<List<News>, List<NewsViewModel>>(src);
+        }
+
+        protected override List<NewsViewModel> TinyMapperMap(List<News> src)
+        {
+            var list = new List<NewsViewModel>();
+            foreach (var item in src)
+            {
+                list.Add(TinyMapper.Map<News, NewsViewModel>(item));
+            }
+            return list;
         }
 
         protected override List<NewsViewModel> NativeMapperMap(List<News> src)
@@ -49,6 +102,11 @@ namespace PerformanceTest.Tests
         protected override string TestName
         {
             get { return "SimpleTest"; }
+        }
+
+        protected override string Size
+        {
+            get { return "S"; }
         }
     }
 }

@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using Mapster;
+using Nelibur.ObjectMapper;
 using PerformanceTest.Generators;
 using PerformanceTest.Mapping;
 using PerformanceTest.Models;
@@ -23,6 +26,26 @@ namespace PerformanceTest.Tests
             ExpressMapperMapping.Init();
         }
 
+        protected override void InitOoMapper()
+        {
+            OoMapperMappings.Init();
+        }
+
+        protected override void InitValueInjectorMapper()
+        {
+            ValueInjectorMappings.Init();
+        }
+
+        protected override void InitMapsterMapper()
+        {
+            MapsterMapperMappings.Init();
+        }
+
+        protected override void InitTinyMapper()
+        {
+            TinyMapperMappings.Init();
+        }
+
         protected override void InitNativeMapper()
         {
         }
@@ -35,6 +58,34 @@ namespace PerformanceTest.Tests
         protected override List<UserViewModel> ExpressMapperMap(List<User> src)
         {
             return ExpressMapper.Mapper.Map<List<User>, List<UserViewModel>>(src);
+        }
+
+        protected override List<UserViewModel> OoMapperMap(List<User> src)
+        {
+            var userViewModels = OoMapper.Mapper.Map<List<User>, List<UserViewModel>>(src);
+            return userViewModels;
+        }
+
+        protected override List<UserViewModel> ValueInjectorMap(List<User> src)
+        {
+            var list = new List<UserViewModel>();
+            foreach (var item in src)
+            {
+                list.Add(Omu.ValueInjecter.Mapper.Map<User, UserViewModel>(item));
+            }
+            return list;
+        }
+
+        protected override List<UserViewModel> MapsterMap(List<User> src)
+        {
+            var userViewModels = TypeAdapter.Adapt<List<User>, List<UserViewModel>>(src);
+            return userViewModels;
+        }
+
+        protected override List<UserViewModel> TinyMapperMap(List<User> src)
+        {
+            // custom mapping is not supported
+            throw new NotImplementedException();
         }
 
         protected override List<UserViewModel> NativeMapperMap(List<User> src)
@@ -50,6 +101,11 @@ namespace PerformanceTest.Tests
         protected override string TestName
         {
             get { return "SimpleWithAssociationTest"; }
+        }
+
+        protected override string Size
+        {
+            get { return "M"; }
         }
     }
 }

@@ -6,6 +6,10 @@ namespace PerformanceTest.ViewModels
 {
     public class TestViewModel
     {
+        public TestViewModel()
+        {
+            
+        }
         public TestViewModel(string descr)
         {
             Description = descr;

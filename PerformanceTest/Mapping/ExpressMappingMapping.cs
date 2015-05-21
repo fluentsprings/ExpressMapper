@@ -35,5 +35,20 @@ namespace PerformanceTest.Mapping
             Mapper.Register<Item, ItemViewModel>();
             Mapper.Compile();
         }
+
+        public static void InitAdvanced()
+        {
+            Mapper.Register<ProductVariant, ProductVariantViewModel>();
+            Mapper.Register<Product, ProductViewModel>()
+                .Member(dest => dest.DefaultSharedOption, src => src.DefaultOption);
+            Mapper.Register<Test, TestViewModel>()
+                .Member(dest => dest.Age, src => src.Age)
+                .Member(dest => dest.Weight, src => src.Weight * 2)
+                .Member(dest => dest.Type, src => (Types)src.Type)
+                .Member(dest => dest.Name, src => string.Format("{0} - {1} - {2}", src.Name, src.Weight, src.Age))
+                .Member(dest => dest.SpareTheProduct, src => src.SpareProduct)
+                .Member(dest => dest.Description, src => string.Format("{0} - {1}", src.Name, src.Id));
+            Mapper.Compile();
+        }
     }
 }

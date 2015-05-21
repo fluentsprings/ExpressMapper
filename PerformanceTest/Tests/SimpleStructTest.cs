@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using Mapster;
+using Nelibur.ObjectMapper;
 using PerformanceTest.Generators;
 using PerformanceTest.Mapping;
 using PerformanceTest.Models;
@@ -24,6 +26,26 @@ namespace PerformanceTest.Tests
             ExpressMapperMapping.Init();
         }
 
+        protected override void InitOoMapper()
+        {
+            OoMapperMappings.Init();
+        }
+
+        protected override void InitValueInjectorMapper()
+        {
+            ValueInjectorMappings.Init();
+        }
+
+        protected override void InitMapsterMapper()
+        {
+            MapsterMapperMappings.Init();
+        }
+
+        protected override void InitTinyMapper()
+        {
+            TinyMapperMappings.Init();
+        }
+
         protected override void InitNativeMapper()
         {
         }
@@ -36,6 +58,36 @@ namespace PerformanceTest.Tests
         protected override List<ItemViewModel> ExpressMapperMap(List<Item> src)
         {
             return ExpressMapper.Mapper.Map<List<Item>, List<ItemViewModel>>(src);
+        }
+
+        protected override List<ItemViewModel> OoMapperMap(List<Item> src)
+        {
+            return OoMapper.Mapper.Map<List<Item>, List<ItemViewModel>>(src);
+        }
+
+        protected override List<ItemViewModel> ValueInjectorMap(List<Item> src)
+        {
+            var list = new List<ItemViewModel>();
+            foreach (var item in src)
+            {
+                list.Add(Omu.ValueInjecter.Mapper.Map<Item, ItemViewModel>(item));
+            }
+            return list;
+        }
+
+        protected override List<ItemViewModel> MapsterMap(List<Item> src)
+        {
+            return TypeAdapter.Adapt<List<Item>, List<ItemViewModel>>(src);
+        }
+
+        protected override List<ItemViewModel> TinyMapperMap(List<Item> src)
+        {
+            var list = new List<ItemViewModel>();
+            foreach (var item in src)
+            {
+                list.Add(TinyMapper.Map<Item, ItemViewModel>(item));
+            }
+            return list;
         }
 
         protected override List<ItemViewModel> NativeMapperMap(List<Item> src)
@@ -51,6 +103,11 @@ namespace PerformanceTest.Tests
         protected override string TestName
         {
             get { return "SimpleStructTest"; }
+        }
+
+        protected override string Size
+        {
+            get { return "XS"; }
         }
     }
 }

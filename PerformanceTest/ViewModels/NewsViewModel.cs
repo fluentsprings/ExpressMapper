@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PerformanceTest.Tests
+namespace PerformanceTest.ViewModels
 {
     public class NewsViewModel
     {

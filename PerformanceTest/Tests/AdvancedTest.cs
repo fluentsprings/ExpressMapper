@@ -8,7 +8,7 @@ using PerformanceTest.ViewModels;
 
 namespace PerformanceTest.Tests
 {
-    public class ComplexTest : BaseTest<List<Test>, List<TestViewModel>>
+    public class AdvancedTest : BaseTest<List<Test>, List<TestViewModel>>
     {
         protected override List<Test> GetData()
         {
@@ -22,7 +22,7 @@ namespace PerformanceTest.Tests
 
         protected override void InitExpressMapper()
         {
-            ExpressMapperMapping.Init();
+            ExpressMapperMapping.InitAdvanced();
         }
 
         protected override void InitOoMapper()
@@ -61,10 +61,8 @@ namespace PerformanceTest.Tests
 
         protected override List<TestViewModel> OoMapperMap(List<Test> src)
         {
-            // Custom constructor, beforeMap, AfterMap is not supported
-
-            throw new NotImplementedException();
-            //return OoMapper.Mapper.Map<List<Test>, List<TestViewModel>>(src);
+            var testViewModels = OoMapper.Mapper.Map<List<Test>, List<TestViewModel>>(src);
+            return testViewModels;
         }
 
         protected override List<TestViewModel> ValueInjectorMap(List<Test> src)
@@ -79,7 +77,8 @@ namespace PerformanceTest.Tests
 
         protected override List<TestViewModel> MapsterMap(List<Test> src)
         {
-            return TypeAdapter.Adapt<List<Test>, List<TestViewModel>>(src);
+            var testViewModels = TypeAdapter.Adapt<List<Test>, List<TestViewModel>>(src);
+            return testViewModels;
         }
 
         protected override List<TestViewModel> TinyMapperMap(List<Test> src)
@@ -99,12 +98,12 @@ namespace PerformanceTest.Tests
 
         protected override string TestName
         {
-            get { return "ComplexTest"; }
+            get { return "AdvancedTest"; }
         }
 
         protected override string Size
         {
-            get { return "XXL"; }
+            get { return "XL"; }
         }
     }
 }

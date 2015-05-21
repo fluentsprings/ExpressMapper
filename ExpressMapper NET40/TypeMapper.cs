@@ -111,7 +111,7 @@ namespace ExpressMapper
         public IList ProcessCollection(IEnumerable src)
         {
             var source = src as IEnumerable<T>;
-            var destination = new List<TN>();
+            var destination = new List<TN>(source.Count());
             foreach (var item in source)
             {
                 destination.Add(MapTo(item));
@@ -121,19 +121,24 @@ namespace ExpressMapper
 
         public IEnumerable ProcessArray(IEnumerable src)
         {
-            var source = src as IEnumerable<T>;
-            var destination = new List<TN>();
-            foreach (var item in source)
+            var source = src as T[];
+            var destination = new List<TN>(source.Length);
+            for (var i = 0; i < source.Length; i++)
             {
-                destination.Add(MapTo(item));
+                destination.Add(MapTo(source[i]));
             }
             return destination.ToArray();
         }
 
         public IQueryable ProcessQueryable(IEnumerable src)
         {
-            var enumerable = src as IEnumerable<T>;
-            return enumerable.Select(MapTo).AsQueryable();
+            var source = src as IEnumerable<T>;
+            var destination = new List<TN>(source.Count());
+            foreach (var item in source)
+            {
+                destination.Add(MapTo(item));
+            }
+            return destination.AsQueryable();
         }
 
         public void AfterMap(Action<T, TN> afterMap)
@@ -315,7 +320,12 @@ namespace ExpressMapper
 
             var destList = typeof(List<>).MakeGenericType(destType);
             var destColl = Expression.Variable(destList, string.Format("{0}_{1}", typeof(TN).Name, callSetPropMethod.Member.Name));
-            var newColl = Expression.New(destList);
+
+            var constructorInfo = destList.GetConstructors().First(c => c.GetParameters().FirstOrDefault(p => p.ParameterType == typeof(int)) != null);
+
+            var srcCountExp = Expression.Call(typeof (Enumerable), "Count", new[] {sourceType}, sourceVariable);
+
+            var newColl = Expression.New(constructorInfo, srcCountExp);
             var destAssign = Expression.Assign(destColl, newColl);
 
             var closedEnumeratorSourceType = typeof(IEnumerator<>).MakeGenericType(sourceType);
