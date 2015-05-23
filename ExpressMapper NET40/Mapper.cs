@@ -12,6 +12,9 @@ namespace ExpressMapper
         private readonly static Dictionary<int, Func<ICustomTypeMapper>> CustomMappers = new Dictionary<int, Func<ICustomTypeMapper>>();
         private readonly static Dictionary<int, MulticastDelegate> CustomSimpleMappers = new Dictionary<int, MulticastDelegate>();
 
+        private readonly static Dictionary<int, Func<object, object>> CustomTypeMapperCache = new Dictionary<int, Func<object, object>>();
+
+
         public static IMemberConfiguration<T,TN> Register<T, TN>()
         {
             var classMapper = new TypeMapper<T, TN>();
@@ -61,7 +64,6 @@ namespace ExpressMapper
 
         public static TN Map<T, TN>(T src)
         {
-
             var cacheKey = CalculateCacheKey(typeof(T), typeof(TN));
 
             if (CustomMappers.ContainsKey(cacheKey))
@@ -143,10 +145,129 @@ namespace ExpressMapper
             throw new MapNotImplemented(typeof(T), typeof(TN), string.Format("There is no mapping has bee found. Source Type: {0}, Destination Type: {1}", typeof(T).FullName, typeof(TN).FullName));
         }
 
+        public static object Map(object src, Type srcType, Type dstType)
+        {
+            var cacheKey = CalculateCacheKey(srcType, dstType);
+
+            if (CustomMappers.ContainsKey(cacheKey))
+            {
+                var customTypeMapper = CustomMappers[cacheKey];
+
+                var typeMapper = customTypeMapper();
+
+                if (!CustomTypeMapperCache.ContainsKey(cacheKey))
+                {
+                    CompileNonGenericCustomTypeMapper(srcType, dstType, typeMapper, cacheKey);
+                }
+                return CustomTypeMapperCache[cacheKey](src);
+            }
+
+            if (CustomSimpleMappers.ContainsKey(cacheKey))
+            {
+                var funcMap = CustomSimpleMappers[cacheKey];
+                var result = funcMap.DynamicInvoke(src);
+                return result;
+            }
+
+            if (TypeMappers.ContainsKey(cacheKey))
+            {
+                if (src == null)
+                {
+                    return null;
+                }
+
+                var mapper = TypeMappers[cacheKey];
+                var nonGenericMapFunc = mapper.GetNonGenericMapFunc();
+
+                return nonGenericMapFunc(src);
+            }
+
+            var colType = CollectionTypes.None;
+            Type tnCol;
+
+            var tCol =
+                srcType.GetInterfaces()
+                    .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>)) ??
+                (srcType.IsGenericType
+                    && srcType.GetInterfaces().Any(t => t == typeof(IEnumerable)) ? srcType
+                    : null);
+
+            tnCol = dstType.GetInterfaces()
+                .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IQueryable<>)) ??
+                        (dstType.IsGenericType && dstType.GetInterfaces().Any(t => t == typeof(IQueryable)) ? dstType
+                            : null);
+            if (tnCol != null)
+            {
+                colType = CollectionTypes.Queryable;
+            }
+
+            if (colType == CollectionTypes.None)
+            {
+                tnCol = dstType.GetInterfaces()
+                .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>)) ??
+                        (dstType.IsGenericType && dstType.GetInterfaces().Any(t => t == typeof(IEnumerable)) ? dstType
+                            : null);
+                colType = dstType.IsArray ? CollectionTypes.Array : colType;
+            }
+
+            if (tCol != null && tnCol != null)
+            {
+                if (src == null)
+                {
+                    return null;
+                }
+                var sourceType = tCol.GetGenericArguments()[0];
+                var destType = tnCol.GetGenericArguments()[0];
+                var calculateCacheKey = CalculateCacheKey(sourceType, destType);
+                if (TypeMappers.ContainsKey(calculateCacheKey))
+                {
+                    var typeMapper = TypeMappers[calculateCacheKey];
+                    switch (colType)
+                    {
+                        case CollectionTypes.Queryable:
+                            return typeMapper.ProcessQueryable(src as IQueryable);
+
+                        case CollectionTypes.Array:
+                            return typeMapper.ProcessArray(src as IEnumerable);
+
+                        default:
+                            return typeMapper.ProcessCollection(src as IEnumerable);
+                    }
+                }
+            }
+            throw new MapNotImplemented(srcType, dstType, string.Format("There is no mapping has bee found. Source Type: {0}, Destination Type: {1}", srcType.FullName, dstType.FullName));
+        }
+
+        #region Helper methods
+
+        private static void CompileNonGenericCustomTypeMapper(Type srcType, Type dstType, ICustomTypeMapper typeMapper,
+            int cacheKey)
+        {
+            var parameterExpression = Expression.Parameter(typeof (object), "src");
+            var srcConverted = Expression.Convert(parameterExpression, srcType);
+            var srcTypedExp = Expression.Variable(srcType, "srcTyped");
+            var srcAssigned = Expression.Assign(srcConverted, srcTypedExp);
+
+            var customGenericType = typeof (ICustomTypeMapper<,>).MakeGenericType(srcType, dstType);
+            var castToCustomGeneric = Expression.Convert(Expression.Constant(typeMapper, typeof (ICustomTypeMapper)),
+                customGenericType);
+            var genVariable = Expression.Variable(customGenericType);
+            var assignExp = Expression.Assign(genVariable, castToCustomGeneric);
+            var methodInfo = customGenericType.GetMethod("Map");
+
+            var mapCall = Expression.Call(genVariable, methodInfo, srcTypedExp);
+            var lambda = Expression.Lambda<Func<object, object>>(mapCall, parameterExpression, srcTypedExp,
+                genVariable);
+            CustomTypeMapperCache.Add(cacheKey, lambda.Compile());
+        }
+
         private static int CalculateCacheKey(Type source, Type dest)
         {
             var srcHash = source.GetHashCode();
-            return srcHash + dest.GetHashCode() / srcHash;
+            return srcHash + dest.GetHashCode()/srcHash;
         }
+
+        #endregion
+
     }
 }

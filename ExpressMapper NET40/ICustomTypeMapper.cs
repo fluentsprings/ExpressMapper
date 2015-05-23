@@ -5,7 +5,7 @@
     }
 
     /// <summary>
-    /// Interface to implement custom mapper
+    /// Interface to implement custom mapperd
     /// </summary>
     public interface ICustomTypeMapper<in T, out TN> : ICustomTypeMapper
     {

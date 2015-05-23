@@ -26,6 +26,17 @@ namespace ExpressMapper
         private Func<T, TN> _constructorFunc;
         private BlockExpression _finalExpression;
 
+        private Func<object, object> _nonGenericMapFunc; 
+
+        #endregion
+
+        #region Constructors
+
+        public TypeMapper()
+        {
+            CompileNonGenericMapFunc();
+        }
+
         #endregion
 
         #region Compilation phase
@@ -99,8 +110,12 @@ namespace ExpressMapper
 
         #endregion
 
-
         #region ITypeMapper<T, TN>, ITypeMapper implementation
+
+        public Func<object, object> GetNonGenericMapFunc()
+        {
+            return _nonGenericMapFunc;
+        }
 
         public List<Expression> GetMapExpressions()
         {
@@ -247,6 +262,24 @@ namespace ExpressMapper
         #endregion
 
         #region Helpers
+
+        private void CompileNonGenericMapFunc()
+        {
+            var parameterExpression = Expression.Parameter(typeof(object), "src");
+            var srcConverted = Expression.Convert(parameterExpression, typeof(T));
+            var srcTypedExp = Expression.Variable(typeof(T), "srcTyped");
+            var srcAssigned = Expression.Assign(srcConverted, srcTypedExp);
+
+            var customGenericType = typeof(ITypeMapper<,>).MakeGenericType(typeof(T), typeof(TN));
+            var castToCustomGeneric = Expression.Convert(Expression.Constant((ITypeMapper)this), customGenericType);
+            var genVariable = Expression.Variable(customGenericType);
+            var assignExp = Expression.Assign(genVariable, castToCustomGeneric);
+            var methodInfo = customGenericType.GetMethod("MapTo");
+
+            var mapCall = Expression.Call(genVariable, methodInfo, srcTypedExp);
+            var lambda = Expression.Lambda<Func<object, object>>(mapCall, parameterExpression, srcTypedExp, genVariable);
+            _nonGenericMapFunc = lambda.Compile();
+        }
 
         private void ProcessAutoProperties()
         {

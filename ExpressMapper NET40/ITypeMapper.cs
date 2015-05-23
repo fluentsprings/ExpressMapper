@@ -9,6 +9,7 @@ namespace ExpressMapper
 {
     public interface ITypeMapper
     {
+        Func<object, object> GetNonGenericMapFunc();
         List<Expression> GetMapExpressions();
         IList ProcessCollection(IEnumerable src);
         IEnumerable ProcessArray(IEnumerable src);
