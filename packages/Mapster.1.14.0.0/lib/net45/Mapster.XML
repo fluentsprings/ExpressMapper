@@ -1,0 +1,182 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Mapster</name>
+    </assembly>
+    <members>
+        <member name="P:Mapster.TypeAdapterConfigSettings.NewInstanceForSameType">
+            <summary>
+            This property only use TypeAdapter.Adapt() method. Project().To() not use this property. Default: true
+            </summary>
+        </member>
+        <member name="F:Mapster.TypeAdapterConfigSettingsBase.NewInstanceForSameType">
+            <summary>
+            This property only use TypeAdapter.Adapt() method. Project().To() not use this property. Default: true
+            </summary>
+        </member>
+        <member name="F:Mapster.TypeAdapterConfigSettingsBase.IgnoreNullValues">
+            <summary>
+            This property only use TypeAdapter.Adapt() method. Project().To() not use this property. Default: false
+            </summary>
+        </member>
+        <member name="F:Mapster.TypeAdapterConfigSettingsBase.InheritedSourceType">
+            <summary>
+            Source type of the inherited config
+            </summary>
+        </member>
+        <member name="F:Mapster.TypeAdapterConfigSettingsBase.InheritedDestinationType">
+            <summary>
+            Destination type of the inherited config
+            </summary>
+        </member>
+        <member name="T:Mapster.Models.FieldModel">
+            <summary>
+            Getter : FieldInfo.GetValue
+            Setter : FieldInfo.SetValue
+            </summary>
+        </member>
+        <member name="T:Mapster.Utils.FastEnum`1">
+            <summary>
+            perf about 5 times faster than enums toString. 
+            Inspired by this example, but made generic and used reverse lookup to cover unordered enums.
+            http://craddock.it/c-enum-performance-trick/
+            </summary>
+            <typeparam name="TEnum"></typeparam>
+        </member>
+        <member name="M:Mapster.Utils.FastEnum`1.#ctor(System.String)">
+            <summary>
+            Creates instance from string value and matches to enum with case insensitive comparison.
+            </summary>
+            <param name="val">value to match</param>
+        </member>
+        <member name="M:Mapster.Utils.FastEnum`1.#ctor(`0)">
+            <summary>
+            Creates instance from enum value
+            </summary>
+            <param name="val">enum value</param>
+        </member>
+        <member name="M:Mapster.Utils.FastEnum`1.ToString(`0)">
+            <summary>
+            Converts enum to string using dictionary to avoid reflection perf hit.
+            </summary>
+            <param name="val">Enum to evaluate</param>
+            <returns></returns>
+        </member>
+        <member name="M:Mapster.Utils.FastEnum`1.ToEnum(System.String)">
+            <summary>
+            Converts string to Enum using case insensitive comparison
+            </summary>
+            <param name="val">String to evaluate</param>
+            <returns></returns>
+        </member>
+        <member name="M:Mapster.ProjectionConfig`2.MaxDepth(System.Int32)">
+            <summary>
+            Set MaxDepth Value. Default 3
+            </summary>
+            <param name="maxDepth">int maxDepth</param>
+            <returns>return instance</returns>
+        </member>
+        <member name="M:Mapster.Utils.FastObjectFactory.CreateObjectFactory``1(System.Func{``0})">
+            <summary>
+            Create a new instance of the specified type
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Mapster.Adapters.ClassAdapter`2">
+            <summary>
+            Maps one class to another.
+            </summary>
+            <remarks>The operations in this class must be extremely fast.  Make sure to benchmark before making **any** changes in here.  
+            The core Adapt method is critically important to performance.
+            </remarks>
+            <typeparam name="TSource">The source type.</typeparam>
+            <typeparam name="TDestination">The destination type</typeparam>
+        </member>
+        <member name="M:Mapster.Adapters.ClassAdapter`2.Adapt(`0)">
+            <summary>
+            Creates a destination object and maps the source to that object.
+            </summary>
+            <param name="source">The Source object to map.</param>
+            <returns>The resulting Destination object.</returns>
+        </member>
+        <member name="M:Mapster.Adapters.ClassAdapter`2.Adapt(`0,`1)">
+            <summary>
+            Maps the source to an existing destination object.
+            </summary>
+            <param name="source">The Source object to map.</param>
+            <param name="destination">The Destination to map to.</param>
+            <returns>The resulting Destination object.</returns>
+        </member>
+        <member name="M:Mapster.Adapters.ClassAdapter`2.Adapt(`0,System.Boolean,System.Collections.Generic.Dictionary{System.Int64,System.Int32})">
+            <summary>
+            Maps the source to the destination based on parameter indexes - For internal use
+            </summary>
+            <param name="source">The Source object to map.</param>
+            <param name="evaluateMaxDepth">Indicates whether or not max depth should be evaluated.</param>
+            <param name="parameterIndexes">The parameter indexes.</param>
+            <returns>The destination object.</returns>
+        </member>
+        <member name="M:Mapster.Utils.PropertyCaller.CreateSetMethod(System.Reflection.PropertyInfo)">
+            
+             Creates a dynamic setter for the property
+            
+        </member>
+        <member name="M:Mapster.Utils.PropertyCaller.CreateGetMethod(System.Reflection.PropertyInfo)">
+            
+             Creates a dynamic getter for the property
+            
+        </member>
+        <member name="M:Mapster.TypeAdapter.Adapt``1(System.Object)">
+            <summary>
+            Adapte the source object to the destination type.
+            </summary>
+            <typeparam name="TDestination">Destination type.</typeparam>
+            <param name="source">Source object to adapt.</param>
+            <returns>Adapted destination type.</returns>
+        </member>
+        <member name="M:Mapster.TypeAdapter.Adapt``2(``0)">
+            <summary>
+            Adapte the source object to the destination type.
+            </summary>
+            <typeparam name="TSource">Source type.</typeparam>
+            <typeparam name="TDestination">Destination type.</typeparam>
+            <param name="source">Source object to adapt.</param>
+            <returns>Adapted destination type.</returns>
+        </member>
+        <member name="M:Mapster.TypeAdapter.Adapt``2(``0,``1)">
+            <summary>
+            Adapte the source object to the existing destination object.
+            </summary>
+            <typeparam name="TSource">Source type.</typeparam>
+            <typeparam name="TDestination">Destination type.</typeparam>
+            <param name="source">Source object to adapt.</param>
+            <param name="destination">The destination object to populate.</param>
+            <returns>Adapted destination type.</returns>
+        </member>
+        <member name="M:Mapster.TypeAdapter.Adapt(System.Object,System.Type,System.Type)">
+            <summary>
+            Adapte the source object to the destination type.
+            </summary>
+            <param name="source">Source object to adapt.</param>
+            <param name="sourceType">The type of the source object.</param>
+            <param name="destinationType">The type of the destination object.</param>
+            <returns>Adapted destination type.</returns>
+        </member>
+        <member name="M:Mapster.TypeAdapter.Adapt(System.Object,System.Object,System.Type,System.Type)">
+            <summary>
+            Adapte the source object to an existing destination object.
+            </summary>
+            <param name="source">Source object to adapt.</param>
+            <param name="destination">Destination object to populate.</param>
+            <param name="sourceType">The type of the source object.</param>
+            <param name="destinationType">The type of the destination object.</param>
+            <returns>Adapted destination type.</returns>
+        </member>
+        <member name="M:Mapster.TypeAdapter.GetInstance">
+            <summary>
+            Returns an instance representation of the adapter, mainly for DI/IOC situations.
+            </summary>
+            <returns>Instance of the adapter.</returns>
+        </member>
+    </members>
+</doc>
