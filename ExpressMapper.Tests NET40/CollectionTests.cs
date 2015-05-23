@@ -86,5 +86,25 @@ namespace ExpressMapper.Tests
                 Assert.AreEqual(result[i], testData.Value[i]);
             }
         }
+
+        [Test]
+        public void NonGenericCollectionMap()
+        {
+            Mapper.Register<TestModel, TestViewModel>();
+            Mapper.Register<Size, SizeViewModel>();
+            Mapper.Register<Country, CountryViewModel>();
+            Mapper.Compile();
+
+            var testData = Functional.CollectionAutoMemberMap();
+
+            var result = Mapper.Map(testData.Key, typeof(List<TestModel>), typeof(List<TestViewModel>)) as List<TestViewModel>;
+
+            Assert.AreEqual(result.Count, testData.Value.Count);
+
+            for (var i = 0; i < result.Count; i++)
+            {
+                Assert.AreEqual(result[i], testData.Value[i]);
+            }
+        }
     }
 }

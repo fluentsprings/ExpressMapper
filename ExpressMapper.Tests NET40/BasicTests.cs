@@ -290,7 +290,7 @@ namespace ExpressMapper.Tests
         }
 
         [Test]
-        public void QueriableToArray()
+        public void QueryableToArray()
         {
             Mapper.Register<TestCollection, TestCollectionViewModel>();
             Mapper.Register<TestItem, TestItemViewModel>()
@@ -305,6 +305,32 @@ namespace ExpressMapper.Tests
             var typeCollTest = Functional.CollectionTypeMap();
             var result = typeCollTest.Key.MapTo<TestItem, TestItemViewModel>();
             Assert.AreEqual(result.Array.Count(), typeCollTest.Key.Queryable.Count());
+        }
+
+        [Test]
+        public void NonGenericSimpleMap()
+        {
+            Mapper.Register<TestModel, TestViewModel>();
+            Mapper.Register<Size, SizeViewModel>();
+            Mapper.Register<Country, CountryViewModel>();
+            Mapper.Compile();
+
+            var test = Functional.AutoMemberMap();
+
+            var testViewModel = Mapper.Map(test.Key, typeof(TestModel), typeof(TestViewModel)) as TestViewModel;
+
+            Assert.AreEqual(testViewModel, test.Value);
+        }
+
+        [Test]
+        public void CustomMapNonGeneric()
+        {
+            Mapper.Register<Size, SizeViewModel>()
+                .Custom(new SizeMapper());
+            Mapper.Compile();
+            var sizeResult = Functional.CustomMap();
+            var result = Mapper.Map(sizeResult.Key, typeof(Size), typeof(SizeViewModel));
+            Assert.AreEqual(result, sizeResult.Value);
         }
     }
 }

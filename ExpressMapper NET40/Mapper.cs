@@ -246,7 +246,7 @@ namespace ExpressMapper
             var parameterExpression = Expression.Parameter(typeof (object), "src");
             var srcConverted = Expression.Convert(parameterExpression, srcType);
             var srcTypedExp = Expression.Variable(srcType, "srcTyped");
-            var srcAssigned = Expression.Assign(srcConverted, srcTypedExp);
+            var srcAssigned = Expression.Assign(srcTypedExp, srcConverted);
 
             var customGenericType = typeof (ICustomTypeMapper<,>).MakeGenericType(srcType, dstType);
             var castToCustomGeneric = Expression.Convert(Expression.Constant(typeMapper, typeof (ICustomTypeMapper)),
@@ -256,8 +256,13 @@ namespace ExpressMapper
             var methodInfo = customGenericType.GetMethod("Map");
 
             var mapCall = Expression.Call(genVariable, methodInfo, srcTypedExp);
-            var lambda = Expression.Lambda<Func<object, object>>(mapCall, parameterExpression, srcTypedExp,
-                genVariable);
+            var resultVarExp = Expression.Variable(typeof(object), "result");
+            var resultAssignExp = Expression.Assign(resultVarExp, Expression.Convert(mapCall, typeof(object)));
+
+            var blockExpression = Expression.Block(new[] {srcTypedExp, genVariable, resultVarExp},
+                new Expression[] {srcAssigned, assignExp, resultAssignExp, resultVarExp});
+
+            var lambda = Expression.Lambda<Func<object, object>>(blockExpression, parameterExpression);
             CustomTypeMapperCache.Add(cacheKey, lambda.Compile());
         }
 
