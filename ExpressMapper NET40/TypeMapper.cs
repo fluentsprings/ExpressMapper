@@ -334,7 +334,7 @@ namespace ExpressMapper
 
             var blockExpression = (tCol != null && tnCol != null)
                 ? MapCollection(sourceType, destType, tCol, tnCol, callGetPropMethod, callSetPropMethod)
-                : MapProperty(sourceType, destType, callGetPropMethod, callSetPropMethod);
+                : MapProperty2(sourceType, destType, callGetPropMethod, callSetPropMethod);
 
 
             var refSrcType = sourceType.IsClass;
@@ -445,6 +445,49 @@ namespace ExpressMapper
             var blockForSubstiyution = Expression.Block(mapExprForType);
             var substBlock =
                 new SubstituteParameterVisitor(sourceVariable, destVariable).Visit(blockForSubstiyution) as
+                    BlockExpression;
+            var resultMapExprForType = substBlock.Expressions;
+
+            var assignExp = Expression.Assign(callSetPropMethod, destVariable);
+
+            var expressions = new List<Expression>();
+            expressions.Add(assignSourceFromProp);
+            expressions.AddRange(resultMapExprForType);
+            expressions.Add(assignExp);
+
+            var parameterExpressions = new List<ParameterExpression> { sourceVariable, destVariable };
+            var blockExpression = Expression.Block(parameterExpressions, expressions);
+
+            return blockExpression;
+        }
+
+        private static BlockExpression MapProperty2(Type sourceType, Type destType, Expression callGetPropMethod, MemberExpression callSetPropMethod)
+        {
+            var sourceVariable = Expression.Variable(sourceType,
+                string.Format("{0}_{1}Src", typeof(T).Name, Guid.NewGuid().ToString().Replace("-", "_")));
+
+
+            var assignSourceFromProp = Expression.Assign(sourceVariable, callGetPropMethod);
+            var mapExprForType = Mapper.GetMapExpressions(sourceType, destType);
+            var destVariable = Expression.Variable(destType,
+                string.Format("{0}_{1}_{2}Dest", typeof(TN).Name, callSetPropMethod.Member.Name,
+                    Guid.NewGuid().ToString().Replace("-", "_")));
+
+            var ifDestNull = Expression.Equal(callSetPropMethod, Expression.Constant(null));
+
+            var newDestInstanceExp = mapExprForType[0] as BinaryExpression;
+            mapExprForType.RemoveAt(0);
+
+            var destVar = newDestInstanceExp.Left as ParameterExpression;
+
+            var assignExistingDestExp = Expression.Assign(destVar, callSetPropMethod);
+
+            var destCondition = Expression.IfThenElse(ifDestNull, newDestInstanceExp, assignExistingDestExp);
+            mapExprForType.Insert(0, destCondition);
+
+            var blockForSubstitution = Expression.Block(mapExprForType);
+            var substBlock =
+                new SubstituteParameterVisitor(sourceVariable, destVariable).Visit(blockForSubstitution) as
                     BlockExpression;
             var resultMapExprForType = substBlock.Expressions;
 
