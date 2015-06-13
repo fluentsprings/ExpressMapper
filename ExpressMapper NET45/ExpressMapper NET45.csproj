@@ -40,11 +40,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\ExpressMapper NET40\CollectionExtentions.cs">
+      <Link>CollectionExtentions.cs</Link>
+    </Compile>
     <Compile Include="..\ExpressMapper NET40\CollectionTypes.cs">
       <Link>CollectionTypes.cs</Link>
     </Compile>
+    <Compile Include="..\ExpressMapper NET40\DefaultMappingContext.cs">
+      <Link>DefaultMappingContext.cs</Link>
+    </Compile>
     <Compile Include="..\ExpressMapper NET40\ICustomTypeMapper.cs">
       <Link>ICustomTypeMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\ExpressMapper NET40\IMappingContext.cs">
+      <Link>IMappingContext.cs</Link>
     </Compile>
     <Compile Include="..\ExpressMapper NET40\IMemberConfiguration.cs">
       <Link>IMemberConfiguration.cs</Link>
@@ -64,6 +73,9 @@
     <Compile Include="..\ExpressMapper NET40\MemberConfiguration.cs">
       <Link>MemberConfiguration.cs</Link>
     </Compile>
+    <Compile Include="..\ExpressMapper NET40\NullCheckNestedMemberVisitor.cs">
+      <Link>NullCheckNestedMemberVisitor.cs</Link>
+    </Compile>
     <Compile Include="..\ExpressMapper NET40\SubstituteParameterVisitor.cs">
       <Link>SubstituteParameterVisitor.cs</Link>
     </Compile>
@@ -71,6 +83,12 @@
       <Link>TypeMapper.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ExpressMapper NET40\ExpressMapper NET40.csproj">
+      <Project>{E701191E-BF2E-41B8-A4F0-3D8954E3DD58}</Project>
+      <Name>ExpressMapper NET40</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

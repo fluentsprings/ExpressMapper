@@ -16,6 +16,5 @@ namespace ExpressMapper
         IMemberConfiguration<T, TN> Member<TMember, TNMember>(Expression<Func<TN, TNMember>> dest, Expression<Func<T, TMember>> src);
         IMemberConfiguration<T, TN> Function<TMember, TNMember>(Expression<Func<TN, TNMember>> dest, Func<T, TMember> src);
         IMemberConfiguration<T, TN> Ignore<TMember>(Expression<Func<TN, TMember>> dest);
-        void Custom(ICustomTypeMapper<T, TN> customTypeMapper);
     }
 }

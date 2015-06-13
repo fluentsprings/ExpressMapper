@@ -78,9 +78,9 @@ namespace ExpressMapper
             return this;
         }
 
-        public void Custom(ICustomTypeMapper<T, TN> customTypeMapper)
-        {
-            _typeMapper.Custom(customTypeMapper);
-        }
+        //public void Custom(ICustomTypeMapper<T, TN> customTypeMapper)
+        //{
+        //    _typeMapper.Custom(customTypeMapper);
+        //}
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace ExpressMapper
+﻿using System;
+
+namespace ExpressMapper
 {
     public interface ICustomTypeMapper
     {
@@ -7,8 +9,8 @@
     /// <summary>
     /// Interface to implement custom mapperd
     /// </summary>
-    public interface ICustomTypeMapper<in T, out TN> : ICustomTypeMapper
+    public interface ICustomTypeMapper<T, TN> : ICustomTypeMapper
     {
-        TN Map(T src);
+        TN Map(IMappingContext<T, TN> context);
     }
 }

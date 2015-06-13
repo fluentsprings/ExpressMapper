@@ -6,10 +6,10 @@ namespace ExpressMapper.Tests
 {
     public class TestMapper : ICustomTypeMapper<List<TestModel>, List<TestViewModel>>
     {
-        public List<TestViewModel> Map(List<TestModel> src)
+        public List<TestViewModel> Map(IMappingContext<List<TestModel>, List<TestViewModel>> context)
         {
-            var testViewModels = new List<TestViewModel>();
-            foreach (var testModel in src)
+            var testViewModels = context.Destination ?? new List<TestViewModel>();
+            foreach (var testModel in context.Source)
             {
                 testViewModels.Add(testModel.MapTo<TestModel, TestViewModel>());
             }

@@ -41,11 +41,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\ExpressMapper NET40\CollectionExtentions.cs">
+      <Link>CollectionExtentions.cs</Link>
+    </Compile>
     <Compile Include="..\ExpressMapper NET40\CollectionTypes.cs">
       <Link>CollectionTypes.cs</Link>
     </Compile>
+    <Compile Include="..\ExpressMapper NET40\DefaultMappingContext.cs">
+      <Link>DefaultMappingContext.cs</Link>
+    </Compile>
     <Compile Include="..\ExpressMapper NET40\ICustomTypeMapper.cs">
       <Link>ICustomTypeMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\ExpressMapper NET40\IMappingContext.cs">
+      <Link>IMappingContext.cs</Link>
     </Compile>
     <Compile Include="..\ExpressMapper NET40\IMemberConfiguration.cs">
       <Link>IMemberConfiguration.cs</Link>
@@ -64,6 +73,9 @@
     </Compile>
     <Compile Include="..\ExpressMapper NET40\MemberConfiguration.cs">
       <Link>MemberConfiguration.cs</Link>
+    </Compile>
+    <Compile Include="..\ExpressMapper NET40\NullCheckNestedMemberVisitor.cs">
+      <Link>NullCheckNestedMemberVisitor.cs</Link>
     </Compile>
     <Compile Include="..\ExpressMapper NET40\SubstituteParameterVisitor.cs">
       <Link>SubstituteParameterVisitor.cs</Link>

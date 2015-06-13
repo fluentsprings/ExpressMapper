@@ -41,8 +41,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CollectionExtentions.cs" />
     <Compile Include="CollectionTypes.cs" />
+    <Compile Include="DefaultMappingContext.cs" />
+    <Compile Include="IMappingContext.cs" />
     <Compile Include="MapNotImplemented.cs" />
+    <Compile Include="NullCheckNestedMemberVisitor.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="SubstituteParameterVisitor.cs" />
     <Compile Include="TypeMapper.cs" />
     <Compile Include="ITypeMapper.cs" />
