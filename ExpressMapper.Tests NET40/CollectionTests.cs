@@ -20,7 +20,7 @@ namespace ExpressMapper.Tests
 
             var testData = Functional.CollectionAutoMemberMap();
 
-            var result = testData.Key.MapTo<List<TestModel>, List<TestViewModel>>();
+            var result = testData.Key.MapTo<List<TestModel>, List<TestViewModel>>(null);
 
             Assert.AreEqual(result.Count, testData.Value.Count);
 
