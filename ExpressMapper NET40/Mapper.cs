@@ -42,7 +42,7 @@ namespace ExpressMapper
 
         public static void RegisterCustom<T, TN>(Func<T, TN> mapFunc)
         {
-            Instance.Compile();
+            Instance.RegisterCustom<T, TN>(mapFunc);
         }
 
         public static void Reset()
