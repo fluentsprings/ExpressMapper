@@ -26,7 +26,14 @@ namespace ExpressMapper
         private Func<T, TN> _constructorFunc;
         private BlockExpression _finalExpression;
 
+        private readonly MappingService _mapper;
+
         #endregion
+
+        public TypeMapper(MappingService mapper)
+        {
+            _mapper = mapper;
+        }
 
         #region Compilation phase
 
@@ -310,7 +317,7 @@ namespace ExpressMapper
             return blockExpression;
         }
 
-        private static BlockExpression MapCollection(Type sourcePropType, Type destpropType, Type tCol, Type tnCol, Expression callGetPropMethod, MemberExpression callSetPropMethod)
+        private BlockExpression MapCollection(Type sourcePropType, Type destpropType, Type tCol, Type tnCol, Expression callGetPropMethod, MemberExpression callSetPropMethod)
         {
             var sourceType = tCol.GetGenericArguments()[0];
             var destType = tnCol.GetGenericArguments()[0];
@@ -343,7 +350,7 @@ namespace ExpressMapper
 
             var destColItmVariable = Expression.Variable(destType,
                 string.Format("{0}_{1}ItmDest", typeof(TN).Name, Guid.NewGuid().ToString().Replace("-", "_")));
-            var mapExprForType = Mapper.GetMapExpressions(sourceType, destType);
+            var mapExprForType = _mapper.GetMapExpressions(sourceType, destType);
             var blockForSubstiyution = Expression.Block(mapExprForType);
             var substBlock =
                 new SubstituteParameterVisitor(sourceColItmVariable, destColItmVariable).Visit(
@@ -394,12 +401,12 @@ namespace ExpressMapper
             return blockExpression;
         }
 
-        private static BlockExpression MapProperty(Type sourceType, Type destType, Expression callGetPropMethod, MemberExpression callSetPropMethod)
+        private BlockExpression MapProperty(Type sourceType, Type destType, Expression callGetPropMethod, MemberExpression callSetPropMethod)
         {
             var sourceVariable = Expression.Variable(sourceType,
                 string.Format("{0}_{1}Src", typeof(T).Name, Guid.NewGuid().ToString().Replace("-", "_")));
             var assignSourceFromProp = Expression.Assign(sourceVariable, callGetPropMethod);
-            var mapExprForType = Mapper.GetMapExpressions(sourceType, destType);
+            var mapExprForType = _mapper.GetMapExpressions(sourceType, destType);
             var destVariable = Expression.Variable(destType,
                 string.Format("{0}_{1}_{2}Dest", typeof(TN).Name, callSetPropMethod.Member.Name,
                     Guid.NewGuid().ToString().Replace("-", "_")));

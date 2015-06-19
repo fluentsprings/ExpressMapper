@@ -42,7 +42,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CollectionTypes.cs" />
+    <Compile Include="IMappingService.cs" />
     <Compile Include="MapNotImplemented.cs" />
+    <Compile Include="MappingService.cs" />
     <Compile Include="SubstituteParameterVisitor.cs" />
     <Compile Include="TypeMapper.cs" />
     <Compile Include="ITypeMapper.cs" />
