@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Collections.ObjectModel;
+using System.Reflection;
 
 namespace ExpressMapper
 {
@@ -24,6 +25,8 @@ namespace ExpressMapper
 
         private readonly static Dictionary<int, BlockExpression> CustomTypeMapperExpCache = new Dictionary<int, BlockExpression>();
         private readonly static Dictionary<int, BlockExpression> CustomTypeMapperWithDestExpCache = new Dictionary<int, BlockExpression>();
+        
+        private readonly static List<int> NonGenericCollectionMappingCache = new List<int>();
 
 
         public static IMemberConfiguration<T, TN> Register<T, TN>()
@@ -237,58 +240,28 @@ namespace ExpressMapper
             }
 
             var colType = CollectionTypes.None;
-            Type tnCol;
 
             var tCol =
                 srcType.GetInterfaces()
                     .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>)) ??
-                (srcType.IsGenericType
-                    && srcType.GetInterfaces().Any(t => t == typeof(IEnumerable)) ? srcType
-                    : null);
+                    (srcType.IsGenericType
+                        && srcType.GetInterfaces().Any(t => t == typeof(IEnumerable)) ? srcType
+                        : null);
 
-            tnCol = dstType.GetInterfaces()
-                .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IQueryable<>)) ??
-                        (dstType.IsGenericType && dstType.GetInterfaces().Any(t => t == typeof(IQueryable)) ? dstType
-                            : null);
-            if (tnCol != null)
-            {
-                colType = CollectionTypes.Queryable;
-            }
-
-            if (colType == CollectionTypes.None)
-            {
-                tnCol = dstType.GetInterfaces()
+            var tnCol = dstType.GetInterfaces()
                 .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>)) ??
-                        (dstType.IsGenericType && dstType.GetInterfaces().Any(t => t == typeof(IEnumerable)) ? dstType
-                            : null);
-                colType = dstType.IsArray ? CollectionTypes.Array : colType;
-            }
+                         (dstType.IsGenericType && dstType.GetInterfaces().Any(t => t == typeof(IEnumerable)) ? dstType
+                             : null);
 
             if (tCol != null && tnCol != null)
             {
-                if (src == null)
+                if (!CollectionMappers.ContainsKey(cacheKey))
                 {
-                    return null;
+                    CompileNonGenericCollectionMapping(srcType, dstType);
                 }
-                var sourceType = tCol.GetGenericArguments()[0];
-                var destType = tnCol.GetGenericArguments()[0];
-                var calculateCacheKey = CalculateCacheKey(sourceType, destType);
-                if (TypeMappers.ContainsKey(calculateCacheKey))
-                {
-                    var typeMapper = TypeMappers[calculateCacheKey];
-                    switch (colType)
-                    {
-                        case CollectionTypes.Queryable:
-                            return typeMapper.ProcessQueryable(src as IQueryable);
-
-                        case CollectionTypes.Array:
-                            return typeMapper.ProcessArray(src as IEnumerable);
-
-                        default:
-                            return typeMapper.ProcessCollection(src as IEnumerable);
-                    }
-                }
+                return CollectionMappers[cacheKey].DynamicInvoke(src);
             }
+            
             throw new MapNotImplemented(srcType, dstType, string.Format("There is no mapping has bee found. Source Type: {0}, Destination Type: {1}", srcType.FullName, dstType.FullName));
         }
 
@@ -330,57 +303,26 @@ namespace ExpressMapper
             }
 
             var colType = CollectionTypes.None;
-            Type tnCol;
 
             var tCol =
                 srcType.GetInterfaces()
                     .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>)) ??
-                (srcType.IsGenericType
-                    && srcType.GetInterfaces().Any(t => t == typeof(IEnumerable)) ? srcType
-                    : null);
+                    (srcType.IsGenericType
+                        && srcType.GetInterfaces().Any(t => t == typeof(IEnumerable)) ? srcType
+                        : null);
 
-            tnCol = dstType.GetInterfaces()
-                .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IQueryable<>)) ??
-                        (dstType.IsGenericType && dstType.GetInterfaces().Any(t => t == typeof(IQueryable)) ? dstType
-                            : null);
-            if (tnCol != null)
-            {
-                colType = CollectionTypes.Queryable;
-            }
-
-            if (colType == CollectionTypes.None)
-            {
-                tnCol = dstType.GetInterfaces()
+            var tnCol = dstType.GetInterfaces()
                 .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>)) ??
-                        (dstType.IsGenericType && dstType.GetInterfaces().Any(t => t == typeof(IEnumerable)) ? dstType
-                            : null);
-                colType = dstType.IsArray ? CollectionTypes.Array : colType;
-            }
+                         (dstType.IsGenericType && dstType.GetInterfaces().Any(t => t == typeof(IEnumerable)) ? dstType
+                             : null);
 
             if (tCol != null && tnCol != null)
             {
-                if (src == null)
+                if (!CollectionMappers.ContainsKey(cacheKey))
                 {
-                    return null;
+                    CompileNonGenericCollectionMapping(srcType, dstType);
                 }
-                var sourceType = tCol.GetGenericArguments()[0];
-                var destType = tnCol.GetGenericArguments()[0];
-                var calculateCacheKey = CalculateCacheKey(sourceType, destType);
-                if (TypeMappers.ContainsKey(calculateCacheKey))
-                {
-                    var typeMapper = TypeMappers[calculateCacheKey];
-                    switch (colType)
-                    {
-                        case CollectionTypes.Queryable:
-                            return typeMapper.ProcessQueryable(src as IQueryable);
-
-                        case CollectionTypes.Array:
-                            return typeMapper.ProcessArray(src as IEnumerable);
-
-                        default:
-                            return typeMapper.ProcessCollection(src as IEnumerable);
-                    }
-                }
+                return CollectionMappersWithDest[cacheKey].DynamicInvoke(src, dest);
             }
             throw new MapNotImplemented(srcType, dstType, string.Format("There is no mapping has bee found. Source Type: {0}, Destination Type: {1}", srcType.FullName, dstType.FullName));
         }
@@ -418,6 +360,19 @@ namespace ExpressMapper
 
             var lambda = Expression.Lambda<Func<object, object>>(blockExpression, parameterExpression);
             CustomTypeMapperCache.Add(cacheKey, lambda.Compile());
+        }
+
+        private static void CompileNonGenericCollectionMapping(Type srcType, Type dstType)
+        {
+            var cacheKey = CalculateCacheKey(srcType, dstType);
+            if (NonGenericCollectionMappingCache.Contains(cacheKey)) return;
+
+            var methodInfo = typeof(Mapper).GetMethod("PreCompileCollection");
+            var makeGenericMethod = methodInfo.MakeGenericMethod(srcType, dstType);
+            var methodCallExpression = Expression.Call(makeGenericMethod);
+            var expression = Expression.Lambda<Action>(methodCallExpression);
+            var action = expression.Compile();
+            action();
         }
 
         private static void CompileNonGenericCustomTypeMapperWithDestination(Type srcType, Type dstType, ICustomTypeMapper typeMapper, int cacheKey)

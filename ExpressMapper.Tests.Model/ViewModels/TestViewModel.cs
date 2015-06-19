@@ -10,6 +10,7 @@ namespace ExpressMapper.Tests.Model.ViewModels
         public string Name { get; set; }
         public int Age { get; set; }
         public decimal? Weight { get; set; }
+        public long Height { get; set; }
         public CountryViewModel Country { get; set; }
         public List<SizeViewModel> Sizes { get; set; }
         public DateTime Created { get; set; }
