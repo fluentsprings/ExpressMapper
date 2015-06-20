@@ -7,6 +7,8 @@ namespace ExpressMapper.Tests.Model.Models
         public Guid Id { get; set; }
         public string Name { get; set; }
         public string Alias { get; set; }
+        public int? NotNullable { get; set; }
+        public int Nullable { get; set; }
         public int SortOrder { get; set; }
     }
 }

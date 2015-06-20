@@ -55,6 +55,9 @@
     <Compile Include="..\ExpressMapper NET40\IMappingContext.cs">
       <Link>IMappingContext.cs</Link>
     </Compile>
+    <Compile Include="..\ExpressMapper NET40\IMappingService.cs">
+      <Link>IMappingService.cs</Link>
+    </Compile>
     <Compile Include="..\ExpressMapper NET40\IMemberConfiguration.cs">
       <Link>IMemberConfiguration.cs</Link>
     </Compile>
@@ -69,6 +72,9 @@
     </Compile>
     <Compile Include="..\ExpressMapper NET40\MapperExtentions.cs">
       <Link>MapperExtentions.cs</Link>
+    </Compile>
+    <Compile Include="..\ExpressMapper NET40\MappingService.cs">
+      <Link>MappingService.cs</Link>
     </Compile>
     <Compile Include="..\ExpressMapper NET40\MemberConfiguration.cs">
       <Link>MemberConfiguration.cs</Link>
