@@ -986,7 +986,9 @@ namespace ExpressMapper
 
         private static int CalculateCacheKey(Type source, Type dest)
         {
-            return ((source.GetHashCode() << 19) | (dest.GetHashCode() << 7));
+            int destHashCode = dest.GetHashCode();
+
+            return source.GetHashCode() ^ ((destHashCode << 16) | (destHashCode >> 16));
         }
 
         #endregion
