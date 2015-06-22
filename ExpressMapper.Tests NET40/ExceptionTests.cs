@@ -12,7 +12,7 @@ namespace ExpressMapper.Tests
         public void NoMapping()
         {
             var exceptionMessage = string.Format("There is no mapping has bee found. Source Type: {0}, Destination Type: {1}", typeof(Size).FullName, typeof(SizeViewModel).FullName);
-            Assert.Throws<MapNotImplemented>(() =>
+            Assert.Throws<MapNotImplementedException>(() =>
             {
                 var testData = Functional.NoMapping();
                 testData.Key.MapTo<Size, SizeViewModel>();
@@ -24,7 +24,7 @@ namespace ExpressMapper.Tests
         public void NoMappingForProperty()
         {
             var exceptionMessage = string.Format("There is no mapping has bee found. Source Type: {0}, Destination Type: {1}", typeof(Country).FullName, typeof(Country).FullName);
-            Assert.Throws<MapNotImplemented>(() =>
+            Assert.Throws<MapNotImplementedException>(() =>
             {
                 Mapper.Register<TestModel, TestViewModel>();
                 Mapper.Register<Size, SizeViewModel>();

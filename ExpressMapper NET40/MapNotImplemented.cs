@@ -1,18 +1,30 @@
 ﻿using System;
+using System.Runtime.Serialization;
 
 namespace ExpressMapper
 {
     /// <summary>
-    /// Not implemented exception
+    /// Mapping not implemented exception
     /// </summary>
-    public class MapNotImplemented : Exception
+    [Serializable]
+    public class MapNotImplementedException : Exception
     {
-        public MapNotImplemented(Type src, Type dest, string message) : base(message)
+        public MapNotImplementedException()
+        {
+        }
+        public MapNotImplementedException(string message)
+            : base(message)
         {
         }
 
-        public Type SourceType { get; set; }
-        public Type DestinationType { get; set; }
+        public MapNotImplementedException(string message, Exception inner)
+            : base(message, inner)
+        {
+        }
 
+        protected MapNotImplementedException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+        }
     }
 }

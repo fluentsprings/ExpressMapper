@@ -48,7 +48,7 @@ namespace ExpressMapper
             {
                 return TypeMappers[cacheKey].GetMapExpressions(withDestinationInstance);
             }
-            throw new MapNotImplemented(src, dest, string.Format("There is no mapping has bee found. Source Type: {0}, Destination Type: {1}", src.FullName, dest.FullName));
+            throw new MapNotImplementedException(string.Format("There is no mapping has bee found. Source Type: {0}, Destination Type: {1}", src.FullName, dest.FullName));
         }
 
         public void Compile()
@@ -111,7 +111,9 @@ namespace ExpressMapper
 
         public TN Map<T, TN>(T src)
         {
-            var cacheKey = CalculateCacheKey(typeof(T), typeof(TN));
+            Type srcType = typeof(T);
+            Type destType = typeof(TN);
+            var cacheKey = CalculateCacheKey(srcType, destType);
 
             if (CustomMappers.ContainsKey(cacheKey))
             {
@@ -162,12 +164,14 @@ namespace ExpressMapper
                 return (TN)CollectionMappers[cacheKey].DynamicInvoke(src);
             }
 
-            throw new MapNotImplemented(typeof(T), typeof(TN), string.Format("There is no mapping has bee found. Source Type: {0}, Destination Type: {1}", typeof(T).FullName, typeof(TN).FullName));
+            throw new MapNotImplementedException(string.Format("There is no mapping has bee found. Source Type: {0}, Destination Type: {1}", srcType.FullName, destType.FullName));
         }
 
         public TN Map<T, TN>(T src, TN dest)
         {
-            var cacheKey = CalculateCacheKey(typeof(T), typeof(TN));
+            Type srcType = typeof(T);
+            Type destType = typeof(TN);
+            var cacheKey = CalculateCacheKey(srcType, destType);
 
             if (CustomMappers.ContainsKey(cacheKey))
             {
@@ -218,7 +222,7 @@ namespace ExpressMapper
                 return (TN)CollectionMappersWithDest[cacheKey].DynamicInvoke(src, dest);
             }
 
-            throw new MapNotImplemented(typeof(T), typeof(TN), string.Format("There is no mapping has bee found. Source Type: {0}, Destination Type: {1}", typeof(T).FullName, typeof(TN).FullName));
+            throw new MapNotImplementedException(string.Format("There is no mapping has bee found. Source Type: {0}, Destination Type: {1}", srcType.FullName, destType.FullName));
         }
 
         public object Map(object src, Type srcType, Type dstType)
@@ -281,7 +285,7 @@ namespace ExpressMapper
                 return CollectionMappers[cacheKey].DynamicInvoke(src);
             }
 
-            throw new MapNotImplemented(srcType, dstType, string.Format("There is no mapping has bee found. Source Type: {0}, Destination Type: {1}", srcType.FullName, dstType.FullName));
+            throw new MapNotImplementedException(string.Format("There is no mapping has bee found. Source Type: {0}, Destination Type: {1}", srcType.FullName, dstType.FullName));
         }
 
         public object Map(object src, object dest, Type srcType, Type dstType)
@@ -343,7 +347,7 @@ namespace ExpressMapper
                 }
                 return CollectionMappersWithDest[cacheKey].DynamicInvoke(src, dest);
             }
-            throw new MapNotImplemented(srcType, dstType, string.Format("There is no mapping has bee found. Source Type: {0}, Destination Type: {1}", srcType.FullName, dstType.FullName));
+            throw new MapNotImplementedException(string.Format("There is no mapping has bee found. Source Type: {0}, Destination Type: {1}", srcType.FullName, dstType.FullName));
         }
 
         #region Helper methods
