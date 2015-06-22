@@ -78,9 +78,9 @@ namespace ExpressMapper
             return this;
         }
 
-        public IMemberConfiguration<T, TN> Value<TMember, TNMember>(Expression<Func<TN, TNMember>> dest, TMember value)
+        public IMemberConfiguration<T, TN> Value<TNMember>(Expression<Func<TN, TNMember>> dest, TNMember value)
         {
-            return Member<TMember, TNMember>(dest, x => value);
+            return Member<TNMember, TNMember>(dest, x => value);
         }
 
         //public void Custom(ICustomTypeMapper<T, TN> customTypeMapper)

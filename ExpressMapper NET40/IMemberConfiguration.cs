@@ -16,6 +16,6 @@ namespace ExpressMapper
         IMemberConfiguration<T, TN> Member<TMember, TNMember>(Expression<Func<TN, TNMember>> dest, Expression<Func<T, TMember>> src);
         IMemberConfiguration<T, TN> Function<TMember, TNMember>(Expression<Func<TN, TNMember>> dest, Func<T, TMember> src);
         IMemberConfiguration<T, TN> Ignore<TMember>(Expression<Func<TN, TMember>> dest);
-        IMemberConfiguration<T, TN> Value<TMember, TNMember>(Expression<Func<TN, TNMember>> dest, TMember value);
+        IMemberConfiguration<T, TN> Value<TNMember>(Expression<Func<TN, TNMember>> dest, TNMember value);
     }
 }
