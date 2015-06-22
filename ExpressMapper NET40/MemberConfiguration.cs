@@ -5,11 +5,11 @@ namespace ExpressMapper
 {
     public class MemberConfiguration<T, TN> : IMemberConfiguration<T, TN>
     {
-        private readonly ITypeMapper<T, TN> _typeMapper; 
+        private readonly ITypeMapper<T, TN> _typeMapper;
         public MemberConfiguration(ITypeMapper<T, TN> typeMapper)
         {
             _typeMapper = typeMapper;
-        } 
+        }
 
         public IMemberConfiguration<T, TN> Instantiate(Func<T, TN> constructor)
         {
@@ -76,6 +76,11 @@ namespace ExpressMapper
             }
             _typeMapper.Ignore(dest);
             return this;
+        }
+
+        public IMemberConfiguration<T, TN> Value<TMember, TNMember>(Expression<Func<TN, TNMember>> dest, TMember value)
+        {
+            return Member<TMember, TNMember>(dest, x => value);
         }
 
         //public void Custom(ICustomTypeMapper<T, TN> customTypeMapper)

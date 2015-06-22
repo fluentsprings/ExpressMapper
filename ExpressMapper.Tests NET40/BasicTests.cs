@@ -63,6 +63,22 @@ namespace ExpressMapper.Tests
         }
 
         [Test]
+        public void ManualConstantMemberMap()
+        {
+            Mapper.Register<Size, SizeViewModel>()
+                .Value(src => src.SortOrder, 123)
+                .Value(src => src.BoolValue, true);
+            Mapper.Compile();
+
+            var sizeResult = Functional.ManualPrimitiveMemberMap();
+
+            var result = sizeResult.Key.MapTo<Size, SizeViewModel>();
+
+            Assert.AreEqual(result.SortOrder, 123);
+            Assert.AreEqual(result.BoolValue, true);
+        }
+
+        [Test]
         public void InstantiateMap()
         {
             Mapper.Register<Size, SizeViewModel>()

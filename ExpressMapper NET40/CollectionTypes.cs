@@ -3,7 +3,7 @@
     /// <summary>
     /// Enumeration for determining collection type
     /// </summary>
-    public enum CollectionTypes
+    internal enum CollectionTypes
     {
         None = 0,
         Enumerable = 1,
