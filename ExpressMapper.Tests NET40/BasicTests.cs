@@ -51,7 +51,8 @@ namespace ExpressMapper.Tests
                 .Member(src => src.Name, dest => string.Format("Full - {0} - Size", dest.Alias))
                 .Member(src => src.SortOrder, dest => dest.Id.GetHashCode())
                 .Member(src => src.Nullable, dest => dest.Nullable)
-                .Member(src => src.NotNullable, dest => dest.NotNullable);
+                .Member(src => src.NotNullable, dest => dest.NotNullable)
+                .Member(src => src.BoolValue, dest => dest.BoolValue);
             Mapper.Compile();
 
             var sizeResult = Functional.ManualPrimitiveMemberMap();

@@ -34,11 +34,6 @@ namespace ExpressMapper
             return Instance.Map<T, TN>(src, dest);
         }
 
-        public static TN Map<TN>(object src)
-        {
-            return Instance.Map<TN>(src);
-        }
-
         public static object Map(object src, Type srcType, Type dstType)
         {
             return Instance.Map(src, srcType, dstType);

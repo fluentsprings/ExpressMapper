@@ -10,5 +10,6 @@ namespace ExpressMapper.Tests.Model.Models
         public int? NotNullable { get; set; }
         public int Nullable { get; set; }
         public int SortOrder { get; set; }
+        public bool BoolValue { get; set; }
     }
 }

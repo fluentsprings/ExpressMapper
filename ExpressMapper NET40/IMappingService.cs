@@ -7,7 +7,6 @@ namespace ExpressMapper
         void Compile();
         TN Map<T, TN>(T src);
         TN Map<T, TN>(T src, TN dest);
-        TN Map<TN>(object src);
         object Map(object src, Type srcType, Type dstType);
         object Map(object src, object dest, Type srcType, Type dstType);
         IMemberConfiguration<T, TN> Register<T, TN>();

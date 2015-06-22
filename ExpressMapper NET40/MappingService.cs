@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Collections.ObjectModel;
-using System.Reflection;
 
 namespace ExpressMapper
 {
@@ -28,8 +27,16 @@ namespace ExpressMapper
 
         public IMemberConfiguration<T, TN> Register<T, TN>()
         {
+            Type src = typeof(T);
+            Type dest = typeof(TN);
+            var cacheKey = CalculateCacheKey(src, dest);
+
+            if (TypeMappers.ContainsKey(cacheKey))
+            {
+                throw new InvalidOperationException(String.Format("Mapping from {0} to {1} is already registered", src.FullName, dest.FullName));
+            }
+
             var classMapper = new TypeMapper<T, TN>(this);
-            var cacheKey = CalculateCacheKey(typeof(T), typeof(TN));
             TypeMappers[cacheKey] = classMapper;
             return new MemberConfiguration<T, TN>(classMapper);
         }
@@ -73,13 +80,29 @@ namespace ExpressMapper
 
         public void RegisterCustom<T, TN>(Func<T, TN> mapFunc)
         {
-            var cacheKey = CalculateCacheKey(typeof(T), typeof(TN));
+            Type src = typeof(T);
+            Type dest = typeof(TN);
+            var cacheKey = CalculateCacheKey(src, dest);
+
+            if (CustomSimpleMappers.ContainsKey(cacheKey))
+            {
+                throw new InvalidOperationException(String.Format("Mapping from {0} to {1} is already registered", src.FullName, dest.FullName));
+            }
+
             CustomSimpleMappers.Add(cacheKey, mapFunc);
         }
 
         public void RegisterCustom<T, TN, TMapper>() where TMapper : ICustomTypeMapper<T, TN>
         {
-            var cacheKey = CalculateCacheKey(typeof(T), typeof(TN));
+            Type src = typeof(T);
+            Type dest = typeof(TN);
+            var cacheKey = CalculateCacheKey(src, dest);
+
+            if (CustomMappers.ContainsKey(cacheKey))
+            {
+                throw new InvalidOperationException(String.Format("Mapping from {0} to {1} is already registered", src.FullName, dest.FullName));
+            }
+
             var newExpression = Expression.New(typeof(TMapper));
             var newLambda = Expression.Lambda<Func<ICustomTypeMapper<T, TN>>>(newExpression);
             var compile = newLambda.Compile();
@@ -88,7 +111,6 @@ namespace ExpressMapper
 
         public TN Map<T, TN>(T src)
         {
-
             var cacheKey = CalculateCacheKey(typeof(T), typeof(TN));
 
             if (CustomMappers.ContainsKey(cacheKey))
@@ -197,16 +219,6 @@ namespace ExpressMapper
             }
 
             throw new MapNotImplemented(typeof(T), typeof(TN), string.Format("There is no mapping has bee found. Source Type: {0}, Destination Type: {1}", typeof(T).FullName, typeof(TN).FullName));
-        }
-
-        public TN Map<TN>(object src)
-        {
-            if (src == null)
-            {
-                return default(TN);
-            }
-
-            return (TN)Map(src, src.GetType(), typeof(TN));
         }
 
         public object Map(object src, Type srcType, Type dstType)

@@ -12,6 +12,7 @@ namespace ExpressMapper.Tests.Model.Models
         public int Nullable { get; set; }
         public decimal? Weight { get; set; }
         public long Height { get; set; }
+        public bool BoolValue { get; set; }
         public Country Country { get; set; }
         public List<Size> Sizes { get; set; }
         public DateTime Created { get; set; }
