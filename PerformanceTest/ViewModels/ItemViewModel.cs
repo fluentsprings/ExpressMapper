@@ -2,7 +2,7 @@
 
 namespace PerformanceTest.ViewModels
 {
-    public struct ItemViewModel
+    public class ItemViewModel
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
