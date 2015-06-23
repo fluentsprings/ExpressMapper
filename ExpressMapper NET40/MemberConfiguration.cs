@@ -80,6 +80,10 @@ namespace ExpressMapper
 
         public IMemberConfiguration<T, TN> Value<TNMember>(Expression<Func<TN, TNMember>> dest, TNMember value)
         {
+            if (!(dest.Body is MemberExpression))
+            {
+                throw new Exception("MemberExpression should return one of the properties of destination class");
+            }
             return Member<TNMember, TNMember>(dest, x => value);
         }
 
