@@ -1,0 +1,8 @@
+language: csharp
+solution: ExpressMapper.sln
+install:
+  - nuget restore ExpressMapper.sln
+  - nuget install NUnit.Runners -Version 2.6.4 -OutputDirectory testrunner
+script:
+  - xbuild /p:Configuration=Release ExpressMapper.sln
+  - mono ./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe ./ExpressMapper.Tests NET45/bin/Release/ExpressMapper.Tests.dll
