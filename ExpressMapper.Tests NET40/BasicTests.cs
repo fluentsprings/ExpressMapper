@@ -79,6 +79,48 @@ namespace ExpressMapper.Tests
         }
 
         [Test]
+        public void ManualNestedNotNullMemberMap()
+        {
+            Mapper.Register<Trip, TripViewModel>()
+                .Member(src => src.Name, dest => dest.Category.Name)
+                .Ignore(x => x.Category);
+            Mapper.Compile();
+
+            var source = new Trip()
+            {
+                Category = new CategoryTrip()
+                {
+                    Name = "TestCat123"
+                },
+                Name = "abc"
+            };
+
+            var result = source.MapTo<Trip, TripViewModel>();
+
+            Assert.IsNull(result.Category);
+            Assert.AreEqual(result.Name, "TestCat123");
+        }
+
+        [Test]
+        public void ManualNestedNullMemberMap()
+        {
+            Mapper.Register<Trip, TripViewModel>()
+                .Member(src => src.Name, dest => dest.Category.Name)
+                .Ignore(x => x.Category);
+            Mapper.Compile();
+
+            var source = new Trip()
+            {
+                Name = "abc"
+            };
+
+            var result = source.MapTo<Trip, TripViewModel>();
+
+            Assert.IsNull(result.Category);
+            Assert.IsNull(result.Name);
+        }
+
+        [Test]
         public void InstantiateMap()
         {
             Mapper.Register<Size, SizeViewModel>()
@@ -193,7 +235,7 @@ namespace ExpressMapper.Tests
             Mapper.Register<TestModel, TestViewModel>();
             Mapper.Register<Country, CountryViewModel>();
             Mapper.Register<Size, SizeViewModel>();
-                
+
             Mapper.Compile();
             var sizeResult = Functional.NullPropertyAndNullCollectionMap();
             var result = sizeResult.Key.MapTo<TestModel, TestViewModel>();
@@ -228,7 +270,7 @@ namespace ExpressMapper.Tests
         {
             Mapper.RegisterCustom<GenderTypes, string>(g => g.ToString());
             Mapper.Compile();
-                
+
             var result = GenderTypes.Men.MapTo<GenderTypes, string>();
             Assert.AreEqual(result, GenderTypes.Men.ToString());
         }
@@ -266,10 +308,10 @@ namespace ExpressMapper.Tests
                     GenderTypes? optionalGender;
                     switch (src.Gender)
                     {
-                            case GenderTypes.Unisex:
+                        case GenderTypes.Unisex:
                             optionalGender = null;
                             break;
-                        default :
+                        default:
                             optionalGender = src.Gender;
                             break;
                     }
@@ -279,10 +321,10 @@ namespace ExpressMapper.Tests
             Mapper.Register<Size, SizeViewModel>();
             Mapper.Register<Feature, FeatureViewModel>();
             Mapper.Register<City, CityViewModel>()
-                .Member(dest=> dest.FeaturesList, src => src.Features);
+                .Member(dest => dest.FeaturesList, src => src.Features);
             Mapper.Register<Supplier, SupplierViewModel>();
             Mapper.Register<Brand, BrandViewModel>();
-            
+
             Mapper.Compile();
             var testData = Functional.ComplexMap();
 
@@ -301,7 +343,7 @@ namespace ExpressMapper.Tests
                 .Ignore(dest => dest.Enumerable)
                 .Ignore(dest => dest.List)
                 .Ignore(dest => dest.Queryable);
-            
+
             Mapper.Compile();
 
             var typeCollTest = Functional.CollectionTypeMap();
@@ -560,7 +602,7 @@ namespace ExpressMapper.Tests
 
             for (var i = 0; i < 6; i++)
             {
-                Assert.AreEqual(result.List.ElementAt(i).GetHashCode(), testList[i+4]);
+                Assert.AreEqual(result.List.ElementAt(i).GetHashCode(), testList[i + 4]);
             }
         }
 
