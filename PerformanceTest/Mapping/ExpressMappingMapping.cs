@@ -10,6 +10,7 @@ namespace PerformanceTest.Mapping
     {
         public static void Init()
         {
+            Mapper.Reset();
             Mapper.Register<ProductVariant, ProductVariantViewModel>();
             Mapper.Register<Product, ProductViewModel>()
                 .Member(dest => dest.DefaultSharedOption, src => src.DefaultOption);
@@ -38,6 +39,7 @@ namespace PerformanceTest.Mapping
 
         public static void InitAdvanced()
         {
+            Mapper.Reset();
             Mapper.Register<ProductVariant, ProductVariantViewModel>();
             Mapper.Register<Product, ProductViewModel>()
                 .Member(dest => dest.DefaultSharedOption, src => src.DefaultOption);

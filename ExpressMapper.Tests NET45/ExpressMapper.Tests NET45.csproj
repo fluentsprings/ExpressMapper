@@ -57,6 +57,9 @@
     <Compile Include="..\ExpressMapper.Tests NET40\ExceptionTests.cs">
       <Link>ExceptionTests.cs</Link>
     </Compile>
+    <Compile Include="..\ExpressMapper.Tests NET40\SizeListMapper.cs">
+      <Link>SizeListMapper.cs</Link>
+    </Compile>
     <Compile Include="..\ExpressMapper.Tests NET40\SizeMapper.cs">
       <Link>SizeMapper.cs</Link>
     </Compile>
@@ -74,6 +77,9 @@
       <Project>{9170a04c-8d4b-47a7-a6e3-7fc0f24244dd}</Project>
       <Name>ExpressMapper.Tests.Model</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

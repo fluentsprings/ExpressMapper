@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using ExpressMapper.Tests.Model.Enums;
 using ExpressMapper.Tests.Model.Models;
@@ -73,6 +74,95 @@ namespace ExpressMapper.Tests.Model.Generator
                 }
             };
             return new KeyValuePair<Item, ItemViewModel>(src, result);
+        }
+
+        public static KeyValuePair<ItemModel, ItemModelViewModel> ExistingDestinationComplex()
+        {
+            var itmId = Guid.NewGuid();
+            var name = "Item model";
+            var itemModel = new ItemModel
+            {
+                Id = itmId,
+                Name = string.Format("{0} - CHANGED!", name),
+                SubItems = new List<SubItem>()
+            };
+            var itemModelVm = new ItemModelViewModel
+            {
+                Id = itmId,
+                Name = name,
+                SubItems = new SubItemViewModel[10]
+            };
+
+            for (var i = 0; i < 10; i++)
+            {
+                var subItemId = Guid.NewGuid();
+                var subItmName = string.Format("Sub item - {0}", i);
+                var subItem = new SubItem
+                {
+                    Id = subItemId,
+                    Name = string.Format("{0} - CHANGED!", subItmName),
+                    Units = new Unit[4]
+                };
+
+                var subItemVm = new SubItemViewModel
+                {
+                    Id = subItemId,
+                    Name = subItmName,
+                    Units = new Collection<UnitViewModel>()
+                };
+
+                itemModel.SubItems.Add(subItem);
+                itemModelVm.SubItems[i] = subItemVm;
+
+                for (var j = 0; j < 5; j++)
+                {
+                    var unitId = Guid.NewGuid();
+                    var unitName = string.Format("Unit - {0}", j);
+
+                    var unit = new Unit
+                    {
+                        Id = unitId,
+                        Name = string.Format("{0}, - CHANGED!", unitName),
+                        SubUnits = new Collection<SubUnit>()
+                    };
+                    if (j < 4)
+                    {
+                        subItem.Units[j] = unit;
+                    }
+
+                    var unitVm = new UnitViewModel();
+                    
+                    unitVm.Id = unitId;
+                    unitVm.Name = unitName;
+                    unitVm.SubUnits = new List<SubUnitViewModel>();
+                    subItemVm.Units.Add(unitVm);
+                    
+
+                    for (var k = 0; k < 6; k++)
+                    {
+                        var subUnitId = Guid.NewGuid();
+                        var subUnitName = string.Format("Sub unit - {0}", subUnitId);
+
+                        var subUnit = new SubUnit
+                        {
+                            Id = subUnitId,
+                            Name = String.Format("{0}, - CHANGED!", subUnitName)
+                        };
+                        unit.SubUnits.Add(subUnit);
+                        if (k < 3)
+                        {
+                            var subUnitVm = new SubUnitViewModel
+                            {
+                                Id = subUnitId,
+                                Name = subUnitName,
+                            };
+                            unitVm.SubUnits.Add(subUnitVm);
+                        }
+                    }
+                }
+            }
+
+            return new KeyValuePair<ItemModel, ItemModelViewModel>(itemModel, itemModelVm);
         } 
 
         public static KeyValuePair<Item, ItemViewModel> AutoMemberStructMap()
@@ -167,6 +257,392 @@ namespace ExpressMapper.Tests.Model.Generator
             };
 
             return new KeyValuePair<TestModel, TestViewModel>(src, result);
+        }
+
+        public static KeyValuePair<TestItem, TestItemViewModel> ExistingDestCollEquals()
+        {
+            var testItem = new TestItem();
+            var testItemVm = new TestItemViewModel();
+
+            var testItems = new List<TestCollection>();
+            var testItemsVm = new List<TestCollectionViewModel>();
+
+            for (var i = 0; i < 5; i++)
+            {
+                var id = Guid.NewGuid();
+                var format = string.Format("Name - {0}", i);
+                var name = string.Format("{0} - CHANGED!", format);
+
+                var testCollection = new TestCollection
+                {
+                    Id = id,
+                    Name = name
+                };
+
+                var testCollectionVm = new TestCollectionViewModel
+                {
+                    Id = id,
+                    Name = format
+                };
+                
+                testItems.Add(testCollection);
+                testItemsVm.Add(testCollectionVm);
+            }
+            testItem.Queryable = testItems.AsQueryable();
+            testItemVm.Array = testItemsVm.ToArray();
+
+            return new KeyValuePair<TestItem, TestItemViewModel>(testItem, testItemVm);
+        }
+
+        public static KeyValuePair<TestItem, TestItemViewModel> ExistingDestCollEqualsWithNullElement()
+        {
+            var testItem = new TestItem();
+            var testItemVm = new TestItemViewModel();
+
+            var testItems = new List<TestCollection>();
+            var testItemsVm = new List<TestCollectionViewModel>();
+
+            for (var i = 0; i < 5; i++)
+            {
+                var id = Guid.NewGuid();
+                var format = string.Format("Name - {0}", i);
+                var name = string.Format("{0} - CHANGED!", format);
+
+                var testCollection = new TestCollection
+                {
+                    Id = id,
+                    Name = name
+                };
+
+                var testCollectionVm = new TestCollectionViewModel
+                {
+                    Id = id,
+                    Name = format
+                };
+
+                testItems.Add(testCollection);
+                testItemsVm.Add(i == 3 ? null : testCollectionVm);
+            }
+            testItem.Queryable = testItems.AsQueryable();
+            testItemVm.Array = testItemsVm.ToArray();
+
+            return new KeyValuePair<TestItem, TestItemViewModel>(testItem, testItemVm);
+        }
+
+        public static KeyValuePair<TestItem, TestItemViewModel> ExistingDestSrcCollGreater()
+        {
+            var testItem = new TestItem();
+            var testItemVm = new TestItemViewModel();
+
+            var testItems = new List<TestCollection>();
+            var testItemsVm = new List<TestCollectionViewModel>();
+
+            for (var i = 0; i < 10; i++)
+            {
+                var id = Guid.NewGuid();
+                var format = string.Format("Name - {0}", i);
+                var name = string.Format("{0} - CHANGED!", format);
+
+                var testCollection = new TestCollection
+                {
+                    Id = id,
+                    Name = name
+                };
+
+                var testCollectionVm = new TestCollectionViewModel
+                {
+                    Id = id,
+                    Name = format
+                };
+
+                testItems.Add(testCollection);
+                if (i < 6)
+                {
+                    testItemsVm.Add(testCollectionVm);
+                }
+            }
+            testItem.Array = testItems.ToArray();
+            testItemVm.Collection = testItemsVm;
+
+            return new KeyValuePair<TestItem, TestItemViewModel>(testItem, testItemVm);
+        }
+
+        public static KeyValuePair<TestItem, TestItemViewModel> ExistingDestCollGreater()
+        {
+            var testItem = new TestItem();
+            var testItemVm = new TestItemViewModel();
+
+            var testItems = new List<TestCollection>();
+            var testItemsVm = new List<TestCollectionViewModel>();
+
+            for (var i = 0; i < 10; i++)
+            {
+                var id = Guid.NewGuid();
+                var format = string.Format("Name - {0}", i);
+                var name = string.Format("{0} - CHANGED!", format);
+
+                var testCollection = new TestCollection
+                {
+                    Id = id,
+                    Name = name
+                };
+
+                var testCollectionVm = new TestCollectionViewModel
+                {
+                    Id = id,
+                    Name = format
+                };
+
+                if (i < 6)
+                {
+                    testItems.Add(testCollection);
+                }
+                testItemsVm.Add(testCollectionVm);
+            }
+            testItem.Collection = testItems.ToArray();
+            testItemVm.List = testItemsVm;
+
+            return new KeyValuePair<TestItem, TestItemViewModel>(testItem, testItemVm);
+        }
+
+        public static KeyValuePair<TestItem, TestItemViewModel> ExistingDestCollNotEqual()
+        {
+            var testItem = new TestItem();
+            var testItemVm = new TestItemViewModel();
+
+            var testItems = new List<TestCollection>();
+            var testItemsVm = new List<TestCollectionViewModel>();
+
+            for (var i = 0; i < 10; i++)
+            {
+                var id = Guid.NewGuid();
+                var format = string.Format("Name - {0}", i);
+                var name = string.Format("{0} - CHANGED!", format);
+
+                var testCollection = new TestCollection
+                {
+                    Id = id,
+                    Name = name
+                };
+
+                var testCollectionVm = new TestCollectionViewModel
+                {
+                    Id = id,
+                    Name = format
+                };
+
+                if (i < 6)
+                {
+                    testItems.Add(testCollection);
+                }
+                testItemsVm.Add(testCollectionVm);
+            }
+            testItem.Collection = testItems;
+            testItemVm.Array = testItemsVm.ToArray();
+
+            return new KeyValuePair<TestItem, TestItemViewModel>(testItem, testItemVm);
+        }
+
+        public static KeyValuePair<TestModel, TestViewModel> AccessSourceNestedProperty()
+        {
+            var testId = Guid.NewGuid();
+
+            var created = DateTime.UtcNow;
+            var src = new TestModel
+            {
+                Id = testId,
+                Age = 18,
+                Created = created,
+                Name = "AutoMemberMap",
+                Weight = 32
+            };
+
+            var result = new TestViewModel
+            {
+                Id = testId,
+                Age = 18,
+                Created = created,
+                Weight = 32
+            };
+
+            return new KeyValuePair<TestModel, TestViewModel>(src, result);
+        }
+
+        public static KeyValuePair<TestModel, TestViewModel> ExistingDestinationSimpleMap()
+        {
+            var testId = Guid.NewGuid();
+            var countryId = Guid.NewGuid();
+
+            var created = DateTime.UtcNow;
+            var xxlId = Guid.NewGuid();
+            var xlId = Guid.NewGuid();
+            var src = new TestModel
+            {
+                Id = testId,
+                Age = 18,
+                Country = new Country
+                {
+                    Id = countryId,
+                    Name = "USA - changed",
+                    Code = "US - changed"
+                },
+                Created = created,
+                Name = "AutoMemberMap - changed",
+                Sizes = new List<Size>
+                {
+                    new Size
+                    {
+                        Id = xxlId,
+                        Name = "XXL size - changed",
+                        Alias = "XXL",
+                        SortOrder = 3
+                    },
+                    new Size
+                    {
+                        Id = xlId,
+                        Name = "XL size - CHANGED",
+                        Alias = "XL",
+                        SortOrder = 2
+                    }
+                },
+                Weight = 32
+            };
+
+            var result = new TestViewModel
+            {
+                Id = testId,
+                Age = 18,
+                Country = new CountryViewModel
+                {
+                    Id = countryId,
+                    Name = "USA",
+                    Code = "US"
+                },
+                Created = created,
+                Name = "AutoMemberMap",
+                Sizes = new List<SizeViewModel>
+                {
+                    new SizeViewModel
+                    {
+                        Id = xxlId,
+                        Name = "XXL size",
+                        Alias = "XXL",
+                        SortOrder = 3
+                    },
+                    new SizeViewModel
+                    {
+                        Id = xlId,
+                        Name = "XL size",
+                        Alias = "XL",
+                        SortOrder = 2
+                    }
+                },
+                Weight = 32
+            };
+
+            return new KeyValuePair<TestModel, TestViewModel>(src, result);
+        }
+
+
+        public static KeyValuePair<Trip, TripViewModel> ExistingDestinationMediumMap()
+        {
+            var tripId = Guid.NewGuid();
+            var categoryId = Guid.NewGuid();
+            var catalogId = Guid.NewGuid();
+            var typeId = Guid.NewGuid();
+
+            var tripType = new TripType
+            {
+                Id = typeId,
+                Name = "Easy - changed",
+            };
+
+            var tripTypeViewModel = new TripTypeViewModel
+            {
+                Id = typeId,
+                Name = "Easy",
+            };
+
+            var tripCatalog = new TripCatalog
+            {
+                Id = catalogId,
+                Name = "Adventure - changed",
+                TripType = tripType
+            };
+
+            var tripCatalogViewModel = new TripCatalogViewModel
+            {
+                Id = catalogId,
+                Name = "Adventure",
+                TripType = tripTypeViewModel
+            };
+
+
+            var categoryTrip = new CategoryTrip
+            {
+                Id = categoryId,
+                Name = "Asia - changed",
+                Catalog = tripCatalog
+            };
+
+            var categoryTripViewModel = new CategoryTripViewModel
+            {
+                Id = categoryId,
+                Name = "Asia",
+                Catalog = tripCatalogViewModel
+            };
+
+            var trip = new Trip
+            {
+                Id = tripId,
+                Name = "Fascinating family - changed",
+                Category = categoryTrip
+            };
+
+            var tripViewModel = new TripViewModel
+            {
+                Id = tripId,
+                Name = "Fascinating family",
+                Category = categoryTripViewModel
+            };
+            
+
+            return new KeyValuePair<Trip, TripViewModel>(trip, tripViewModel);
+        }
+
+        public static KeyValuePair<Trip, TripViewModel> AccessSourceManyNestedProperties()
+        {
+            var tripId = Guid.NewGuid();
+            var categoryId = Guid.NewGuid();
+            var catalogId = Guid.NewGuid();
+
+            var tripCatalog = new TripCatalog
+            {
+                Id = catalogId,
+                Name = "Adventure - changed",
+            };
+
+            var categoryTrip = new CategoryTrip
+            {
+                Id = categoryId,
+                Name = "Asia - changed",
+                Catalog = tripCatalog
+            };
+
+            var trip = new Trip
+            {
+                Id = tripId,
+                Name = "Fascinating family - changed",
+                Category = categoryTrip
+            };
+
+            var tripViewModel = new TripViewModel
+            {
+                Id = tripId
+            };
+
+
+            return new KeyValuePair<Trip, TripViewModel>(trip, tripViewModel);
         }
 
         public static KeyValuePair<Size, SizeViewModel> ManualPrimitiveMemberMap()

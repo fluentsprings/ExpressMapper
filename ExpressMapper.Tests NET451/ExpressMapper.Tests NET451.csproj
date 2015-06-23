@@ -54,6 +54,9 @@
     <Compile Include="..\ExpressMapper.Tests NET40\ExceptionTests.cs">
       <Link>ExceptionTests.cs</Link>
     </Compile>
+    <Compile Include="..\ExpressMapper.Tests NET40\SizeListMapper.cs">
+      <Link>SizeListMapper.cs</Link>
+    </Compile>
     <Compile Include="..\ExpressMapper.Tests NET40\SizeMapper.cs">
       <Link>SizeMapper.cs</Link>
     </Compile>
@@ -63,14 +66,17 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ExpressMapper NET451\ExpressMapper NET451.csproj">
-      <Project>{5e211506-6d4e-4cd8-b454-d02672cf948a}</Project>
-      <Name>ExpressMapper NET451</Name>
+    <ProjectReference Include="..\ExpressMapper NET40\ExpressMapper NET40.csproj">
+      <Project>{E701191E-BF2E-41B8-A4F0-3D8954E3DD58}</Project>
+      <Name>ExpressMapper NET40</Name>
     </ProjectReference>
     <ProjectReference Include="..\ExpressMapper.Tests.Model\ExpressMapper.Tests.Model.csproj">
       <Project>{9170a04c-8d4b-47a7-a6e3-7fc0f24244dd}</Project>
       <Name>ExpressMapper.Tests.Model</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

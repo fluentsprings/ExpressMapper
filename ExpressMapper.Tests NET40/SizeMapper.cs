@@ -5,15 +5,15 @@ namespace ExpressMapper.Tests
 {
     public class SizeMapper : ICustomTypeMapper<Size, SizeViewModel>
     {
-        public SizeViewModel Map(Size src)
+        public SizeViewModel Map(IMappingContext<Size, SizeViewModel> context)
         {
-            return new SizeViewModel
-            {
-                Id = src.Id,
-                Alias = src.Alias,
-                Name = src.Name,
-                SortOrder = src.SortOrder
-            };
+            var sizeViewModel = context.Destination ?? new SizeViewModel();
+
+            sizeViewModel.Id = context.Source.Id;
+            sizeViewModel.Alias = context.Source.Alias;
+            sizeViewModel.Name = context.Source.Name;
+            sizeViewModel.SortOrder = context.Source.SortOrder;
+            return sizeViewModel;
         }
     }
 }

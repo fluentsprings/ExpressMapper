@@ -20,7 +20,7 @@ namespace ExpressMapper.Tests
 
             var testData = Functional.CollectionAutoMemberMap();
 
-            var result = testData.Key.MapTo<List<TestModel>, List<TestViewModel>>();
+            var result = testData.Key.MapTo<List<TestModel>, List<TestViewModel>>(null);
 
             Assert.AreEqual(result.Count, testData.Value.Count);
 
@@ -84,6 +84,51 @@ namespace ExpressMapper.Tests
             for (var i = 0; i < result.Count; i++)
             {
                 Assert.AreEqual(result[i], testData.Value[i]);
+            }
+        }
+
+        [Test]
+        public void NonGenericCollectionMap()
+        {
+            Mapper.Register<TestModel, TestViewModel>();
+            Mapper.Register<Size, SizeViewModel>();
+            Mapper.Register<Country, CountryViewModel>();
+            Mapper.Compile();
+
+            var testData = Functional.CollectionAutoMemberMap();
+
+            var result = Mapper.Map(testData.Key, typeof(List<TestModel>), typeof(List<TestViewModel>)) as List<TestViewModel>;
+
+            Assert.AreEqual(result.Count, testData.Value.Count);
+
+            for (var i = 0; i < result.Count; i++)
+            {
+                Assert.AreEqual(result[i], testData.Value[i]);
+            }
+        }
+
+        [Test]
+        public void NonGenericCollectionWithDestMap()
+        {
+            Mapper.Register<TestModel, TestViewModel>();
+            Mapper.Register<Size, SizeViewModel>();
+            Mapper.Register<Country, CountryViewModel>();
+            Mapper.Compile();
+
+            var testData = Functional.CollectionAutoMemberMap();
+
+            var hashCode = testData.Value.GetHashCode();
+            var itemHashes = testData.Value.Select(i => i.GetHashCode()).ToArray();
+
+            var result = Mapper.Map(testData.Key, testData.Value, typeof(List<TestModel>), typeof(List<TestViewModel>)) as List<TestViewModel>;
+
+            Assert.AreEqual(hashCode, result.GetHashCode());
+            Assert.AreEqual(result.Count, testData.Value.Count);
+
+            for (var i = 0; i < result.Count; i++)
+            {
+                Assert.AreEqual(result[i], testData.Value[i]);
+                Assert.AreEqual(itemHashes[i], result[i].GetHashCode());
             }
         }
     }

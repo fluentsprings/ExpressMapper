@@ -5,9 +5,9 @@ namespace ExpressMapper
 {
     public class SubstituteParameterVisitor : ExpressionVisitor
     {
-        private readonly ParameterExpression[] _parametersToReplace;
+        private readonly Expression[] _parametersToReplace;
 
-        public SubstituteParameterVisitor(params ParameterExpression[] parametersToReplace)
+        public SubstituteParameterVisitor(params Expression[] parametersToReplace)
         {
             _parametersToReplace = parametersToReplace;
         }

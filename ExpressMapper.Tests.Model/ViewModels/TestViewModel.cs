@@ -9,7 +9,11 @@ namespace ExpressMapper.Tests.Model.ViewModels
         public Guid Id { get; set; }
         public string Name { get; set; }
         public int Age { get; set; }
+        public int NotNullable { get; set; }
+        public int? Nullable { get; set; } 
         public decimal? Weight { get; set; }
+        public long Height { get; set; }
+        public bool BoolValue { get; set; }
         public CountryViewModel Country { get; set; }
         public List<SizeViewModel> Sizes { get; set; }
         public DateTime Created { get; set; }
@@ -27,7 +31,7 @@ namespace ExpressMapper.Tests.Model.ViewModels
                 }
             }
 
-            return Id == other.Id && Name == other.Name && Age == other.Age && Weight == other.Weight &&
+            return Id == other.Id && Name == other.Name && Age == other.Age && NotNullable == other.NotNullable && Nullable.GetValueOrDefault() == other.Nullable.GetValueOrDefault() && Weight == other.Weight && BoolValue == other.BoolValue &&
                    Created == other.Created && ((Country == null && other.Country == null) || Country.Equals(other.Country)) && sizes;
         }
     }
