@@ -70,9 +70,6 @@
     <Compile Include="..\ExpressMapper NET40\Mapper.cs">
       <Link>Mapper.cs</Link>
     </Compile>
-    <Compile Include="..\ExpressMapper NET40\MapperExtentions.cs">
-      <Link>MapperExtentions.cs</Link>
-    </Compile>
     <Compile Include="..\ExpressMapper NET40\MappingService.cs">
       <Link>MappingService.cs</Link>
     </Compile>

@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using ExpressMapper.Tests.Model.Enums;
+﻿using ExpressMapper.Tests.Model.Enums;
 using ExpressMapper.Tests.Model.Generator;
 using ExpressMapper.Tests.Model.Models;
 using ExpressMapper.Tests.Model.Models.Structs;
 using ExpressMapper.Tests.Model.ViewModels;
 using ExpressMapper.Tests.Model.ViewModels.Structs;
 using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ExpressMapper.Tests
 {
@@ -24,7 +23,7 @@ namespace ExpressMapper.Tests
 
             var test = Functional.AutoMemberMap();
 
-            var testViewModel = test.Key.MapTo<TestModel, TestViewModel>();
+            var testViewModel = Mapper.Map<TestModel, TestViewModel>(test.Key);
 
             Assert.AreEqual(testViewModel, test.Value);
         }
@@ -39,7 +38,7 @@ namespace ExpressMapper.Tests
 
             var test = Functional.AutoMemberMap();
 
-            var testViewModel = test.Key.MapTo<TestModel, TestViewModel>();
+            var testViewModel = Mapper.Map<TestModel, TestViewModel>(test.Key);
 
             Assert.AreEqual(testViewModel, test.Value);
         }
@@ -57,7 +56,7 @@ namespace ExpressMapper.Tests
 
             var sizeResult = Functional.ManualPrimitiveMemberMap();
 
-            var result = sizeResult.Key.MapTo<Size, SizeViewModel>();
+            var result = Mapper.Map<Size, SizeViewModel>(sizeResult.Key);
 
             Assert.AreEqual(result, sizeResult.Value);
         }
@@ -72,7 +71,7 @@ namespace ExpressMapper.Tests
 
             var sizeResult = Functional.ManualPrimitiveMemberMap();
 
-            var result = sizeResult.Key.MapTo<Size, SizeViewModel>();
+            var result = Mapper.Map<Size, SizeViewModel>(sizeResult.Key);
 
             Assert.AreEqual(result.SortOrder, 123);
             Assert.AreEqual(result.BoolValue, true);
@@ -95,7 +94,7 @@ namespace ExpressMapper.Tests
                 Name = "abc"
             };
 
-            var result = source.MapTo<Trip, TripViewModel>();
+            var result = Mapper.Map<Trip, TripViewModel>(source);
 
             Assert.IsNull(result.Category);
             Assert.AreEqual(result.Name, "TestCat123");
@@ -114,7 +113,7 @@ namespace ExpressMapper.Tests
                 Name = "abc"
             };
 
-            var result = source.MapTo<Trip, TripViewModel>();
+            var result = Mapper.Map<Trip, TripViewModel>(source);
 
             Assert.IsNull(result.Category);
             Assert.IsNull(result.Name);
@@ -129,7 +128,7 @@ namespace ExpressMapper.Tests
 
             var sizeResult = Functional.InstantiateMap();
 
-            var result = sizeResult.Key.MapTo<Size, SizeViewModel>();
+            var result = Mapper.Map<Size, SizeViewModel>(sizeResult.Key);
 
             Assert.AreEqual(result, sizeResult.Value);
         }
@@ -142,7 +141,7 @@ namespace ExpressMapper.Tests
             Mapper.Compile();
 
             var sizeResult = Functional.IgnoreMap();
-            var result = sizeResult.Key.MapTo<Size, SizeViewModel>();
+            var result = Mapper.Map<Size, SizeViewModel>(sizeResult.Key);
             Assert.AreEqual(result, sizeResult.Value);
         }
 
@@ -155,7 +154,7 @@ namespace ExpressMapper.Tests
             Mapper.Compile();
 
             var sizeResult = Functional.BeforeMap();
-            var result = sizeResult.Key.MapTo<Size, SizeViewModel>();
+            var result = Mapper.Map<Size, SizeViewModel>(sizeResult.Key);
             Assert.AreEqual(result, sizeResult.Value);
         }
 
@@ -166,7 +165,7 @@ namespace ExpressMapper.Tests
                 .After((src, dest) => dest.Name = "OVERRIDE BY AFTER MAP");
             Mapper.Compile();
             var sizeResult = Functional.AfterMap();
-            var result = sizeResult.Key.MapTo<Size, SizeViewModel>();
+            var result = Mapper.Map<Size, SizeViewModel>(sizeResult.Key);
             Assert.AreEqual(result, sizeResult.Value);
         }
 
@@ -177,7 +176,7 @@ namespace ExpressMapper.Tests
             Mapper.RegisterCustom<Size, SizeViewModel, SizeMapper>();
             Mapper.Compile();
             var sizeResult = Functional.CustomMap();
-            var result = sizeResult.Key.MapTo<Size, SizeViewModel>();
+            var result = Mapper.Map<Size, SizeViewModel>(sizeResult.Key);
             Assert.AreEqual(result, sizeResult.Value);
         }
 
@@ -189,7 +188,7 @@ namespace ExpressMapper.Tests
             Mapper.RegisterCustom<Size, SizeViewModel, SizeMapper>();
             Mapper.Compile();
             var sizeResult = Functional.CustomNestedCollectionMap();
-            var result = sizeResult.Key.MapTo<TestModel, TestViewModel>();
+            var result = Mapper.Map<TestModel, TestViewModel>(sizeResult.Key);
             Assert.AreEqual(result, sizeResult.Value);
         }
 
@@ -201,7 +200,7 @@ namespace ExpressMapper.Tests
             Mapper.RegisterCustom<List<Size>, List<SizeViewModel>, SizeListMapper>();
             Mapper.Compile();
             var sizeResult = Functional.CustomNestedCollectionMap();
-            var result = sizeResult.Key.MapTo<TestModel, TestViewModel>();
+            var result = Mapper.Map<TestModel, TestViewModel>(sizeResult.Key);
             Assert.AreEqual(result, sizeResult.Value);
         }
 
@@ -213,7 +212,7 @@ namespace ExpressMapper.Tests
             Mapper.RegisterCustom<Size, SizeViewModel, SizeMapper>();
             Mapper.Compile();
             var sizeResult = Functional.CustomNestedCollectionMap();
-            var result = sizeResult.Key.MapTo(sizeResult.Value);
+            var result = Mapper.Map(sizeResult.Key, sizeResult.Value);
             Assert.AreEqual(result, sizeResult.Value);
         }
 
@@ -225,7 +224,7 @@ namespace ExpressMapper.Tests
             Mapper.RegisterCustom<List<Size>, List<SizeViewModel>, SizeListMapper>();
             Mapper.Compile();
             var sizeResult = Functional.CustomNestedCollectionMap();
-            var result = sizeResult.Key.MapTo(sizeResult.Value);
+            var result = Mapper.Map(sizeResult.Key, sizeResult.Value);
             Assert.AreEqual(result, sizeResult.Value);
         }
 
@@ -238,7 +237,7 @@ namespace ExpressMapper.Tests
 
             Mapper.Compile();
             var sizeResult = Functional.NullPropertyAndNullCollectionMap();
-            var result = sizeResult.Key.MapTo<TestModel, TestViewModel>();
+            var result = Mapper.Map<TestModel, TestViewModel>(sizeResult.Key);
             Assert.AreEqual(result, sizeResult.Value);
         }
 
@@ -249,7 +248,7 @@ namespace ExpressMapper.Tests
             Mapper.Register<Size, SizeViewModel>();
             Mapper.Compile();
             var supplierResult = Functional.GetPropertyMaps();
-            var result = supplierResult.Key.MapTo<Supplier, SupplierViewModel>();
+            var result = Mapper.Map<Supplier, SupplierViewModel>(supplierResult.Key);
             Assert.AreEqual(result, supplierResult.Value);
         }
 
@@ -261,7 +260,7 @@ namespace ExpressMapper.Tests
             Mapper.Register<Size, SizeViewModel>();
             Mapper.Compile();
             var supplierResult = Functional.GetPropertyMaps();
-            var result = supplierResult.Key.MapTo<Supplier, SupplierViewModel>();
+            var result = Mapper.Map<Supplier, SupplierViewModel>(supplierResult.Key);
             Assert.AreEqual(result, supplierResult.Value);
         }
 
@@ -271,7 +270,7 @@ namespace ExpressMapper.Tests
             Mapper.RegisterCustom<GenderTypes, string>(g => g.ToString());
             Mapper.Compile();
 
-            var result = GenderTypes.Men.MapTo<GenderTypes, string>();
+            var result = Mapper.Map<GenderTypes, string>(GenderTypes.Men);
             Assert.AreEqual(result, GenderTypes.Men.ToString());
         }
 
@@ -282,7 +281,7 @@ namespace ExpressMapper.Tests
             Mapper.Compile();
             var testData = Functional.AutoMemberStructMap();
 
-            var result = testData.Key.MapTo<Item, ItemViewModel>();
+            var result = Mapper.Map<Item, ItemViewModel>(testData.Key);
             Assert.AreEqual(result, testData.Value);
         }
 
@@ -295,7 +294,7 @@ namespace ExpressMapper.Tests
             Mapper.Compile();
             var testData = Functional.StructWithCollectionMap();
 
-            var result = testData.Key.MapTo<Item, ItemViewModel>();
+            var result = Mapper.Map<Item, ItemViewModel>(testData.Key);
             Assert.AreEqual(result, testData.Value);
         }
 
@@ -328,7 +327,7 @@ namespace ExpressMapper.Tests
             Mapper.Compile();
             var testData = Functional.ComplexMap();
 
-            var result = testData.Key.MapTo<FashionProduct, FashionProductViewModel>();
+            var result = Mapper.Map<FashionProduct, FashionProductViewModel>(testData.Key);
             var valid = result.Equals(testData.Value);
             Assert.IsTrue(valid);
         }
@@ -347,7 +346,7 @@ namespace ExpressMapper.Tests
             Mapper.Compile();
 
             var typeCollTest = Functional.CollectionTypeMap();
-            var result = typeCollTest.Key.MapTo<TestItem, TestItemViewModel>();
+            var result = Mapper.Map<TestItem, TestItemViewModel>(typeCollTest.Key);
             Assert.AreEqual(result.Array.Length, typeCollTest.Key.List.Count);
         }
 
@@ -365,7 +364,7 @@ namespace ExpressMapper.Tests
             Mapper.Compile();
 
             var typeCollTest = Functional.CollectionTypeMap();
-            var result = typeCollTest.Key.MapTo<TestItem, TestItemViewModel>();
+            var result = Mapper.Map<TestItem, TestItemViewModel>(typeCollTest.Key);
             Assert.AreEqual(result.Queryable.Count(), typeCollTest.Key.List.Count());
         }
 
@@ -383,7 +382,7 @@ namespace ExpressMapper.Tests
             Mapper.Compile();
 
             var typeCollTest = Functional.CollectionTypeMap();
-            var result = typeCollTest.Key.MapTo<TestItem, TestItemViewModel>();
+            var result = Mapper.Map<TestItem, TestItemViewModel>(typeCollTest.Key);
             Assert.AreEqual(result.Queryable.Count(), typeCollTest.Key.Enumerable.Count());
         }
 
@@ -401,7 +400,7 @@ namespace ExpressMapper.Tests
             Mapper.Compile();
 
             var typeCollTest = Functional.CollectionTypeMap();
-            var result = typeCollTest.Key.MapTo<TestItem, TestItemViewModel>();
+            var result = Mapper.Map<TestItem, TestItemViewModel>(typeCollTest.Key);
             Assert.AreEqual(result.Array.Count(), typeCollTest.Key.Queryable.Count());
         }
 

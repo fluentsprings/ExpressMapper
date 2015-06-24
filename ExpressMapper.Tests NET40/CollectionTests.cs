@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using ExpressMapper.Tests.Model.Generator;
+﻿using ExpressMapper.Tests.Model.Generator;
 using ExpressMapper.Tests.Model.Models;
 using ExpressMapper.Tests.Model.ViewModels;
 using NUnit.Framework;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ExpressMapper.Tests
 {
@@ -20,7 +20,7 @@ namespace ExpressMapper.Tests
 
             var testData = Functional.CollectionAutoMemberMap();
 
-            var result = testData.Key.MapTo<List<TestModel>, List<TestViewModel>>(null);
+            var result = Mapper.Map<List<TestModel>, List<TestViewModel>>(testData.Key);
 
             Assert.AreEqual(result.Count, testData.Value.Count);
 
@@ -38,7 +38,7 @@ namespace ExpressMapper.Tests
 
             var testData = Functional.EnumerableToListTypeMap();
 
-            var result = testData.Key.MapTo<IEnumerable<TestCollection>, List<TestCollectionViewModel>>();
+            var result = Mapper.Map<IEnumerable<TestCollection>, List<TestCollectionViewModel>>(testData.Key);
 
             Assert.AreEqual(result.Count(), testData.Value.Count);
 
@@ -56,7 +56,7 @@ namespace ExpressMapper.Tests
 
             var testData = Functional.EnumerableToArrayTypeMap();
 
-            var result = testData.Key.MapTo<IEnumerable<TestCollection>, List<TestCollectionViewModel>>();
+            var result = Mapper.Map<IEnumerable<TestCollection>, List<TestCollectionViewModel>>(testData.Key);
 
             Assert.AreEqual(result.Count(), testData.Value.Length);
 
@@ -77,7 +77,7 @@ namespace ExpressMapper.Tests
 
             var testData = Functional.CollectionAutoMemberMap();
 
-            var result = testData.Key.MapTo<List<TestModel>, List<TestViewModel>>();
+            var result = Mapper.Map<List<TestModel>, List<TestViewModel>>(testData.Key);
 
             Assert.AreEqual(result.Count, testData.Value.Count);
 

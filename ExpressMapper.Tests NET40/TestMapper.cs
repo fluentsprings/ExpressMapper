@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using ExpressMapper.Tests.Model.Models;
+﻿using ExpressMapper.Tests.Model.Models;
 using ExpressMapper.Tests.Model.ViewModels;
+using System.Collections.Generic;
 
 namespace ExpressMapper.Tests
 {
@@ -11,7 +11,7 @@ namespace ExpressMapper.Tests
             var testViewModels = context.Destination ?? new List<TestViewModel>();
             foreach (var testModel in context.Source)
             {
-                testViewModels.Add(testModel.MapTo<TestModel, TestViewModel>());
+                testViewModels.Add(Mapper.Map<TestModel, TestViewModel>(testModel));
             }
             return testViewModels;
         }

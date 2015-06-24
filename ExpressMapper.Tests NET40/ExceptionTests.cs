@@ -15,7 +15,7 @@ namespace ExpressMapper.Tests
             Assert.Throws<MapNotImplementedException>(() =>
             {
                 var testData = Functional.NoMapping();
-                testData.Key.MapTo<Size, SizeViewModel>();
+                Mapper.Map<Size, SizeViewModel>(testData.Key);
 
             }, exceptionMessage);
         }
@@ -31,7 +31,7 @@ namespace ExpressMapper.Tests
                 Mapper.Compile();
 
                 var testData = Functional.NoMappingForProperty();
-                testData.Key.MapTo<TestModel, TestViewModel>();
+                Mapper.Map<TestModel, TestViewModel>(testData.Key);
 
             }, exceptionMessage);
         }
