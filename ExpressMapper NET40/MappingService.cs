@@ -584,7 +584,7 @@ namespace ExpressMapper
             }
             else
             {
-                if (typeof(TN).IsGenericType && typeof(TN).GetInterfaces().Any(t => t == typeof(IQueryable)))
+                if (typeof(TN).IsGenericType && typeof(IQueryable).IsAssignableFrom(typeof(TN)))
                 {
                     resultCollection = Expression.Call(typeof(Queryable), "AsQueryable", new[] { destType }, destColl);
                 }
@@ -862,7 +862,7 @@ namespace ExpressMapper
                 }
                 else
                 {
-                    if (destVariable.Type.IsGenericType && destVariable.Type.GetInterfaces().Any(t => t == typeof(IQueryable)))
+                    if (destVariable.Type.IsGenericType && typeof(IQueryable).IsAssignableFrom(destVariable.Type))
                     {
                         resultCollection = Expression.Call(typeof(Queryable), "AsQueryable", new[] { destType }, destVarExp);
                     }

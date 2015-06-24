@@ -3,6 +3,7 @@ using ExpressMapper.Tests.Model.Models;
 using ExpressMapper.Tests.Model.ViewModels;
 using NUnit.Framework;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace ExpressMapper.Tests
@@ -45,6 +46,24 @@ namespace ExpressMapper.Tests
             for (var i = 0; i < result.Count(); i++)
             {
                 Assert.AreEqual(result[i], testData.Value[i]);
+            }
+        }
+
+        [Test]
+        public void EnumerationToQueryableTypeMap()
+        {
+            Mapper.Register<TestCollection, TestCollectionViewModel>();
+            Mapper.Compile();
+
+            var testData = Functional.EnumerableToListTypeMap();
+
+            var result = Mapper.Map<IEnumerable<TestCollection>, IQueryable<TestCollectionViewModel>>(testData.Key);
+
+            Assert.AreEqual(result.Count(), testData.Value.Count);
+
+            for (var i = 0; i < result.Count(); i++)
+            {
+                Assert.AreEqual(result.ElementAt(i), testData.Value[i]);
             }
         }
 
