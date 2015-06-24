@@ -80,6 +80,9 @@
     <Compile Include="..\ExpressMapper NET40\NullCheckNestedMemberVisitor.cs">
       <Link>NullCheckNestedMemberVisitor.cs</Link>
     </Compile>
+    <Compile Include="..\ExpressMapper NET40\StaticExpressions.cs">
+      <Link>StaticExpressions.cs</Link>
+    </Compile>
     <Compile Include="..\ExpressMapper NET40\SubstituteParameterVisitor.cs">
       <Link>SubstituteParameterVisitor.cs</Link>
     </Compile>

@@ -266,11 +266,11 @@ namespace ExpressMapper
                     if (customMapExpression != null && customMapExpressionWithDest != null)
                     {
                         var srcExp = Expression.Variable(getPropertyType,
-                            string.Format("{0}Src", Guid.NewGuid().ToString().Replace("-", string.Empty)));
+                            string.Format("{0}Src", Guid.NewGuid().ToString("N")));
                         var assignSrcExp = Expression.Assign(srcExp, callGetPropMethod);
 
                         var destExp = Expression.Variable(setPropertyType,
-                            string.Format("{0}Dest", Guid.NewGuid().ToString().Replace("-", string.Empty)));
+                            string.Format("{0}Dest", Guid.NewGuid().ToString("N")));
                         var assignDestExp = Expression.Assign(destExp, callSetPropMethod);
 
                         var substituteParameterVisitor = new SubstituteParameterVisitor(srcExp, destExp);
@@ -357,11 +357,11 @@ namespace ExpressMapper
                 if (customMapExpression != null && customMapExpressionWithDest != null)
                 {
                     var srcExp = Expression.Variable(typeof(TSourceMember),
-                        string.Format("{0}Src", Guid.NewGuid().ToString().Replace("-", string.Empty)));
+                        string.Format("{0}Src", Guid.NewGuid().ToString("N")));
                     var assignSrcExp = Expression.Assign(srcExp, right.Body);
 
                     var destExp = Expression.Variable(typeof(TDestMember),
-                        string.Format("{0}Dest", Guid.NewGuid().ToString().Replace("-", string.Empty)));
+                        string.Format("{0}Dest", Guid.NewGuid().ToString("N")));
                     var assignDestExp = Expression.Assign(destExp, left.Body);
 
                     var substituteParameterVisitor = new SubstituteParameterVisitor(srcExp, destExp);
@@ -561,10 +561,10 @@ namespace ExpressMapper
             {
                 var resultExpression =
                     new Tuple<Expression, Expression>(
-                        Expression.IfThenElse(Expression.Equal(callGetPropMethod, Expression.Constant(null)),
+                        Expression.IfThenElse(Expression.Equal(callGetPropMethod, StaticExpressions.NullConstant),
                             Expression.Assign(callSetPropMethod, Expression.Default(destPropType)),
                             blockExpression.Item1),
-                        Expression.IfThenElse(Expression.Equal(callGetPropMethod, Expression.Constant(null)),
+                        Expression.IfThenElse(Expression.Equal(callGetPropMethod, StaticExpressions.NullConstant),
                             Expression.Assign(callSetPropMethod, Expression.Default(destPropType)),
                             blockExpression.Item2));
                 return resultExpression;
@@ -628,7 +628,7 @@ namespace ExpressMapper
             var brk = Expression.Label();
             var loopExpression = Expression.Loop(
                 Expression.IfThenElse(
-                    Expression.NotEqual(doMoveNext, Expression.Constant(false)),
+                    Expression.NotEqual(doMoveNext, StaticExpressions.FalseConstant),
                     ifTrueBlock
                     , Expression.Break(brk))
                 , brk);
@@ -668,7 +668,7 @@ namespace ExpressMapper
             var blockExpression = Expression.Block(parameters, expressions);
 
             var checkSrcForNullExp =
-                Expression.IfThenElse(Expression.Equal(callGetPropMethod, Expression.Constant(null)),
+                Expression.IfThenElse(Expression.Equal(callGetPropMethod, StaticExpressions.NullConstant),
                     Expression.Assign(callSetPropMethod, Expression.Default(callSetPropMethod.Type)), blockExpression);
             var blockResultExp = Expression.Block(new ParameterExpression[] { }, new Expression[] { checkSrcForNullExp });
 
@@ -692,7 +692,7 @@ namespace ExpressMapper
                     callSetPropMethod),
                 MapCollectionCountEquals(sourcePropType, destpropType, tCol, tnCol, callGetPropMethod, callSetPropMethod));
 
-            var result = Expression.IfThenElse(Expression.NotEqual(callSetPropMethod, Expression.Constant(null)), notNullCondition,
+            var result = Expression.IfThenElse(Expression.NotEqual(callSetPropMethod, StaticExpressions.NullConstant), notNullCondition,
                 MapCollection(sourcePropType, destpropType, tCol, tnCol, callGetPropMethod, callSetPropMethod));
 
             var blockExpression = Expression.Block(new ParameterExpression[] { }, new Expression[] { result });
@@ -703,7 +703,7 @@ namespace ExpressMapper
             var resultExpression = Expression.Block(new[] { sourceVariable }, expressions);
 
             var checkSrcForNullExp =
-                Expression.IfThenElse(Expression.Equal(callGetPropMethod, Expression.Constant(null)),
+                Expression.IfThenElse(Expression.Equal(callGetPropMethod, StaticExpressions.NullConstant),
                     Expression.Assign(callSetPropMethod, Expression.Default(callSetPropMethod.Type)), resultExpression);
             var block = Expression.Block(new ParameterExpression[] { }, new Expression[] { checkSrcForNullExp });
 
@@ -753,7 +753,7 @@ namespace ExpressMapper
                 {
                     mapExprForType.RemoveAt(0);
 
-                    var destCondition = Expression.IfThen(Expression.Equal(destItmVarExp, Expression.Constant(null)),
+                    var destCondition = Expression.IfThen(Expression.Equal(destItmVarExp, StaticExpressions.NullConstant),
                         newDestInstanceExp);
                     mapExprForType.Insert(0, destCondition);
                 }
@@ -773,7 +773,7 @@ namespace ExpressMapper
             var brk = Expression.Label();
             var loopExpression = Expression.Loop(
                 Expression.IfThenElse(
-                    Expression.AndAlso(Expression.NotEqual(doMoveNextSrc, Expression.Constant(false)), Expression.NotEqual(doMoveNextDest, Expression.Constant(false))),
+                    Expression.AndAlso(Expression.NotEqual(doMoveNextSrc, StaticExpressions.FalseConstant), Expression.NotEqual(doMoveNextDest, StaticExpressions.FalseConstant)),
                     ifTrueBlock
                     , Expression.Break(brk))
                 , brk);
@@ -882,7 +882,7 @@ namespace ExpressMapper
                     {
                         mapExprForType.RemoveAt(0);
 
-                        var destCondition = Expression.IfThen(Expression.Equal(destItmVarExp, Expression.Constant(null)),
+                        var destCondition = Expression.IfThen(Expression.Equal(destItmVarExp, StaticExpressions.NullConstant),
                             newDestInstanceExp);
                         mapExprForType.Insert(0, destCondition);
                     }
@@ -926,7 +926,7 @@ namespace ExpressMapper
 
                 var brk = Expression.Label();
                 var loopExpression = Expression.Loop(
-                    Expression.IfThenElse(Expression.NotEqual(doMoveNextSrc, Expression.Constant(false)),
+                    Expression.IfThenElse(Expression.NotEqual(doMoveNextSrc, StaticExpressions.FalseConstant),
                         innerLoopBlock
                         , Expression.Break(brk))
                     , brk);
@@ -1017,7 +1017,7 @@ namespace ExpressMapper
                 {
                     mapExprForType.RemoveAt(0);
 
-                    var destCondition = Expression.IfThen(Expression.Equal(destItmVarExp, Expression.Constant(null)),
+                    var destCondition = Expression.IfThen(Expression.Equal(destItmVarExp, StaticExpressions.NullConstant),
                         newDestInstanceExp);
                     mapExprForType.Insert(0, destCondition);
                 }
@@ -1056,9 +1056,9 @@ namespace ExpressMapper
             var ifFalseBlock = Expression.Block(new ParameterExpression[] { }, blockExpsNew);
 
             var endOfListExp = Expression.Variable(typeof(bool), "endOfList");
-            var assignInitEndOfListExp = Expression.Assign(endOfListExp, Expression.Constant(false));
+            var assignInitEndOfListExp = Expression.Assign(endOfListExp, StaticExpressions.FalseConstant);
 
-            var ifNotEndOfListExp = Expression.IfThen(Expression.Equal(endOfListExp, Expression.Constant(false)), Expression.Assign(endOfListExp, Expression.Not(doMoveNextDest)));
+            var ifNotEndOfListExp = Expression.IfThen(Expression.Equal(endOfListExp, StaticExpressions.FalseConstant), Expression.Assign(endOfListExp, Expression.Not(doMoveNextDest)));
 
             var mapAndAddItemExp = Expression.IfThenElse(endOfListExp, ifFalseBlock, ifTrueBlock);
 
@@ -1067,7 +1067,7 @@ namespace ExpressMapper
 
             var brk = Expression.Label();
             var loopExpression = Expression.Loop(
-                Expression.IfThenElse(Expression.NotEqual(doMoveNextSrc, Expression.Constant(false)),
+                Expression.IfThenElse(Expression.NotEqual(doMoveNextSrc, StaticExpressions.FalseConstant),
                     innerLoopBlock
                     , Expression.Break(brk))
                 , brk);
@@ -1115,7 +1115,7 @@ namespace ExpressMapper
                 string.Format("{0}_{1}_{2}Dest", typeof(TN).Name, callSetPropMethod.Member.Name,
                     Guid.NewGuid().ToString().Replace("-", "_")));
 
-            var ifDestNull = destType.IsPrimitive || destType.IsEnum ? (Expression)Expression.Constant(false) : Expression.Equal(callSetPropMethod, Expression.Constant(null));
+            var ifDestNull = destType.IsPrimitive || destType.IsEnum ? (Expression)StaticExpressions.FalseConstant : Expression.Equal(callSetPropMethod, StaticExpressions.NullConstant);
 
             var newDestInstanceExp = mapExprForType[0] as BinaryExpression;
             mapExprForType.RemoveAt(0);

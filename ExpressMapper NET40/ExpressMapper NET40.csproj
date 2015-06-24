@@ -51,6 +51,7 @@
     <Compile Include="NullCheckNestedMemberVisitor.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="StaticExpressions.cs" />
     <Compile Include="SubstituteParameterVisitor.cs" />
     <Compile Include="TypeMapper.cs" />
     <Compile Include="ITypeMapper.cs" />
