@@ -86,6 +86,24 @@ namespace ExpressMapper.Tests
         }
 
         [Test]
+        public void ArrayToListTypeMap()
+        {
+            Mapper.Register<TestCollection, TestCollectionViewModel>();
+            Mapper.Compile();
+
+            var testData = Functional.EnumerableToArrayTypeMap();
+
+            var result = Mapper.Map<TestCollection[], IList<TestCollectionViewModel>>(testData.Key.ToArray());
+
+            Assert.AreEqual(result.Count(), testData.Value.Length);
+
+            for (var i = 0; i < result.Count(); i++)
+            {
+                Assert.AreEqual(result[i], testData.Value[i]);
+            }
+        }
+
+        [Test]
         public void CustomMap()
         {
             Mapper.Register<TestModel, TestViewModel>();

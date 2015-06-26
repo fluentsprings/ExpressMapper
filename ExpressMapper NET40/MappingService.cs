@@ -531,8 +531,8 @@ namespace ExpressMapper
 
         private BlockExpression CompileCollectionInternal<T, TN>(ParameterExpression sourceParameterExp, ParameterExpression destParameterExp = null)
         {
-            var sourceType = typeof(T).GetGenericArguments()[0];
-            var destType = typeof(TN).GetGenericArguments()[0];
+            var sourceType = GetCollectionElementType(typeof(T));
+            var destType = GetCollectionElementType(typeof(TN));
 
             var destList = typeof(List<>).MakeGenericType(destType);
             var destColl = Expression.Variable(destList, "destColl");
@@ -607,10 +607,16 @@ namespace ExpressMapper
             return blockExpression;
         }
 
+        private static Type GetCollectionElementType(Type type)
+        {
+            return type.IsArray ? type.GetElementType() : type.GetGenericArguments()[0];
+        }
+
         private void CompileCollectionWithDestination<T, TN>()
         {
-            var sourceType = typeof(T).GetGenericArguments()[0];
-            var destType = typeof(TN).GetGenericArguments()[0];
+            var sourceType = GetCollectionElementType(typeof(T));
+            var destType = GetCollectionElementType(typeof(TN));
+
             var sourceVariable = Expression.Parameter(typeof(T), "source");
             var destVariable = Expression.Parameter(typeof(TN), "dest");
 
@@ -648,8 +654,8 @@ namespace ExpressMapper
 
         private BlockExpression MapCollectionCountEquals(Type tCol, Type tnCol, Expression sourceVariable, Expression destVariable)
         {
-            var sourceType = tCol.GetGenericArguments()[0];
-            var destType = tnCol.GetGenericArguments()[0];
+            var sourceType = GetCollectionElementType(tCol);
+            var destType = GetCollectionElementType(tnCol);
 
             // Source enumeration
             var closedEnumeratorSourceType = typeof(IEnumerator<>).MakeGenericType(sourceType);
@@ -722,8 +728,8 @@ namespace ExpressMapper
 
         private BlockExpression MapCollectionNotCountEquals(Type tCol, Type tnCol, Expression sourceVariable, Expression destVariable)
         {
-            var sourceType = tCol.GetGenericArguments()[0];
-            var destType = tnCol.GetGenericArguments()[0];
+            var sourceType = GetCollectionElementType(tCol);
+            var destType = GetCollectionElementType(tnCol);
 
             var destList = typeof(IList<>).MakeGenericType(destType);
             var destCollection = typeof(ICollection<>).MakeGenericType(destType);
