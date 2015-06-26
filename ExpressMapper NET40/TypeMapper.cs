@@ -363,6 +363,13 @@ namespace ExpressMapper
                                 Expression.Call(typeof(Enum).GetMethod("Parse", new Type[] { typeof(Type), typeof(string), typeof(bool) }), Expression.Constant(setNullableType ?? setType), right, Expression.Constant(true)),
                                 setType)));
             }
+            else if (!setType.IsClass)
+            {
+                return Expression.Assign(left,
+                            Expression.Convert(
+                                Expression.Call(typeof(Convert).GetMethod("ChangeType", new Type[] { typeof(object), typeof(Type) }), Expression.Convert(right, typeof(object)), Expression.Constant(setNullableType ?? setType)),
+                                setType));
+            }
             else
             {
                 return Expression.IfThen(

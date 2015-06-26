@@ -743,5 +743,27 @@ namespace ExpressMapper.Tests
             Assert.AreEqual(GenderTypes.Women.ToString(), testViewModel.NullableGender);
             Assert.AreEqual((int)GenderTypes.Women, testViewModel.GenderIndex);
         }
+
+        [Test]
+        public void ConvertibleMap()
+        {
+            Mapper.Register<TestModel, TestViewModel>()
+                .Ignore(x => x.Country)
+                .Ignore(x => x.Sizes)
+                .Member(x => x.GenderIndex, x => x.BoolValue)
+                .Member(x => x.NotNullable, x => x.Height);
+            Mapper.Compile();
+
+            var test = new TestModel()
+            {
+                BoolValue = true,
+                Height = 123
+            };
+
+            var testViewModel = Mapper.Map<TestModel, TestViewModel>(test);
+
+            Assert.AreEqual(1, testViewModel.GenderIndex);
+            Assert.AreEqual(123, testViewModel.NotNullable);
+        }
     }
 }
