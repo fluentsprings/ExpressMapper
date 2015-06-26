@@ -363,7 +363,6 @@ namespace ExpressMapper
                                 Expression.Call(typeof(Enum).GetMethod("Parse", new Type[] { typeof(Type), typeof(string), typeof(bool) }), Expression.Constant(setNullableType ?? setType), right, Expression.Constant(true)),
                                 setType)));
             }
-            // todo: Yuriy Anisimov - after refactoring make it - for each primitive type to eliminate boxing and unboxing - performance improvement 
             else if (!getType.IsClass)
             {
                 return Expression.Assign(left,
