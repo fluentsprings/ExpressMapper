@@ -721,5 +721,27 @@ namespace ExpressMapper.Tests
             Assert.AreEqual(result.Category.Catalog.GetHashCode(), tripCatCtlHash);
             Assert.AreEqual(result.Category.Catalog.TripType.GetHashCode(), tripCatCtlTypeHash);
         }
+
+        [Test]
+        public void EnumMap()
+        {
+            Mapper.Register<TestModel, TestViewModel>()
+                .Ignore(x => x.Country)
+                .Ignore(x => x.Sizes)
+                .Member(x => x.GenderIndex, x => x.NullableGender);
+            Mapper.Compile();
+
+            var test = new TestModel()
+            {
+                Gender = GenderTypes.Men.ToString(),
+                NullableGender = GenderTypes.Women
+            };
+
+            var testViewModel = Mapper.Map<TestModel, TestViewModel>(test);
+
+            Assert.AreEqual(GenderTypes.Men, testViewModel.Gender);
+            Assert.AreEqual(GenderTypes.Women.ToString(), testViewModel.NullableGender);
+            Assert.AreEqual((int)GenderTypes.Women, testViewModel.GenderIndex);
+        }
     }
 }

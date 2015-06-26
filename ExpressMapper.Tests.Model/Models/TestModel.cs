@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ExpressMapper.Tests.Model.Enums;
+using System;
 using System.Collections.Generic;
 
 namespace ExpressMapper.Tests.Model.Models
@@ -16,5 +17,7 @@ namespace ExpressMapper.Tests.Model.Models
         public Country Country { get; set; }
         public List<Size> Sizes { get; set; }
         public DateTime Created { get; set; }
+        public string Gender { get; set; }
+        public GenderTypes? NullableGender { get; set; }
     }
 }

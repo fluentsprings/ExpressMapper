@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ExpressMapper.Tests.Model.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -17,6 +18,9 @@ namespace ExpressMapper.Tests.Model.ViewModels
         public CountryViewModel Country { get; set; }
         public List<SizeViewModel> Sizes { get; set; }
         public DateTime Created { get; set; }
+        public GenderTypes Gender { get; set; }
+        public string NullableGender { get; set; }
+        public int GenderIndex { get; set; }
         public bool Equals(TestViewModel other)
         {
             var sizes = true;
@@ -31,7 +35,7 @@ namespace ExpressMapper.Tests.Model.ViewModels
                 }
             }
 
-            return Id == other.Id && Name == other.Name && Age == other.Age && NotNullable == other.NotNullable && Nullable.GetValueOrDefault() == other.Nullable.GetValueOrDefault() && Weight == other.Weight && BoolValue == other.BoolValue &&
+            return Id == other.Id && Name == other.Name && Age == other.Age && NotNullable == other.NotNullable && Nullable.GetValueOrDefault() == other.Nullable.GetValueOrDefault() && Weight == other.Weight && BoolValue == other.BoolValue && Gender == other.Gender && NullableGender == other.NullableGender && GenderIndex == other.GenderIndex &&
                    Created == other.Created && ((Country == null && other.Country == null) || Country.Equals(other.Country)) && sizes;
         }
     }

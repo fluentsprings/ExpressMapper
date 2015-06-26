@@ -296,6 +296,18 @@ namespace ExpressMapper
                         _customPropertyCache[propertySet.Name] = releaseExp;
                         _customPropertyDestInstCache[propertySet.Name] = releaseWithDestExp;
                     }
+                    else if (typeof(IConvertible).IsAssignableFrom(setPropertyType) &&
+                        typeof(IConvertible).IsAssignableFrom(getPropertyType))
+                    {
+                        var assignExp = CreateConvertibleAssignExpression(callSetPropMethod,
+                            callGetPropMethod,
+                            propertySet.PropertyType,
+                            propertyGet.PropertyType,
+                            setPropertyNullableType);
+
+                        _propertyCache[propertySet.Name] = assignExp;
+                        _propertyDestInstCache[propertySet.Name] = assignExp;
+                    }
                     else
                     {
                         var mapComplexResult = MapDifferentTypeProps(getPropertyType, setPropertyType,
@@ -335,6 +347,31 @@ namespace ExpressMapper
             }
 
             return Expression.Assign(left, right);
+        }
+
+        private static Expression CreateConvertibleAssignExpression(Expression setMethod, Expression getMethod, Type setType, Type getType, Type setNullableType)
+        {
+            Expression left = setMethod;
+            Expression right = getMethod;
+
+            if ((setNullableType ?? setType).IsEnum && (getType == typeof(string)))
+            {
+                return Expression.IfThen(
+                    Expression.NotEqual(getMethod, StaticExpressions.NullConstant),
+                        Expression.Assign(left,
+                            Expression.Convert(
+                                Expression.Call(typeof(Enum).GetMethod("Parse", new Type[] { typeof(Type), typeof(string), typeof(bool) }), Expression.Constant(setNullableType ?? setType), right, Expression.Constant(true)),
+                                setType)));
+            }
+            else
+            {
+                return Expression.IfThen(
+                    Expression.NotEqual(getMethod, StaticExpressions.NullConstant),
+                        Expression.Assign(left,
+                            Expression.Convert(
+                                Expression.Call(typeof(Convert).GetMethod("ChangeType", new Type[] { typeof(object), typeof(Type) }), Expression.Convert(right, typeof(object)), Expression.Constant(setNullableType ?? setType)),
+                                setType)));
+            }
         }
 
         public void MapMember<TSourceMember, TDestMember>(Expression<Func<TN, TDestMember>> left, Expression<Func<T, TSourceMember>> right)
@@ -383,6 +420,18 @@ namespace ExpressMapper
 
                     _customPropertyCache[memberExpression.Member.Name] = releaseExp;
                     _customPropertyDestInstCache[memberExpression.Member.Name] = releaseWithDestExp;
+                }
+                else if (typeof(IConvertible).IsAssignableFrom(destType) &&
+                    typeof(IConvertible).IsAssignableFrom(sourceType))
+                {
+                    var assignExp = CreateConvertibleAssignExpression(memberExpression,
+                        right.Body,
+                        destType,
+                        sourceType,
+                        destNullableType);
+
+                    _customPropertyCache[memberExpression.Member.Name] = assignExp;
+                    _customPropertyDestInstCache[memberExpression.Member.Name] = assignExp;
                 }
                 else
                 {
