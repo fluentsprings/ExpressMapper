@@ -363,7 +363,7 @@ namespace ExpressMapper
                                 Expression.Call(typeof(Enum).GetMethod("Parse", new Type[] { typeof(Type), typeof(string), typeof(bool) }), Expression.Constant(setNullableType ?? setType), right, Expression.Constant(true)),
                                 setType)));
             }
-            else if (!setType.IsClass)
+            else if (!getType.IsClass)
             {
                 return Expression.Assign(left,
                             Expression.Convert(
@@ -433,7 +433,7 @@ namespace ExpressMapper
                 {
                     var assignExp = CreateConvertibleAssignExpression(memberExpression,
                         right.Body,
-                        destType,
+                        typeof(TDestMember),
                         sourceType,
                         destNullableType);
 
