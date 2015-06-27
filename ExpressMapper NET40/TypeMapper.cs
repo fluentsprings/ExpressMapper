@@ -246,7 +246,7 @@ namespace ExpressMapper
             return Expression.Assign(parameterExpression, createDestination);
         }
 
-        public void AutoMapProperty(PropertyInfo propertyGet, PropertyInfo propertySet)
+        private void AutoMapProperty(PropertyInfo propertyGet, PropertyInfo propertySet)
         {
             var callSetPropMethod = Expression.Property(_destFakeParameter, propertySet);
             var callGetPropMethod = Expression.Property(_sourceParameter, propertyGet);
@@ -366,7 +366,7 @@ namespace ExpressMapper
                 }
                 else
                 {
-                    var mapComplexResult = MapDifferentTypeProps(right.Type, left.Type, right, left);
+                    var mapComplexResult = MapDifferentTypeProps(right, left);
 
                     _customPropertyCache[memberExpression.Member.Name] =
                         nullCheckNestedMemberVisitor.CheckNullExpression != null
@@ -410,7 +410,7 @@ namespace ExpressMapper
             var rightExpression = Expression.Invoke(expr, parameterExpression);
             if (typeof(TNMember) != typeof(TMember))
             {
-                var mapComplexResult = MapDifferentTypeProps(typeof(TMember), typeof(TNMember), rightExpression, left.Body as MemberExpression);
+                var mapComplexResult = MapDifferentTypeProps(rightExpression, left.Body as MemberExpression);
                 _customPropertyCache[memberExpression.Member.Name] = mapComplexResult.Item1;
                 _customPropertyDestInstCache[memberExpression.Member.Name] = mapComplexResult.Item2;
             }
@@ -420,7 +420,6 @@ namespace ExpressMapper
                 _customPropertyCache.Add(memberExpression.Member.Name, binaryExpression);
                 _customPropertyDestInstCache.Add(memberExpression.Member.Name, binaryExpression);
             }
-
         }
 
         public void Instantiate(Func<T, TN> constructor)
@@ -521,8 +520,11 @@ namespace ExpressMapper
             }
         }
 
-        private Tuple<Expression, Expression> MapDifferentTypeProps(Type sourceType, Type destType, Expression callGetPropMethod, MemberExpression callSetPropMethod)
+        private Tuple<Expression, Expression> MapDifferentTypeProps(Expression callGetPropMethod, MemberExpression callSetPropMethod)
         {
+            Type sourceType = callGetPropMethod.Type;
+            Type destType = callSetPropMethod.Type;
+
             var tCol =
                 sourceType.GetInterfaces()
                     .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>)) ??
