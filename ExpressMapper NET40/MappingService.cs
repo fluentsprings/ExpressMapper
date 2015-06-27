@@ -979,13 +979,21 @@ namespace ExpressMapper
             {
                 return Expression.Call(destColl, destList.GetMethod("ToArray"));
             }
-            else if (destPropType.IsGenericType && typeof(IQueryable).IsAssignableFrom(destPropType))
+            else if (destPropType.IsGenericType)
             {
-                return Expression.Call(typeof(Queryable), "AsQueryable", new[] { destType }, destColl);
-            }
-            else if (destPropType.IsGenericType && destPropType == typeof(Collection<>).MakeGenericType(destType))
-            {
-                return Expression.Call(typeof(CollectionExtentions), "ToCollection", new[] { destType }, destColl);
+                if (typeof(IQueryable).IsAssignableFrom(destPropType))
+                {
+                    return Expression.Call(typeof(Queryable), "AsQueryable", new[] { destType }, destColl);
+                }
+                else
+                {
+                    Type collectionType = typeof(Collection<>).MakeGenericType(destType);
+
+                    if (destPropType == collectionType)
+                    {
+                        return Expression.New(collectionType.GetConstructor(new Type[] { destList }), destColl);
+                    }
+                }
             }
 
             return destColl;

@@ -46,9 +46,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\ExpressMapper NET40\CollectionExtentions.cs">
-      <Link>CollectionExtentions.cs</Link>
-    </Compile>
     <Compile Include="..\ExpressMapper NET40\CollectionTypes.cs">
       <Link>CollectionTypes.cs</Link>
     </Compile>
