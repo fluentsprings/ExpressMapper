@@ -630,8 +630,8 @@ namespace ExpressMapper
 
         private BlockExpression MapCollection(Type sourcePropType, Type destpropType, Type tCol, Type tnCol, Expression callGetPropMethod, MemberExpression callSetPropMethod)
         {
-            var sourceType = tCol.GetGenericArguments()[0];
-            var destType = tnCol.GetGenericArguments()[0];
+            var sourceType = MappingService.GetCollectionElementType(tCol);
+            var destType = MappingService.GetCollectionElementType(tnCol);
             var sourceVariable = Expression.Variable(sourcePropType,
                 string.Format("{0}_{1}", typeof(T).Name, Guid.NewGuid().ToString().Replace("-", "_")));
             var assignSourceFromProp = Expression.Assign(sourceVariable, callGetPropMethod);
@@ -687,8 +687,8 @@ namespace ExpressMapper
 
         private BlockExpression MapCollection2(Type sourcePropType, Type destpropType, Type tCol, Type tnCol, Expression callGetPropMethod, MemberExpression callSetPropMethod)
         {
-            var sourceType = tCol.GetGenericArguments()[0];
-            var destType = tnCol.GetGenericArguments()[0];
+            var sourceType = MappingService.GetCollectionElementType(tCol);
+            var destType = MappingService.GetCollectionElementType(tnCol);
             var sourceVariable = Expression.Variable(sourcePropType,
                 string.Format("{0}_{1}", typeof(T).Name, Guid.NewGuid().ToString().Replace("-", "_")));
             var assignSourceVarExp = Expression.Assign(sourceVariable, callGetPropMethod);
@@ -722,8 +722,8 @@ namespace ExpressMapper
 
         private BlockExpression MapCollectionCountEquals(Type sourcePropType, Type destpropType, Type tCol, Type tnCol, Expression callGetPropMethod, MemberExpression callSetPropMethod)
         {
-            var sourceType = tCol.GetGenericArguments()[0];
-            var destType = tnCol.GetGenericArguments()[0];
+            var sourceType = MappingService.GetCollectionElementType(tCol);
+            var destType = MappingService.GetCollectionElementType(tnCol);
             var sourceVariable = Expression.Variable(sourcePropType,
                 string.Format("{0}_{1}", typeof(T).Name, Guid.NewGuid().ToString().Replace("-", "_")));
 

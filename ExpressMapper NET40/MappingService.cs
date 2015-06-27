@@ -575,7 +575,7 @@ namespace ExpressMapper
             return blockExpression;
         }
 
-        private static Type GetCollectionElementType(Type type)
+        internal static Type GetCollectionElementType(Type type)
         {
             return type.IsArray ? type.GetElementType() : type.GetGenericArguments()[0];
         }
