@@ -85,6 +85,9 @@
     <Compile Include="..\ExpressMapper NET40\NullCheckNestedMemberVisitor.cs">
       <Link>NullCheckNestedMemberVisitor.cs</Link>
     </Compile>
+    <Compile Include="..\ExpressMapper NET40\Properties\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="..\ExpressMapper NET40\StaticExpressions.cs">
       <Link>StaticExpressions.cs</Link>
     </Compile>
@@ -94,7 +97,6 @@
     <Compile Include="..\ExpressMapper NET40\TypeMapper.cs">
       <Link>TypeMapper.cs</Link>
     </Compile>
-    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ExpressMapper NET40\ExpressMapper NET40.csproj">
