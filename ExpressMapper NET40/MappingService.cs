@@ -694,87 +694,6 @@ namespace ExpressMapper
             return blockExpression;
         }
 
-        private BlockExpression MapCollectionCountEquals(Type sourcePropType, Type destpropType, Type tCol, Type tnCol, Expression callGetPropMethod, MemberExpression callSetPropMethod)
-        {
-            var sourceType = GetCollectionElementType(tCol);
-            var destType = GetCollectionElementType(tnCol);
-            var sourceVariable = Expression.Variable(sourcePropType,
-                string.Format("{0}Src", Guid.NewGuid().ToString().Replace("-", "_")));
-
-            // Source enumeration
-            var closedEnumeratorSourceType = typeof(IEnumerator<>).MakeGenericType(sourceType);
-            var closedEnumerableSourceType = typeof(IEnumerable<>).MakeGenericType(sourceType);
-            var enumeratorSrc = Expression.Variable(closedEnumeratorSourceType,
-                string.Format("{0}EnumSrc", Guid.NewGuid().ToString().Replace("-", "_")));
-            var assignToEnumSrc = Expression.Assign(enumeratorSrc,
-                Expression.Call(sourceVariable, closedEnumerableSourceType.GetMethod("GetEnumerator")));
-            var doMoveNextSrc = Expression.Call(enumeratorSrc, typeof(IEnumerator).GetMethod("MoveNext"));
-            var currentSrc = Expression.Property(enumeratorSrc, "Current");
-            var srcItmVarExp = Expression.Variable(sourceType,
-                string.Format("{0}ItmSrc", Guid.NewGuid().ToString().Replace("-", "_")));
-            var assignSourceItmFromProp = Expression.Assign(srcItmVarExp, currentSrc);
-
-            // dest enumeration
-            var closedEnumeratorDestType = typeof(IEnumerator<>).MakeGenericType(destType);
-            var closedEnumerableDestType = typeof(IEnumerable<>).MakeGenericType(destType);
-            var enumeratorDest = Expression.Variable(closedEnumeratorDestType,
-                string.Format("{0}EnumDest", Guid.NewGuid().ToString().Replace("-", "_")));
-            var assignToEnumDest = Expression.Assign(enumeratorDest,
-                Expression.Call(callSetPropMethod, closedEnumerableDestType.GetMethod("GetEnumerator")));
-            var doMoveNextDest = Expression.Call(enumeratorDest, typeof(IEnumerator).GetMethod("MoveNext"));
-            var currentDest = Expression.Property(enumeratorDest, "Current");
-            var destItmVarExp = Expression.Variable(destType,
-                string.Format("{0}ItmDest", Guid.NewGuid().ToString().Replace("-", "_")));
-            var assignDestItmFromProp = Expression.Assign(destItmVarExp, currentDest);
-
-            var blockForSubstitution = GetCustomMapExpression(sourceType, destType, true);
-            if (blockForSubstitution == null)
-            {
-                var mapExprForType = new List<Expression>(GetMapExpressions(sourceType, destType, true));
-
-                var newDestInstanceExp = mapExprForType[0] as BinaryExpression;
-                if (newDestInstanceExp != null)
-                {
-                    mapExprForType.RemoveAt(0);
-
-                    var destCondition = Expression.IfThen(Expression.Equal(destItmVarExp, StaticExpressions.NullConstant),
-                        newDestInstanceExp);
-                    mapExprForType.Insert(0, destCondition);
-                }
-
-                blockForSubstitution = Expression.Block(mapExprForType);
-            }
-
-            var substBlock =
-                new SubstituteParameterVisitor(srcItmVarExp, destItmVarExp).Visit(
-                    blockForSubstitution) as BlockExpression;
-
-            var blockExps = new List<Expression> { assignSourceItmFromProp, assignDestItmFromProp };
-            blockExps.AddRange(substBlock.Expressions);
-
-            var ifTrueBlock = Expression.Block(new[] { srcItmVarExp, destItmVarExp }, blockExps);
-
-            var brk = Expression.Label();
-            var loopExpression = Expression.Loop(
-                Expression.IfThenElse(
-                    Expression.AndAlso(Expression.NotEqual(doMoveNextSrc, StaticExpressions.FalseConstant), Expression.NotEqual(doMoveNextDest, StaticExpressions.FalseConstant)),
-                    ifTrueBlock
-                    , Expression.Break(brk))
-                , brk);
-
-            var parameters = new List<ParameterExpression> { enumeratorSrc, enumeratorDest };
-            var expressions = new List<Expression>
-            {
-                assignToEnumSrc,
-                assignToEnumDest,
-                loopExpression
-            };
-
-            var blockExpression = Expression.Block(parameters, expressions);
-            return blockExpression;
-        }
-
-
         internal BlockExpression MapCollectionNotCountEquals(Type tCol, Type tnCol, Expression sourceVariable, Expression destVariable)
         {
             var sourceType = GetCollectionElementType(tCol);
@@ -1276,7 +1195,7 @@ namespace ExpressMapper
             var notNullCondition = Expression.IfThenElse(conditionToCreateList,
                 MapCollectionNotCountEquals(sourcePropType, destpropType, callGetPropMethod,
                     callSetPropMethod),
-                MapCollectionCountEquals(sourcePropType, destpropType, tCol, tnCol, callGetPropMethod, callSetPropMethod));
+                MapCollectionCountEquals(tCol, tnCol, callGetPropMethod, callSetPropMethod));
 
             var result = Expression.IfThenElse(Expression.NotEqual(callSetPropMethod, StaticExpressions.NullConstant), notNullCondition,
                 MapCollection(sourcePropType, destpropType, tCol, tnCol, callGetPropMethod, callSetPropMethod));
