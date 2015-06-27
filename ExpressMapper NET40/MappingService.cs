@@ -555,40 +555,11 @@ namespace ExpressMapper
             var assignSourceItmFromProp = Expression.Assign(sourceColItmVariable, current);
 
             var destColItmVariable = Expression.Variable(destType, "ItmDest");
-            var mapExprForType = GetMapExpressions(sourceType, destType);
-            var blockForSubstiyution = Expression.Block(mapExprForType);
-            var substBlock =
-                new SubstituteParameterVisitor(sourceColItmVariable, destColItmVariable).Visit(
-                    blockForSubstiyution) as BlockExpression;
-            var resultMapExprForType = substBlock.Expressions;
 
-            var addToNewColl = Expression.Call(destColl, "Add", null, destColItmVariable);
-            var blockExps = new List<Expression> { assignSourceItmFromProp };
-            blockExps.AddRange(resultMapExprForType);
-            blockExps.Add(addToNewColl);
+            var loopExpression = CollectionLoopExpression(sourceType, destType, destColl, sourceColItmVariable, destColItmVariable,
+                assignSourceItmFromProp, doMoveNext);
 
-            var ifTrueBlock = Expression.Block(new[] { sourceColItmVariable, destColItmVariable }, blockExps);
-
-            var brk = Expression.Label();
-            var loopExpression = Expression.Loop(
-                Expression.IfThenElse(
-                    Expression.NotEqual(doMoveNext, StaticExpressions.FalseConstant),
-                    ifTrueBlock
-                    , Expression.Break(brk))
-                , brk);
-
-            Expression resultCollection = destColl;
-            if (typeof(TN).IsArray)
-            {
-                resultCollection = Expression.Call(destColl, destList.GetMethod("ToArray"));
-            }
-            else
-            {
-                if (typeof(TN).IsGenericType && typeof(IQueryable).IsAssignableFrom(typeof(TN)))
-                {
-                    resultCollection = Expression.Call(typeof(Queryable), "AsQueryable", new[] { destType }, destColl);
-                }
-            }
+            Expression resultCollection = ConvertCollection(typeof(TN), destList, destType, destColl);
 
             var parameters = new List<ParameterExpression> { destColl, enumerator };
 
@@ -802,33 +773,6 @@ namespace ExpressMapper
                 var destItmVarExp = Expression.Variable(destType, "ItmDest");
                 var assignDestItmFromProp = Expression.Assign(destItmVarExp, currentDest);
 
-                var blockForSubstitution = GetCustomMapExpression(sourceType, destType, true);
-                if (blockForSubstitution == null)
-                {
-                    var mapExprForType = GetMapExpressions(sourceType, destType, true);
-
-                    var newDestInstanceExp = mapExprForType[0] as BinaryExpression;
-                    if (newDestInstanceExp != null)
-                    {
-                        mapExprForType.RemoveAt(0);
-
-                        var destCondition = Expression.IfThen(Expression.Equal(destItmVarExp, StaticExpressions.NullConstant),
-                            newDestInstanceExp);
-                        mapExprForType.Insert(0, destCondition);
-                    }
-
-                    blockForSubstitution = Expression.Block(mapExprForType);
-                }
-
-                var substBlock =
-                    new SubstituteParameterVisitor(srcItmVarExp, destItmVarExp).Visit(
-                        blockForSubstitution) as BlockExpression;
-                var resultMapExprForType = substBlock.Expressions;
-
-                var blockExps = new List<Expression> { assignDestItmFromProp };
-                blockExps.AddRange(resultMapExprForType);
-
-                var ifTrueBlock = Expression.Block(new ParameterExpression[] { }, blockExps);
 
                 // If destination list is empty
 
@@ -847,6 +791,8 @@ namespace ExpressMapper
                 var blockExpsNew = new List<Expression>(resultMapExprForTypeNew);
 
                 var ifFalseBlock = Expression.Block(new ParameterExpression[] { }, blockExpsNew);
+
+                var ifTrueBlock = IfElseExpr(sourceType, destType, srcItmVarExp, destItmVarExp, assignDestItmFromProp);
 
                 var mapAndAddItemExp = Expression.IfThenElse(doMoveNextDest, ifTrueBlock, ifFalseBlock);
                 var addToNewCollNew = Expression.Call(destVarExp, "Add", null, destItmVarExp);
@@ -925,33 +871,7 @@ namespace ExpressMapper
             var destItmVarExp = Expression.Variable(destType, "ItmDest");
             var assignDestItmFromProp = Expression.Assign(destItmVarExp, currentDest);
 
-            var blockForSubstitution = GetCustomMapExpression(sourceType, destType, true);
-            if (blockForSubstitution == null)
-            {
-                var mapExprForType = GetMapExpressions(sourceType, destType, true);
-
-                var newDestInstanceExp = mapExprForType[0] as BinaryExpression;
-                if (newDestInstanceExp != null)
-                {
-                    mapExprForType.RemoveAt(0);
-
-                    var destCondition = Expression.IfThen(Expression.Equal(destItmVarExp, StaticExpressions.NullConstant),
-                        newDestInstanceExp);
-                    mapExprForType.Insert(0, destCondition);
-                }
-
-                blockForSubstitution = Expression.Block(mapExprForType);
-            }
-
-            var substBlock =
-                new SubstituteParameterVisitor(srcItmVarExp, destItmVarExp).Visit(
-                    blockForSubstitution) as BlockExpression;
-            var resultMapExprForType = substBlock.Expressions;
-
-            var blockExps = new List<Expression> { assignDestItmFromProp };
-            blockExps.AddRange(resultMapExprForType);
-
-            var ifTrueBlock = Expression.Block(new ParameterExpression[] { }, blockExps);
+            var ifTrueBlock = IfElseExpr(sourceType, destType, srcItmVarExp, destItmVarExp, assignDestItmFromProp);
 
             // If destination list is empty
             var blockForSubstitutionNew = GetCustomMapExpression(sourceType, destType);
@@ -992,6 +912,104 @@ namespace ExpressMapper
 
             var blockExpression = Expression.Block(new[] { endOfListExp, enumeratorSrc, enumeratorDest }, new Expression[] { assignInitEndOfListExp, assignToEnumSrc, assignToEnumDest, loopExpression });
             return blockExpression;
+        }
+
+        internal Expression IfElseExpr(Type sourceType,
+            Type destType,
+            Expression srcItmVarExp,
+            Expression destItmVarExp,
+            Expression assignDestItmFromProp)
+        {
+            // TODO: Change name
+
+            var blockForSubstitution = GetCustomMapExpression(sourceType, destType, true);
+            if (blockForSubstitution == null)
+            {
+                var mapExprForType = GetMapExpressions(sourceType, destType, true);
+
+                var newDestInstanceExp = mapExprForType[0] as BinaryExpression;
+                if (newDestInstanceExp != null)
+                {
+                    mapExprForType.RemoveAt(0);
+
+                    var destCondition = Expression.IfThen(Expression.Equal(destItmVarExp, StaticExpressions.NullConstant),
+                        newDestInstanceExp);
+                    mapExprForType.Insert(0, destCondition);
+                }
+
+                blockForSubstitution = Expression.Block(mapExprForType);
+            }
+
+            var substBlock =
+                new SubstituteParameterVisitor(srcItmVarExp, destItmVarExp).Visit(
+                    blockForSubstitution) as BlockExpression;
+            var resultMapExprForType = substBlock.Expressions;
+
+            var blockExps = new List<Expression> { assignDestItmFromProp };
+            blockExps.AddRange(resultMapExprForType);
+
+            return Expression.Block(new ParameterExpression[] { }, blockExps);
+        }
+
+        internal LoopExpression CollectionLoopExpression(
+            Type sourceType,
+            Type destType,
+            ParameterExpression destColl,
+            ParameterExpression sourceColItmVariable,
+            ParameterExpression destColItmVariable,
+            BinaryExpression assignSourceItmFromProp,
+            MethodCallExpression doMoveNext)
+        {
+            var blockForSubstitution = GetCustomMapExpression(sourceType, destType);
+            if (blockForSubstitution == null)
+            {
+                var mapExprForType = GetMapExpressions(sourceType, destType);
+                blockForSubstitution = Expression.Block(mapExprForType);
+            }
+
+            var substBlock =
+                new SubstituteParameterVisitor(sourceColItmVariable, destColItmVariable).Visit(
+                    blockForSubstitution) as BlockExpression;
+
+            var resultMapExprForType = substBlock.Expressions;
+
+            var addToNewColl = Expression.Call(destColl, "Add", null, destColItmVariable);
+            var blockExps = new List<Expression> { assignSourceItmFromProp };
+            blockExps.AddRange(resultMapExprForType);
+            blockExps.Add(addToNewColl);
+
+            var ifTrueBlock = Expression.Block(new[] { sourceColItmVariable, destColItmVariable }, blockExps);
+
+            var brk = Expression.Label();
+            var loopExpression = Expression.Loop(
+                Expression.IfThenElse(
+                    Expression.NotEqual(doMoveNext, StaticExpressions.FalseConstant),
+                    ifTrueBlock
+                    , Expression.Break(brk))
+                , brk);
+
+            return loopExpression;
+        }
+
+        internal Expression ConvertCollection(Type destPropType,
+            Type destList,
+            Type destType,
+            Expression destColl)
+        {
+            if (destPropType.IsArray)
+            {
+                return Expression.Call(destColl, destList.GetMethod("ToArray"));
+            }
+            else if (destPropType.IsGenericType && typeof(IQueryable).IsAssignableFrom(destPropType))
+            {
+                return Expression.Call(typeof(Queryable), "AsQueryable", new[] { destType }, destColl);
+            }
+            else if (destPropType.IsGenericType && destPropType == typeof(Collection<>).MakeGenericType(destType))
+            {
+                return Expression.Call(typeof(CollectionExtentions), "ToCollection", new[] { destType }, destColl);
+            }
+
+            return destColl;
         }
 
         private static int CalculateCacheKey(Type source, Type dest)
