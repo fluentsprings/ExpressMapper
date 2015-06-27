@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -249,85 +248,10 @@ namespace ExpressMapper
 
         public void AutoMapProperty(PropertyInfo propertyGet, PropertyInfo propertySet)
         {
-            var callGetPropMethod = Expression.Property(_sourceParameter, propertyGet);
             var callSetPropMethod = Expression.Property(_destFakeParameter, propertySet);
-            if (!_propertyCache.ContainsKey(propertySet.Name))
-            {
-                Type setPropertyNullableType = Nullable.GetUnderlyingType(propertySet.PropertyType);
-                Type getPropertyNullableType = Nullable.GetUnderlyingType(propertyGet.PropertyType);
+            var callGetPropMethod = Expression.Property(_sourceParameter, propertyGet);
 
-                Type setPropertyType = setPropertyNullableType == null ? propertySet.PropertyType : setPropertyNullableType;
-                Type getPropertyType = getPropertyNullableType == null ? propertyGet.PropertyType : getPropertyNullableType;
-
-                if (setPropertyType != getPropertyType)
-                {
-                    var customMapExpression = _mappingService.GetCustomMapExpression(getPropertyType, setPropertyType);
-                    var customMapExpressionWithDest = _mappingService.GetCustomMapExpression(getPropertyType, setPropertyType, true);
-                    if (customMapExpression != null && customMapExpressionWithDest != null)
-                    {
-                        var srcExp = Expression.Variable(getPropertyType,
-                            string.Format("{0}Src", Guid.NewGuid().ToString("N")));
-                        var assignSrcExp = Expression.Assign(srcExp, callGetPropMethod);
-
-                        var destExp = Expression.Variable(setPropertyType,
-                            string.Format("{0}Dest", Guid.NewGuid().ToString("N")));
-                        var assignDestExp = Expression.Assign(destExp, callSetPropMethod);
-
-                        var substituteParameterVisitor = new SubstituteParameterVisitor(srcExp, destExp);
-                        var blockExpression = substituteParameterVisitor.Visit(customMapExpression) as BlockExpression;
-                        var assignResultExp = Expression.Assign(callSetPropMethod, destExp);
-                        var resultBlockExp = Expression.Block(new[] { srcExp, destExp }, assignSrcExp, blockExpression,
-                            assignResultExp);
-                        var resultBlockWithDestExp = Expression.Block(new[] { srcExp, destExp }, assignSrcExp,
-                            assignDestExp, blockExpression, assignResultExp);
-
-                        var checkNullExp =
-                            Expression.IfThenElse(Expression.Equal(callGetPropMethod, Expression.Default(getPropertyType)),
-                                Expression.Assign(callSetPropMethod, Expression.Default(setPropertyType)), resultBlockExp);
-
-                        var checkNullExpWithDest =
-                            Expression.IfThenElse(Expression.Equal(callGetPropMethod, Expression.Default(getPropertyType)),
-                                Expression.Assign(callSetPropMethod, Expression.Default(setPropertyType)),
-                                resultBlockWithDestExp);
-
-                        var releaseExp = Expression.Block(new ParameterExpression[] { }, checkNullExp);
-                        var releaseWithDestExp = Expression.Block(new ParameterExpression[] { }, checkNullExpWithDest);
-
-                        _customPropertyCache[propertySet.Name] = releaseExp;
-                        _customPropertyDestInstCache[propertySet.Name] = releaseWithDestExp;
-                    }
-                    else if (typeof(IConvertible).IsAssignableFrom(setPropertyType) &&
-                        typeof(IConvertible).IsAssignableFrom(getPropertyType))
-                    {
-                        var assignExp = CreateConvertibleAssignExpression(callSetPropMethod,
-                            callGetPropMethod,
-                            propertySet.PropertyType,
-                            propertyGet.PropertyType,
-                            setPropertyNullableType);
-
-                        _propertyCache[propertySet.Name] = assignExp;
-                        _propertyDestInstCache[propertySet.Name] = assignExp;
-                    }
-                    else
-                    {
-                        var mapComplexResult = MapDifferentTypeProps(getPropertyType, setPropertyType,
-                            callGetPropMethod, callSetPropMethod);
-                        _propertyCache[propertySet.Name] = mapComplexResult.Item1;
-                        _propertyDestInstCache[propertySet.Name] = mapComplexResult.Item2;
-                    }
-                }
-                else
-                {
-                    var assignExp = CreateAssignExpression(callSetPropMethod,
-                        callGetPropMethod,
-                        propertySet.PropertyType,
-                        setPropertyNullableType,
-                        getPropertyNullableType);
-
-                    _propertyCache[propertySet.Name] = assignExp;
-                    _propertyDestInstCache[propertySet.Name] = assignExp;
-                }
-            }
+            MapMember(callSetPropMethod, callGetPropMethod);
         }
 
         private static Expression CreateAssignExpression(Expression setMethod, Expression getMethod, Type setType, Type setNullableType, Type getNullableType)
@@ -381,46 +305,46 @@ namespace ExpressMapper
             }
         }
 
-        public void MapMember<TSourceMember, TDestMember>(Expression<Func<TN, TDestMember>> left, Expression<Func<T, TSourceMember>> right)
+        private void MapMember(MemberExpression left, Expression right)
         {
             var nullCheckNestedMemberVisitor = new NullCheckNestedMemberVisitor();
             nullCheckNestedMemberVisitor.Visit(right);
 
-            var memberExpression = left.Body as MemberExpression;
+            var memberExpression = left;
 
-            Type destNullableType = Nullable.GetUnderlyingType(typeof(TDestMember));
-            Type sourceNullableType = Nullable.GetUnderlyingType(typeof(TSourceMember));
+            Type destNullableType = Nullable.GetUnderlyingType(left.Type);
+            Type sourceNullableType = Nullable.GetUnderlyingType(right.Type);
 
-            Type destType = destNullableType == null ? typeof(TDestMember) : destNullableType;
-            Type sourceType = sourceNullableType == null ? typeof(TSourceMember) : sourceNullableType;
+            Type destType = destNullableType == null ? left.Type : destNullableType;
+            Type sourceType = sourceNullableType == null ? right.Type : sourceNullableType;
 
             if (destType != sourceType)
             {
-                var customMapExpression = _mappingService.GetCustomMapExpression(typeof(TSourceMember), typeof(TDestMember));
-                var customMapExpressionWithDest = _mappingService.GetCustomMapExpression(typeof(TSourceMember), typeof(TDestMember), true);
+                var customMapExpression = _mappingService.GetCustomMapExpression(right.Type, left.Type);
+                var customMapExpressionWithDest = _mappingService.GetCustomMapExpression(right.Type, left.Type, true);
                 if (customMapExpression != null && customMapExpressionWithDest != null)
                 {
-                    var srcExp = Expression.Variable(typeof(TSourceMember),
+                    var srcExp = Expression.Variable(right.Type,
                         string.Format("{0}Src", Guid.NewGuid().ToString("N")));
-                    var assignSrcExp = Expression.Assign(srcExp, right.Body);
+                    var assignSrcExp = Expression.Assign(srcExp, right);
 
-                    var destExp = Expression.Variable(typeof(TDestMember),
+                    var destExp = Expression.Variable(left.Type,
                         string.Format("{0}Dest", Guid.NewGuid().ToString("N")));
-                    var assignDestExp = Expression.Assign(destExp, left.Body);
+                    var assignDestExp = Expression.Assign(destExp, left);
 
                     var substituteParameterVisitor = new SubstituteParameterVisitor(srcExp, destExp);
                     var blockExpression = substituteParameterVisitor.Visit(customMapExpression) as BlockExpression;
-                    var assignResultExp = Expression.Assign(left.Body, destExp);
+                    var assignResultExp = Expression.Assign(left, destExp);
                     var resultBlockExp = Expression.Block(new[] { srcExp, destExp }, assignSrcExp, blockExpression, assignResultExp);
                     var resultBlockWithDestExp = Expression.Block(new[] { srcExp, destExp }, assignSrcExp, assignDestExp, blockExpression, assignResultExp);
 
                     var checkNullExp =
-                        Expression.IfThenElse(Expression.Equal(right.Body, Expression.Default(typeof(TSourceMember))),
-                            Expression.Assign(left.Body, Expression.Default(typeof(TDestMember))), resultBlockExp);
+                        Expression.IfThenElse(Expression.Equal(right, Expression.Default(right.Type)),
+                            Expression.Assign(left, Expression.Default(left.Type)), resultBlockExp);
 
                     var checkNullExpWithDest =
-                        Expression.IfThenElse(Expression.Equal(right.Body, Expression.Default(typeof(TSourceMember))),
-                            Expression.Assign(left.Body, Expression.Default(typeof(TDestMember))), resultBlockWithDestExp);
+                        Expression.IfThenElse(Expression.Equal(right, Expression.Default(right.Type)),
+                            Expression.Assign(left, Expression.Default(left.Type)), resultBlockWithDestExp);
 
                     var releaseExp = Expression.Block(new ParameterExpression[] { }, checkNullExp);
                     var releaseWithDestExp = Expression.Block(new ParameterExpression[] { }, checkNullExpWithDest);
@@ -432,8 +356,8 @@ namespace ExpressMapper
                     typeof(IConvertible).IsAssignableFrom(sourceType))
                 {
                     var assignExp = CreateConvertibleAssignExpression(memberExpression,
-                        right.Body,
-                        typeof(TDestMember),
+                        right,
+                        left.Type,
                         sourceType,
                         destNullableType);
 
@@ -442,18 +366,18 @@ namespace ExpressMapper
                 }
                 else
                 {
-                    var mapComplexResult = MapDifferentTypeProps(typeof(TSourceMember), typeof(TDestMember), right.Body, left.Body as MemberExpression);
+                    var mapComplexResult = MapDifferentTypeProps(right.Type, left.Type, right, left);
 
                     _customPropertyCache[memberExpression.Member.Name] =
                         nullCheckNestedMemberVisitor.CheckNullExpression != null
                             ? Expression.Condition(nullCheckNestedMemberVisitor.CheckNullExpression,
-                                Expression.Assign(memberExpression, Expression.Default(left.Body.Type)),
+                                Expression.Assign(memberExpression, Expression.Default(left.Type)),
                                 mapComplexResult.Item1)
                             : mapComplexResult.Item1;
                     _customPropertyDestInstCache[memberExpression.Member.Name] =
                         nullCheckNestedMemberVisitor.CheckNullExpression != null
                             ? Expression.Condition(nullCheckNestedMemberVisitor.CheckNullExpression,
-                                Expression.Assign(memberExpression, Expression.Default(left.Body.Type)),
+                                Expression.Assign(memberExpression, Expression.Default(left.Type)),
                                 mapComplexResult.Item2)
                             : mapComplexResult.Item2;
                 }
@@ -461,15 +385,20 @@ namespace ExpressMapper
             else
             {
                 var binaryExpression = CreateAssignExpression(memberExpression,
-                    right.Body,
-                    typeof(TDestMember),
+                    right,
+                    left.Type,
                     destNullableType,
                     sourceNullableType);
 
-                var conditionalExpression = nullCheckNestedMemberVisitor.CheckNullExpression != null ? Expression.Condition(nullCheckNestedMemberVisitor.CheckNullExpression, Expression.Assign(memberExpression, Expression.Default(left.Body.Type)), binaryExpression) : (Expression)binaryExpression;
+                var conditionalExpression = nullCheckNestedMemberVisitor.CheckNullExpression != null ? Expression.Condition(nullCheckNestedMemberVisitor.CheckNullExpression, Expression.Assign(memberExpression, Expression.Default(left.Type)), binaryExpression) : (Expression)binaryExpression;
                 _customPropertyCache[memberExpression.Member.Name] = conditionalExpression;
                 _customPropertyDestInstCache[memberExpression.Member.Name] = conditionalExpression;
             }
+        }
+
+        public void MapMember<TSourceMember, TDestMember>(Expression<Func<TN, TDestMember>> left, Expression<Func<T, TSourceMember>> right)
+        {
+            MapMember(left.Body as MemberExpression, right.Body);
         }
 
         public void MapFunction<TMember, TNMember>(Expression<Func<TN, TNMember>> left, Func<T, TMember> right)
