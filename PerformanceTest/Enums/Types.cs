@@ -1,4 +1,4 @@
-﻿namespace PerformanceTest.Enums
+﻿namespace Benchmarks.Enums
 {
     public enum Types
     {

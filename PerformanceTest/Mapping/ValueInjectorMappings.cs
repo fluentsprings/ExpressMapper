@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Benchmarks.Enums;
+using Benchmarks.Models;
+using Benchmarks.ViewModels;
 using Omu.ValueInjecter;
-using PerformanceTest.Enums;
-using PerformanceTest.Models;
-using PerformanceTest.ViewModels;
 
-namespace PerformanceTest.Mapping
+namespace Benchmarks.Mapping
 {
     public class ValueInjectorMappings
     {

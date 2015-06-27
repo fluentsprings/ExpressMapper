@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Threading;
-using PerformanceTest.Models;
-using PerformanceTest.Tests;
-using PerformanceTest.ViewModels;
+using Benchmarks.Tests;
 
-namespace PerformanceTest
+namespace Benchmarks
 {
     class Program
     {

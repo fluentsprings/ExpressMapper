@@ -1,4 +1,4 @@
-﻿namespace PerformanceTest.Tests
+﻿namespace Benchmarks.Tests
 {
     public interface ITest
     {

@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PerformanceTest", "PerformanceTest\PerformanceTest.csproj", "{DA9915F0-7F27-4E73-8AC0-422363E80A5A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmarks", "PerformanceTest\Benchmarks.csproj", "{DA9915F0-7F27-4E73-8AC0-422363E80A5A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpressMapper NET45", "ExpressMapper NET45\ExpressMapper NET45.csproj", "{67AC5D64-8CA8-481F-AD23-5788755F4A33}"
 EndProject

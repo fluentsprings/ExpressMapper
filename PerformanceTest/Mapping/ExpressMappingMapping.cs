@@ -1,10 +1,9 @@
-﻿using ExpressMapper;
-using PerformanceTest.Enums;
-using PerformanceTest.Models;
-using PerformanceTest.Tests;
-using PerformanceTest.ViewModels;
+﻿using Benchmarks.Enums;
+using Benchmarks.Models;
+using Benchmarks.ViewModels;
+using ExpressMapper;
 
-namespace PerformanceTest.Mapping
+namespace Benchmarks.Mapping
 {
     public static class ExpressMapperMapping
     {

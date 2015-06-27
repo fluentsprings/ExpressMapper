@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PerformanceTest.ViewModels
+namespace Benchmarks.ViewModels
 {
     public class UserViewModel
     {

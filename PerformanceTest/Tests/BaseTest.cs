@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
 
-namespace PerformanceTest.Tests
+namespace Benchmarks.Tests
 {
     public abstract class BaseTest<T, TN> : BaseTestResult, ITest
     {

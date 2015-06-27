@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
+using Benchmarks.Enums;
+using Benchmarks.Models;
+using Benchmarks.ViewModels;
 using Mapster;
-using PerformanceTest.Enums;
-using PerformanceTest.Models;
-using PerformanceTest.ViewModels;
 
-namespace PerformanceTest.Mapping
+namespace Benchmarks.Mapping
 {
     public class MapsterMapperMappings
     {
