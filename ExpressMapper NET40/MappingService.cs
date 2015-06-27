@@ -537,10 +537,7 @@ namespace ExpressMapper
             var destList = typeof(List<>).MakeGenericType(destType);
             var destColl = Expression.Variable(destList, "destColl");
 
-            var constructorInfo = destList.GetConstructor(new Type[] { typeof(int) });
-            var srcCountExp = Expression.Call(typeof(Enumerable), "Count", new[] { sourceType }, sourceParameterExp);
-
-            var newColl = Expression.New(constructorInfo, srcCountExp);
+            var newColl = Expression.New(destList);
             var destAssign = Expression.Assign(destColl, newColl);
 
             var closedEnumeratorSourceType = typeof(IEnumerator<>).MakeGenericType(sourceType);
@@ -697,12 +694,12 @@ namespace ExpressMapper
             return blockExpression;
         }
 
-        private BlockExpression MapCollectionNotCountEquals(Type tCol, Type tnCol, Expression sourceVariable, Expression destVariable)
+        internal BlockExpression MapCollectionNotCountEquals(Type tCol, Type tnCol, Expression sourceVariable, Expression destVariable)
         {
             var sourceType = GetCollectionElementType(tCol);
             var destType = GetCollectionElementType(tnCol);
 
-            var destList = typeof(IList<>).MakeGenericType(destType);
+            var destList = typeof(List<>).MakeGenericType(destType);
             var destCollection = typeof(ICollection<>).MakeGenericType(destType);
 
             BlockExpression resultExpression;
@@ -807,25 +804,7 @@ namespace ExpressMapper
                         , Expression.Break(brk))
                     , brk);
 
-                Expression resultCollection = destVarExp;
-                if (destVariable.Type.IsArray)
-                {
-                    resultCollection = Expression.Call(destVarExp, destListType.GetMethod("ToArray"));
-                }
-                else
-                {
-                    if (destVariable.Type.IsGenericType && typeof(IQueryable).IsAssignableFrom(destVariable.Type))
-                    {
-                        resultCollection = Expression.Call(typeof(Queryable), "AsQueryable", new[] { destType }, destVarExp);
-                    }
-                    else
-                    {
-                        if (destVariable.Type.IsGenericType && destVariable.Type == typeof(Collection<>).MakeGenericType(destType))
-                        {
-                            resultCollection = Expression.Call(typeof(CollectionExtentions), "ToCollection", new[] { destType }, destVarExp);
-                        }
-                    }
-                }
+                Expression resultCollection = ConvertCollection(destVariable.Type, destList, destType, destVarExp);
 
                 var assignResult = Expression.Assign(destVariable, resultCollection);
 
@@ -845,7 +824,7 @@ namespace ExpressMapper
             return resultExpression;
         }
 
-        private BlockExpression MapCollectionSourcePrevail(Expression destVariable, Type sourceType, Expression sourceVariable, Type destType)
+        internal BlockExpression MapCollectionSourcePrevail(Expression destVariable, Type sourceType, Expression sourceVariable, Type destType)
         {
             // Source enumeration
             var closedEnumeratorSourceType = typeof(IEnumerator<>).MakeGenericType(sourceType);
