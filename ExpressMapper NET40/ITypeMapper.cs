@@ -37,6 +37,5 @@ namespace ExpressMapper
         void Instantiate(Func<T,TN> constructor);
         void BeforeMap(Action<T,TN> beforeMap);
         void AfterMap(Action<T,TN> afterMap);
-        void AutoMapProperty(PropertyInfo propertyGet, PropertyInfo propertySet);
     }
 }

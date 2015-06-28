@@ -50,7 +50,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CollectionExtentions.cs" />
     <Compile Include="CollectionTypes.cs" />
     <Compile Include="DefaultMappingContext.cs" />
     <Compile Include="IMappingContext.cs" />

@@ -47,9 +47,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\ExpressMapper NET40\CollectionExtentions.cs">
-      <Link>CollectionExtentions.cs</Link>
-    </Compile>
     <Compile Include="..\ExpressMapper NET40\CollectionTypes.cs">
       <Link>CollectionTypes.cs</Link>
     </Compile>
@@ -86,6 +83,9 @@
     <Compile Include="..\ExpressMapper NET40\NullCheckNestedMemberVisitor.cs">
       <Link>NullCheckNestedMemberVisitor.cs</Link>
     </Compile>
+    <Compile Include="..\ExpressMapper NET40\Properties\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="..\ExpressMapper NET40\StaticExpressions.cs">
       <Link>StaticExpressions.cs</Link>
     </Compile>
@@ -95,7 +95,6 @@
     <Compile Include="..\ExpressMapper NET40\TypeMapper.cs">
       <Link>TypeMapper.cs</Link>
     </Compile>
-    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Expressmapper.snk" />
