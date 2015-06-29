@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="CollectionTypes.cs" />
     <Compile Include="DefaultMappingContext.cs" />
+    <Compile Include="DelegateCustomTypeMapper.cs" />
     <Compile Include="IMappingContext.cs" />
     <Compile Include="IMappingService.cs" />
     <Compile Include="MapNotImplemented.cs" />

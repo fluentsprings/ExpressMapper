@@ -11,7 +11,6 @@ namespace ExpressMapper
     {
         private readonly Dictionary<int, ITypeMapper> TypeMappers = new Dictionary<int, ITypeMapper>();
         private readonly Dictionary<int, Func<ICustomTypeMapper>> CustomMappers = new Dictionary<int, Func<ICustomTypeMapper>>();
-        private readonly Dictionary<int, MulticastDelegate> CustomSimpleMappers = new Dictionary<int, MulticastDelegate>();
 
         private readonly Dictionary<int, MulticastDelegate> CollectionMappers = new Dictionary<int, MulticastDelegate>();
         private readonly Dictionary<int, MulticastDelegate> CollectionMappersWithDest = new Dictionary<int, MulticastDelegate>();
@@ -64,7 +63,6 @@ namespace ExpressMapper
             TypeMappers.Clear();
 
             CustomMappers.Clear();
-            CustomSimpleMappers.Clear();
 
             CollectionMappers.Clear();
             CollectionMappersWithDest.Clear();
@@ -82,12 +80,16 @@ namespace ExpressMapper
             Type dest = typeof(TN);
             var cacheKey = CalculateCacheKey(src, dest);
 
-            if (CustomSimpleMappers.ContainsKey(cacheKey))
+            if (CustomMappers.ContainsKey(cacheKey))
             {
                 throw new InvalidOperationException(String.Format("Mapping from {0} to {1} is already registered", src.FullName, dest.FullName));
             }
 
-            CustomSimpleMappers.Add(cacheKey, mapFunc);
+            Type delegateMapperType = typeof(DelegateCustomTypeMapper<,>).MakeGenericType(src, dest);
+            var newExpression = Expression.New(delegateMapperType.GetConstructor(new Type[] { typeof(Func<,>).MakeGenericType(src, dest) }), Expression.Constant(mapFunc));
+            var newLambda = Expression.Lambda<Func<ICustomTypeMapper<T, TN>>>(newExpression);
+            var compile = newLambda.Compile();
+            CustomMappers.Add(cacheKey, compile);
         }
 
         public void RegisterCustom<T, TN, TMapper>() where TMapper : ICustomTypeMapper<T, TN>
@@ -119,12 +121,6 @@ namespace ExpressMapper
                 var typeMapper = customTypeMapper() as ICustomTypeMapper<T, TN>;
                 var context = new DefaultMappingContext<T, TN> { Source = src };
                 return typeMapper.Map(context);
-            }
-
-            if (CustomSimpleMappers.ContainsKey(cacheKey))
-            {
-                var funcMap = CustomSimpleMappers[cacheKey] as Func<T, TN>;
-                return funcMap(src);
             }
 
             if (TypeMappers.ContainsKey(cacheKey))
@@ -177,12 +173,6 @@ namespace ExpressMapper
                 var typeMapper = customTypeMapper() as ICustomTypeMapper<T, TN>;
                 var defaultMappingContext = new DefaultMappingContext<T, TN> { Source = src, Destination = dest };
                 return typeMapper.Map(defaultMappingContext);
-            }
-
-            if (CustomSimpleMappers.ContainsKey(cacheKey))
-            {
-                var funcMap = CustomSimpleMappers[cacheKey] as Func<T, TN>;
-                return funcMap(src);
             }
 
             if (TypeMappers.ContainsKey(cacheKey))
@@ -238,13 +228,6 @@ namespace ExpressMapper
                     CompileNonGenericCustomTypeMapper(srcType, dstType, typeMapper, cacheKey);
                 }
                 return CustomTypeMapperCache[cacheKey](src);
-            }
-
-            if (CustomSimpleMappers.ContainsKey(cacheKey))
-            {
-                var funcMap = CustomSimpleMappers[cacheKey];
-                var result = funcMap.DynamicInvoke(src);
-                return result;
             }
 
             if (TypeMappers.ContainsKey(cacheKey))
