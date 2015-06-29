@@ -19,5 +19,6 @@ namespace ExpressMapper.Tests.Model.Models
         public DateTime Created { get; set; }
         public string Gender { get; set; }
         public GenderTypes? NullableGender { get; set; }
+        public string[] StringCollection { get; set; }
     }
 }
