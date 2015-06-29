@@ -12,7 +12,6 @@ namespace ExpressMapper
         private readonly Dictionary<int, ITypeMapper> TypeMappers = new Dictionary<int, ITypeMapper>();
         private readonly Dictionary<int, Func<ICustomTypeMapper>> CustomMappers = new Dictionary<int, Func<ICustomTypeMapper>>();
         private readonly Dictionary<int, MulticastDelegate> CustomSimpleMappers = new Dictionary<int, MulticastDelegate>();
-        private readonly Dictionary<int, MulticastDelegate> CustomSimpleMappersWithDest = new Dictionary<int, MulticastDelegate>();
 
         private readonly Dictionary<int, MulticastDelegate> CollectionMappers = new Dictionary<int, MulticastDelegate>();
         private readonly Dictionary<int, MulticastDelegate> CollectionMappersWithDest = new Dictionary<int, MulticastDelegate>();
@@ -66,7 +65,6 @@ namespace ExpressMapper
 
             CustomMappers.Clear();
             CustomSimpleMappers.Clear();
-            CustomSimpleMappersWithDest.Clear();
 
             CollectionMappers.Clear();
             CollectionMappersWithDest.Clear();
@@ -305,13 +303,6 @@ namespace ExpressMapper
                 return CustomTypeMapperWithDestCache[cacheKey](src, dest);
             }
 
-            if (CustomSimpleMappersWithDest.ContainsKey(cacheKey))
-            {
-                var funcMap = CustomSimpleMappersWithDest[cacheKey];
-                var result = funcMap.DynamicInvoke(src, dest);
-                return result;
-            }
-
             if (TypeMappers.ContainsKey(cacheKey))
             {
                 if (src == null)
@@ -504,13 +495,13 @@ namespace ExpressMapper
             CustomTypeMapperWithDestExpCache[cacheKey] = Expression.Block(new ParameterExpression[] { }, blockExpression);
         }
 
-        private BlockExpression GetCustomMapExpression(Type src, Type dest, bool withDestination = false)
+        private Tuple<BlockExpression, BlockExpression> GetCustomMapExpression(Type src, Type dest)
         {
             var cacheKey = CalculateCacheKey(src, dest);
             if (!CustomMappers.ContainsKey(cacheKey)) return null;
             CompileGenericCustomTypeMapper(src, dest, CustomMappers[cacheKey](), cacheKey);
             CompileGenericCustomTypeMapperWithDestination(src, dest, CustomMappers[cacheKey](), cacheKey);
-            return withDestination ? CustomTypeMapperWithDestExpCache[cacheKey] : CustomTypeMapperExpCache[cacheKey];
+            return new Tuple<BlockExpression, BlockExpression>(CustomTypeMapperExpCache[cacheKey], CustomTypeMapperWithDestExpCache[cacheKey]);
         }
 
         public void PreCompileCollection<T, TN>()
@@ -925,8 +916,7 @@ namespace ExpressMapper
             if (destType != sourceType)
             {
                 var customMapExpression = GetCustomMapExpression(right.Type, left.Type);
-                var customMapExpressionWithDest = GetCustomMapExpression(right.Type, left.Type, true);
-                if (customMapExpression != null && customMapExpressionWithDest != null)
+                if (customMapExpression != null)
                 {
                     var srcExp = Expression.Variable(right.Type,
                         string.Format("{0}Src", Guid.NewGuid().ToString("N")));
@@ -937,10 +927,12 @@ namespace ExpressMapper
                     var assignDestExp = Expression.Assign(destExp, left);
 
                     var substituteParameterVisitor = new SubstituteParameterVisitor(srcExp, destExp);
-                    var blockExpression = substituteParameterVisitor.Visit(customMapExpression) as BlockExpression;
+                    var blockExpression = substituteParameterVisitor.Visit(customMapExpression.Item1) as BlockExpression;
+                    var blockExpressionWithDest = substituteParameterVisitor.Visit(customMapExpression.Item2) as BlockExpression;
+
                     var assignResultExp = Expression.Assign(left, destExp);
                     var resultBlockExp = Expression.Block(new[] { srcExp, destExp }, assignSrcExp, blockExpression, assignResultExp);
-                    var resultBlockWithDestExp = Expression.Block(new[] { srcExp, destExp }, assignSrcExp, assignDestExp, blockExpression, assignResultExp);
+                    var resultBlockWithDestExp = Expression.Block(new[] { srcExp, destExp }, assignSrcExp, assignDestExp, blockExpressionWithDest, assignResultExp);
 
                     var checkNullExp =
                         Expression.IfThenElse(Expression.Equal(right, Expression.Default(right.Type)),
