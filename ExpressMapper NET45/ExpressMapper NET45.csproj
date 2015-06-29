@@ -52,6 +52,9 @@
     <Compile Include="..\ExpressMapper NET40\DefaultMappingContext.cs">
       <Link>DefaultMappingContext.cs</Link>
     </Compile>
+    <Compile Include="..\ExpressMapper NET40\DelegateCustomTypeMapper.cs">
+      <Link>DelegateCustomTypeMapper.cs</Link>
+    </Compile>
     <Compile Include="..\ExpressMapper NET40\ICustomTypeMapper.cs">
       <Link>ICustomTypeMapper.cs</Link>
     </Compile>

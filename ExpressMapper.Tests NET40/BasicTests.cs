@@ -517,38 +517,40 @@ namespace ExpressMapper.Tests
             }
         }
 
-        //[Test]
-        //public void ExistingDestCollEqualsWithNullElement()
-        //{
-        //    Mapper.Register<TestCollection, TestCollectionViewModel>();
-        //    Mapper.Register<TestItem, TestItemViewModel>()
-        //        .Member(dest => dest.Array, src => src.Queryable)
-        //        .Ignore(dest => dest.Queryable);
+        [Test]
+        public void ExistingDestCollEqualsWithNullElement()
+        {
+            Mapper.Register<TestCollection, TestCollectionViewModel>();
+            Mapper.Register<TestItem, TestItemViewModel>()
+                .Member(dest => dest.Array, src => src.Queryable)
+                .Ignore(dest => dest.Queryable);
 
-        //    Mapper.Compile();
-        //    var testResult = Functional.ExistingDestCollEqualsWithNullElement();
+            Mapper.Compile();
+            var testResult = Functional.ExistingDestCollEqualsWithNullElement();
 
-        //    var testItemHash = testResult.Value.GetHashCode();
-        //    var arrayHash = testResult.Value.Array.GetHashCode();
-        //    var testArr = new List<int>(testResult.Value.Array.Length);
-        //    testArr.AddRange(testResult.Value.Array.Select(tc => tc.GetHashCode()));
+            var testItemHash = testResult.Value.GetHashCode();
+            var arrayHash = testResult.Value.Array.GetHashCode();
+            var testArr = new List<int?>(testResult.Value.Array.Length);
+            testArr.AddRange(testResult.Value.Array.Select(tc => tc == null ? (int?)null : tc.GetHashCode()));
 
+            var result = Mapper.Map(testResult.Key, testResult.Value);
+            Assert.AreEqual(result, testResult.Value);
+            Assert.AreEqual(result.GetHashCode(), testItemHash);
+            Assert.AreEqual(result.Array.GetHashCode(), arrayHash);
 
-        //    var result = Mapper.Map(testResult.Key, testResult.Value);
-        //    Assert.AreEqual(result, testResult.Value);
-        //    Assert.AreEqual(result.GetHashCode(), testItemHash);
-        //    Assert.AreEqual(result.Array.GetHashCode(), arrayHash);
-
-        //    for (var i = 0; i < result.Array.Length; i++)
-        //    {
-        //        if (i == 3)
-        //        {
-        //            Assert.AreNotEqual(result.Array[i], null);
-        //            Assert.AreNotEqual(result.Array[i].GetHashCode(), testArr[i]);
-        //        }
-        //        Assert.AreEqual(result.Array[i].GetHashCode(), testArr[i]);
-        //    }
-        //}
+            for (var i = 0; i < result.Array.Length; i++)
+            {
+                if (i == 3)
+                {
+                    Assert.AreEqual(null, result.Array[i]);
+                    Assert.AreEqual(null, testArr[i]);
+                }
+                else
+                {
+                    Assert.AreEqual(result.Array[i].GetHashCode(), testArr[i]);
+                }
+            }
+        }
 
         [Test]
         public void ExistingSrcCollGreater()

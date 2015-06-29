@@ -11,7 +11,7 @@ namespace ExpressMapper.Tests.Model.ViewModels
         public string Name { get; set; }
         public int Age { get; set; }
         public int NotNullable { get; set; }
-        public int? Nullable { get; set; } 
+        public int? Nullable { get; set; }
         public decimal? Weight { get; set; }
         public long Height { get; set; }
         public bool BoolValue { get; set; }
@@ -21,6 +21,7 @@ namespace ExpressMapper.Tests.Model.ViewModels
         public GenderTypes Gender { get; set; }
         public string NullableGender { get; set; }
         public int GenderIndex { get; set; }
+        public List<String> StringCollection { get; set; }
         public bool Equals(TestViewModel other)
         {
             var sizes = true;
