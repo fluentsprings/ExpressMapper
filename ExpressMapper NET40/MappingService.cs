@@ -1102,7 +1102,7 @@ namespace ExpressMapper
                             : null);
 
             var blockExpression = (tCol != null && tnCol != null)
-                ? new Tuple<Expression, Expression>(MapCollection(sourceType, destType, tCol, tnCol, callGetPropMethod, callSetPropMethod), MapCollection2(sourceType, destType, tCol, tnCol, callGetPropMethod, callSetPropMethod))
+                ? new Tuple<Expression, Expression>(MapCollection(tCol, tnCol, callGetPropMethod, callSetPropMethod), MapCollection2(tCol, tnCol, callGetPropMethod, callSetPropMethod))
                 : new Tuple<Expression, Expression>(MapProperty(sourceType, destType, callGetPropMethod, callSetPropMethod), MapProperty2(sourceType, destType, callGetPropMethod, callSetPropMethod));
 
 
@@ -1123,11 +1123,11 @@ namespace ExpressMapper
             return blockExpression;
         }
 
-        private BlockExpression MapCollection(Type sourcePropType, Type destpropType, Type tCol, Type tnCol, Expression callGetPropMethod, MemberExpression callSetPropMethod)
+        private BlockExpression MapCollection(Type tCol, Type tnCol, Expression callGetPropMethod, MemberExpression callSetPropMethod)
         {
             var sourceType = GetCollectionElementType(tCol);
             var destType = GetCollectionElementType(tnCol);
-            var sourceVariable = Expression.Variable(sourcePropType,
+            var sourceVariable = Expression.Variable(callGetPropMethod.Type,
                 string.Format("{0}Src", Guid.NewGuid().ToString().Replace("-", "_")));
             var assignSourceFromProp = Expression.Assign(sourceVariable, callGetPropMethod);
 
@@ -1156,7 +1156,7 @@ namespace ExpressMapper
             var loopExpression = CollectionLoopExpression(sourceType, destType, destColl, sourceColItmVariable, destColItmVariable,
                 assignSourceItmFromProp, doMoveNext);
 
-            Expression resultCollection = ConvertCollection(destpropType, destList, destType, destColl);
+            Expression resultCollection = ConvertCollection(callSetPropMethod.Type, destList, destType, destColl);
 
             var assignResult = Expression.Assign(callSetPropMethod, resultCollection);
 
@@ -1180,11 +1180,11 @@ namespace ExpressMapper
             return blockResultExp;
         }
 
-        private BlockExpression MapCollection2(Type sourcePropType, Type destpropType, Type tCol, Type tnCol, Expression callGetPropMethod, MemberExpression callSetPropMethod)
+        private BlockExpression MapCollection2(Type tCol, Type tnCol, Expression callGetPropMethod, MemberExpression callSetPropMethod)
         {
             var sourceType = GetCollectionElementType(tCol);
             var destType = GetCollectionElementType(tnCol);
-            var sourceVariable = Expression.Variable(sourcePropType,
+            var sourceVariable = Expression.Variable(callGetPropMethod.Type,
                 string.Format("{0}Src", Guid.NewGuid().ToString().Replace("-", "_")));
             var assignSourceVarExp = Expression.Assign(sourceVariable, callGetPropMethod);
 
@@ -1193,12 +1193,12 @@ namespace ExpressMapper
 
             var conditionToCreateList = Expression.NotEqual(srcCount, destCount);
             var notNullCondition = Expression.IfThenElse(conditionToCreateList,
-                MapCollectionNotCountEquals(sourcePropType, destpropType, callGetPropMethod,
+                MapCollectionNotCountEquals(callGetPropMethod.Type, callSetPropMethod.Type, callGetPropMethod,
                     callSetPropMethod),
                 MapCollectionCountEquals(tCol, tnCol, callGetPropMethod, callSetPropMethod));
 
             var result = Expression.IfThenElse(Expression.NotEqual(callSetPropMethod, StaticExpressions.NullConstant), notNullCondition,
-                MapCollection(sourcePropType, destpropType, tCol, tnCol, callGetPropMethod, callSetPropMethod));
+                MapCollection(tCol, tnCol, callGetPropMethod, callSetPropMethod));
 
             var blockExpression = Expression.Block(new ParameterExpression[] { }, new Expression[] { result });
             var expression = new SubstituteParameterVisitor(sourceVariable).Visit(blockExpression) as BlockExpression;
