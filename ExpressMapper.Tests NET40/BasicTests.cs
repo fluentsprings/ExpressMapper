@@ -467,7 +467,6 @@ namespace ExpressMapper.Tests
             Mapper.Register<Country, CountryViewModel>();
             Mapper.Register<Size, SizeViewModel>();
 
-            Mapper.Compile();
             var sizeResult = Functional.ExistingDestinationSimpleMap();
 
             var testObjHash = sizeResult.Value.GetHashCode();

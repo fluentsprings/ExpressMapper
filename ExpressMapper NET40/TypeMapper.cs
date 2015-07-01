@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -26,7 +25,6 @@ namespace ExpressMapper
         private readonly Dictionary<string, Expression> _propertyDestInstCache = new Dictionary<string, Expression>();
         private readonly Dictionary<string, Expression> _customPropertyDestInstCache = new Dictionary<string, Expression>();
 
-        private ICustomTypeMapper<T, TN> _customTypeMapper;
         private Action<T, TN> _beforeMapHandler;
         private Action<T, TN> _afterMapHandler;
         private Func<T, TN> _constructorFunc;
@@ -51,22 +49,10 @@ namespace ExpressMapper
 
         #region Compilation phase
 
-        public IQueryable ProcessQueryable(IEnumerable src, IQueryable dest)
-        {
-            throw new NotImplementedException();
-        }
-
         public void Compile()
         {
             if (_mapFunc != null) return;
 
-            Expression resultExpression;
-            if (_customTypeMapper != null)
-            {
-                resultExpression = CompileCustomType();
-            }
-            else
-            {
                 _destVariable = GetDestionationVariable();
 
                 ProcessAutoProperties();
@@ -108,8 +94,7 @@ namespace ExpressMapper
                 _finalExpression = Expression.Block(variables, expressions);
                 var substituteParameterVisitor = new SubstituteParameterVisitor(_sourceParameter,
                     _destVariable.Left as ParameterExpression);
-                resultExpression = substituteParameterVisitor.Visit(_finalExpression) as BlockExpression;
-            }
+                Expression resultExpression = substituteParameterVisitor.Visit(_finalExpression) as BlockExpression;
 
             var expression = Expression.Lambda<Func<T, TN>>(resultExpression, _sourceParameter);
             _mapFunc = expression.Compile();
@@ -158,18 +143,6 @@ namespace ExpressMapper
             // TODO: _mappingService.IsDestinationInstance = false;
         }
 
-        private Expression CompileCustomType()
-        {
-            Expression<Func<T, TN>> customMapper = src => _customTypeMapper.Map(new DefaultMappingContext<T, TN> { Source = src });
-            var invocationExpression = Expression.Invoke(customMapper, _sourceParameter);
-            var parameterExpression = Expression.Variable(typeof(TN), "dest");
-            var binaryExpression = Expression.Assign(parameterExpression, invocationExpression);
-            _giveAway.Add(invocationExpression);
-            _giveAway.Add(binaryExpression);
-            var resultExpression = Expression.Block(new[] { parameterExpression }, _giveAway);
-            return resultExpression;
-        }
-
         #endregion
 
         #region ITypeMapper<T, TN>, ITypeMapper implementation
@@ -183,49 +156,6 @@ namespace ExpressMapper
         {
             Compile();
             return withDestinationInstance ? _giveWithDestinationAway : _giveAway;
-        }
-
-        public IList ProcessCollection(IEnumerable src)
-        {
-            var source = src as IEnumerable<T>;
-            var destination = new List<TN>(source.Count());
-            foreach (var item in source)
-            {
-                destination.Add(MapTo(item));
-            }
-            return destination;
-        }
-
-        public IEnumerable ProcessArray(IEnumerable src)
-        {
-            var source = src as T[];
-            var destination = new List<TN>(source.Length);
-            for (var i = 0; i < source.Length; i++)
-            {
-                destination.Add(MapTo(source[i]));
-            }
-            return destination.ToArray();
-        }
-
-        public IQueryable ProcessQueryable(IEnumerable src)
-        {
-            var source = src as IEnumerable<T>;
-            var destination = new List<TN>(source.Count());
-            foreach (var item in source)
-            {
-                destination.Add(MapTo(item));
-            }
-            return destination.AsQueryable();
-        }
-
-        public IList ProcessCollection(IEnumerable src, IList dest)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable ProcessArray(IEnumerable src, IEnumerable dest)
-        {
-            throw new NotImplementedException();
         }
 
         public void AfterMap(Action<T, TN> afterMap)
@@ -302,11 +232,6 @@ namespace ExpressMapper
         {
             var memberExpression = left.Body as MemberExpression;
             _ignoreList.Add(memberExpression.Member.Name);
-        }
-
-        public void Custom(ICustomTypeMapper<T, TN> customTypeMapper)
-        {
-            _customTypeMapper = customTypeMapper;
         }
 
         public TN MapTo(T src)

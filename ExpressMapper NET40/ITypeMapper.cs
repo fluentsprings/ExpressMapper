@@ -11,12 +11,6 @@ namespace ExpressMapper
     {
         Func<object, object> GetNonGenericMapFunc();
         List<Expression> GetMapExpressions(bool withDestinationInstance = false);
-        IList ProcessCollection(IEnumerable src);
-        IEnumerable ProcessArray(IEnumerable src);
-        IQueryable ProcessQueryable(IEnumerable src);
-        IList ProcessCollection(IEnumerable src, IList dest);
-        IEnumerable ProcessArray(IEnumerable src, IEnumerable dest);
-        IQueryable ProcessQueryable(IEnumerable src, IQueryable dest);
         void Compile();
         void CompileDestinationInstance();
     }
@@ -30,7 +24,6 @@ namespace ExpressMapper
     {
         TN MapTo(T src);
         TN MapTo(T src, TN dest);
-        void Custom(ICustomTypeMapper<T, TN> customTypeMapper);
         void Ignore<TMember>(Expression<Func<TN, TMember>> left);
         void MapMember<TMember, TNMember>(Expression<Func<TN, TNMember>> left, Expression<Func<T, TMember>> right);
         void MapFunction<TMember, TNMember>(Expression<Func<TN, TNMember>> left, Func<T, TMember> right);
