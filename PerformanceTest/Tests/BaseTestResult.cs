@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace PerformanceTest.Tests
+namespace Benchmarks.Tests
 {
     public abstract class BaseTestResult
     {

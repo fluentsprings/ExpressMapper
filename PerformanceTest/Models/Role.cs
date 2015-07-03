@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PerformanceTest.Models
+namespace Benchmarks.Models
 {
     public class Role
     {

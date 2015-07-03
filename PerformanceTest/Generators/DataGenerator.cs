@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using PerformanceTest.Models;
-using PerformanceTest.ViewModels;
+using Benchmarks.Models;
 
-namespace PerformanceTest.Generators
+namespace Benchmarks.Generators
 {
     public static class DataGenerator
     {

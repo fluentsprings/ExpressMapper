@@ -7,8 +7,8 @@
     <ProjectGuid>{DA9915F0-7F27-4E73-8AC0-422363E80A5A}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PerformanceTest</RootNamespace>
-    <AssemblyName>PerformanceTest</AssemblyName>
+    <RootNamespace>Benchmarks</RootNamespace>
+    <AssemblyName>Benchmarks</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -33,7 +33,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>PerformanceTest.Program</StartupObject>
+    <StartupObject>Benchmarks.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AutoMapper">

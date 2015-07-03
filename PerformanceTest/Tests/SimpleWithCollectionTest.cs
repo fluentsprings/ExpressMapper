@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using Benchmarks.Generators;
+using Benchmarks.Mapping;
+using Benchmarks.Models;
+using Benchmarks.ViewModels;
 using Mapster;
-using Nelibur.ObjectMapper;
-using PerformanceTest.Generators;
-using PerformanceTest.Mapping;
-using PerformanceTest.Models;
-using PerformanceTest.ViewModels;
 
-namespace PerformanceTest.Tests
+namespace Benchmarks.Tests
 {
     public class SimpleWithCollectionTest : BaseTest<List<Author>, List<AuthorViewModel>>
     {

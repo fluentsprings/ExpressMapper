@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using PerformanceTest.Enums;
+using Benchmarks.Enums;
 
-namespace PerformanceTest.ViewModels
+namespace Benchmarks.ViewModels
 {
     public class TestViewModel
     {

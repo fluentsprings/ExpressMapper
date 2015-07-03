@@ -1,9 +1,8 @@
-﻿using Nelibur.ObjectMapper;
-using PerformanceTest.Models;
-using PerformanceTest.Tests;
-using PerformanceTest.ViewModels;
+﻿using Benchmarks.Models;
+using Benchmarks.ViewModels;
+using Nelibur.ObjectMapper;
 
-namespace PerformanceTest.Mapping
+namespace Benchmarks.Mapping
 {
     public class TinyMapperMappings
     {
