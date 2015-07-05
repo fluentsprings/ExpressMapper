@@ -39,8 +39,6 @@ namespace ExpressMapper
         public TypeMapper(MappingService mappingService)
         {
             _mappingService = mappingService;
-
-            CompileNonGenericMapFunc();
         }
 
         #endregion
@@ -261,6 +259,11 @@ namespace ExpressMapper
 
         private void CompileNonGenericMapFunc()
         {
+            if (_nonGenericMapFunc != null)
+            {
+                return;
+            }
+
             var parameterExpression = Expression.Parameter(typeof(object), "src");
             var srcConverted = Expression.Convert(parameterExpression, typeof(T));
             var srcTypedExp = Expression.Variable(typeof(T), "srcTyped");
@@ -279,7 +282,6 @@ namespace ExpressMapper
 
             var blockExpression = Expression.Block(new[] { srcTypedExp, genVariable, resultVarExp }, new Expression[] { srcAssigned, assignExp, assignResult, resultVarExp });
             var lambda = Expression.Lambda<Func<object, object>>(blockExpression, parameterExpression);
-            //var lambda = Expression.Lambda<Func<object, object>>(mapCall, srcTypedExp, genVariable, parameterExpression);
             _nonGenericMapFunc = lambda.Compile();
         }
 
