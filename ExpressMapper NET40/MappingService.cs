@@ -23,6 +23,8 @@ namespace ExpressMapper
 
         private readonly List<int> NonGenericCollectionMappingCache = new List<int>();
 
+        private static readonly Type GenericEnumerableType = typeof(IEnumerable<>);
+
         public IMemberConfiguration<T, TN> Register<T, TN>()
         {
             Type src = typeof(T);
@@ -39,7 +41,7 @@ namespace ExpressMapper
             return new MemberConfiguration<T, TN>(classMapper);
         }
 
-        private List<Expression> GetMapExpressions(Type src, Type dest, bool withDestinationInstance = false)
+        private List<Expression> GetMapExpressions(Type src, Type dest, bool withDestinationInstance)
         {
             var cacheKey = CalculateCacheKey(src, dest);
             if (TypeMappers.ContainsKey(cacheKey))
@@ -139,13 +141,13 @@ namespace ExpressMapper
 
             var tCol =
                 typeof(T).GetInterfaces()
-                    .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>)) ??
+                    .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == GenericEnumerableType) ??
                     (typeof(T).IsGenericType
                         && typeof(T).GetInterfaces().Any(t => t == typeof(IEnumerable)) ? typeof(T)
                         : null);
 
             tnCol = typeof(TN).GetInterfaces()
-                .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>)) ??
+                .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == GenericEnumerableType) ??
                 (typeof(TN).IsGenericType && typeof(TN).GetInterfaces().Any(t => t == typeof(IEnumerable)) ? typeof(TN)
                     : null);
 
@@ -153,7 +155,7 @@ namespace ExpressMapper
             {
                 if (!CollectionMappers.ContainsKey(cacheKey))
                 {
-                    PreCompileCollection<T, TN>();
+                    PrecompileCollection<T, TN>();
                 }
                 return (TN)CollectionMappers[cacheKey].DynamicInvoke(src);
             }
@@ -191,13 +193,13 @@ namespace ExpressMapper
 
             var tCol =
                 typeof(T).GetInterfaces()
-                    .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>)) ??
+                    .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == GenericEnumerableType) ??
                     (typeof(T).IsGenericType
                         && typeof(T).GetInterfaces().Any(t => t == typeof(IEnumerable)) ? typeof(T)
                         : null);
 
             tnCol = typeof(TN).GetInterfaces()
-                .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>)) ??
+                .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == GenericEnumerableType) ??
                 (typeof(TN).IsGenericType && typeof(TN).GetInterfaces().Any(t => t == typeof(IEnumerable)) ? typeof(TN)
                     : null);
 
@@ -205,7 +207,7 @@ namespace ExpressMapper
             {
                 if (!CollectionMappers.ContainsKey(cacheKey))
                 {
-                    PreCompileCollection<T, TN>();
+                    PrecompileCollection<T, TN>();
                 }
                 return (TN)CollectionMappersWithDest[cacheKey].DynamicInvoke(src, dest);
             }
@@ -247,13 +249,13 @@ namespace ExpressMapper
 
             var tCol =
                 srcType.GetInterfaces()
-                    .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>)) ??
+                    .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == GenericEnumerableType) ??
                     (srcType.IsGenericType
                         && srcType.GetInterfaces().Any(t => t == typeof(IEnumerable)) ? srcType
                         : null);
 
             var tnCol = dstType.GetInterfaces()
-                .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>)) ??
+                .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == GenericEnumerableType) ??
                          (dstType.IsGenericType && dstType.GetInterfaces().Any(t => t == typeof(IEnumerable)) ? dstType
                              : null);
 
@@ -303,13 +305,13 @@ namespace ExpressMapper
 
             var tCol =
                 srcType.GetInterfaces()
-                    .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>)) ??
+                    .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == GenericEnumerableType) ??
                     (srcType.IsGenericType
                         && srcType.GetInterfaces().Any(t => t == typeof(IEnumerable)) ? srcType
                         : null);
 
             var tnCol = dstType.GetInterfaces()
-                .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>)) ??
+                .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == GenericEnumerableType) ??
                          (dstType.IsGenericType && dstType.GetInterfaces().Any(t => t == typeof(IEnumerable)) ? dstType
                              : null);
 
@@ -364,7 +366,7 @@ namespace ExpressMapper
             var cacheKey = CalculateCacheKey(srcType, dstType);
             if (NonGenericCollectionMappingCache.Contains(cacheKey)) return;
 
-            var methodInfo = GetType().GetMethod("PreCompileCollection");
+            var methodInfo = GetType().GetMethod("PrecompileCollection");
             var makeGenericMethod = methodInfo.MakeGenericMethod(srcType, dstType);
             var methodCallExpression = Expression.Call(Expression.Constant(this), makeGenericMethod);
             var expression = Expression.Lambda<Action>(methodCallExpression);
@@ -487,7 +489,7 @@ namespace ExpressMapper
             return new Tuple<BlockExpression, BlockExpression>(CustomTypeMapperExpCache[cacheKey], CustomTypeMapperWithDestExpCache[cacheKey]);
         }
 
-        public void PreCompileCollection<T, TN>()
+        public void PrecompileCollection<T, TN>()
         {
             CompileCollection<T, TN>();
             CompileCollectionWithDestination<T, TN>();
@@ -515,7 +517,7 @@ namespace ExpressMapper
             var destAssign = Expression.Assign(destColl, newColl);
 
             var closedEnumeratorSourceType = typeof(IEnumerator<>).MakeGenericType(sourceType);
-            var closedEnumerableSourceType = typeof(IEnumerable<>).MakeGenericType(sourceType);
+            var closedEnumerableSourceType = GenericEnumerableType.MakeGenericType(sourceType);
             var enumerator = Expression.Variable(closedEnumeratorSourceType, "srcEnumerator");
             var assignToEnum = Expression.Assign(enumerator,
                 Expression.Call(sourceParameterExp, closedEnumerableSourceType.GetMethod("GetEnumerator")));
@@ -527,7 +529,7 @@ namespace ExpressMapper
 
             var destColItmVariable = Expression.Variable(destType, "ItmDest");
 
-            var loopExpression = CollectionLoopExpression(sourceType, destType, destColl, sourceColItmVariable, destColItmVariable,
+            var loopExpression = CollectionLoopExpression(destColl, sourceColItmVariable, destColItmVariable,
                 assignSourceItmFromProp, doMoveNext);
 
             Expression resultCollection = ConvertCollection(typeof(TN), destList, destType, destColl);
@@ -601,7 +603,7 @@ namespace ExpressMapper
 
             // Source enumeration
             var closedEnumeratorSourceType = typeof(IEnumerator<>).MakeGenericType(sourceType);
-            var closedEnumerableSourceType = typeof(IEnumerable<>).MakeGenericType(sourceType);
+            var closedEnumerableSourceType = GenericEnumerableType.MakeGenericType(sourceType);
             var enumeratorSrc = Expression.Variable(closedEnumeratorSourceType, "EnumSrc");
             var assignToEnumSrc = Expression.Assign(enumeratorSrc,
                 Expression.Call(sourceVariable, closedEnumerableSourceType.GetMethod("GetEnumerator")));
@@ -612,7 +614,7 @@ namespace ExpressMapper
 
             // dest enumeration
             var closedEnumeratorDestType = typeof(IEnumerator<>).MakeGenericType(destType);
-            var closedEnumerableDestType = typeof(IEnumerable<>).MakeGenericType(destType);
+            var closedEnumerableDestType = GenericEnumerableType.MakeGenericType(destType);
             var enumeratorDest = Expression.Variable(closedEnumeratorDestType, "EnumDest");
             var assignToEnumDest = Expression.Assign(enumeratorDest,
                 Expression.Call(destVariable, closedEnumerableDestType.GetMethod("GetEnumerator")));
@@ -699,7 +701,7 @@ namespace ExpressMapper
 
                 // Source enumeration
                 var closedEnumeratorSourceType = typeof(IEnumerator<>).MakeGenericType(sourceType);
-                var closedEnumerableSourceType = typeof(IEnumerable<>).MakeGenericType(sourceType);
+                var closedEnumerableSourceType = GenericEnumerableType.MakeGenericType(sourceType);
                 var enumeratorSrc = Expression.Variable(closedEnumeratorSourceType, "EnumSrc");
                 var assignToEnumSrc = Expression.Assign(enumeratorSrc,
                     Expression.Call(sourceVariable, closedEnumerableSourceType.GetMethod("GetEnumerator")));
@@ -711,7 +713,7 @@ namespace ExpressMapper
 
                 // dest enumeration
                 var closedEnumeratorDestType = typeof(IEnumerator<>).MakeGenericType(destType);
-                var closedEnumerableDestType = typeof(IEnumerable<>).MakeGenericType(destType);
+                var closedEnumerableDestType = GenericEnumerableType.MakeGenericType(destType);
                 var enumeratorDest = Expression.Variable(closedEnumeratorDestType, "EnumDest");
                 var assignToEnumDest = Expression.Assign(enumeratorDest,
                     Expression.Call(destVariable, closedEnumerableDestType.GetMethod("GetEnumerator")));
@@ -735,12 +737,7 @@ namespace ExpressMapper
                 var innerLoopBlock = Expression.Block(new[] { srcItmVarExp, destItmVarExp },
                     new Expression[] { assignSourceItmFromProp, mapAndAddItemExp, addToNewCollNew });
 
-                var brk = Expression.Label();
-                var loopExpression = Expression.Loop(
-                    Expression.IfThenElse(Expression.NotEqual(doMoveNextSrc, StaticExpressions.FalseConstant),
-                        innerLoopBlock
-                        , Expression.Break(brk))
-                    , brk);
+                var loopExpression = CreateLoopExpression(doMoveNextSrc, innerLoopBlock);
 
                 Expression resultCollection = ConvertCollection(destVariable.Type, destList, destType, destVarExp);
 
@@ -766,7 +763,7 @@ namespace ExpressMapper
         {
             // Source enumeration
             var closedEnumeratorSourceType = typeof(IEnumerator<>).MakeGenericType(sourceType);
-            var closedEnumerableSourceType = typeof(IEnumerable<>).MakeGenericType(sourceType);
+            var closedEnumerableSourceType = GenericEnumerableType.MakeGenericType(sourceType);
             var enumeratorSrc = Expression.Variable(closedEnumeratorSourceType, "EnumSrc");
             var assignToEnumSrc = Expression.Assign(enumeratorSrc,
                 Expression.Call(sourceVariable, closedEnumerableSourceType.GetMethod("GetEnumerator")));
@@ -778,7 +775,7 @@ namespace ExpressMapper
 
             // dest enumeration
             var closedEnumeratorDestType = typeof(IEnumerator<>).MakeGenericType(destType);
-            var closedEnumerableDestType = typeof(IEnumerable<>).MakeGenericType(destType);
+            var closedEnumerableDestType = GenericEnumerableType.MakeGenericType(destType);
             var enumeratorDest = Expression.Variable(closedEnumeratorDestType, "EnumDest");
             var assignToEnumDest = Expression.Assign(enumeratorDest,
                 Expression.Call(destVariable, closedEnumerableDestType.GetMethod("GetEnumerator")));
@@ -809,15 +806,21 @@ namespace ExpressMapper
             var innerLoopBlock = Expression.Block(new[] { srcItmVarExp, destItmVarExp },
                 new Expression[] { assignSourceItmFromProp, ifNotEndOfListExp, mapAndAddItemExp });
 
+            var loopExpression = CreateLoopExpression(doMoveNextSrc, innerLoopBlock);
+
+            var blockExpression = Expression.Block(new[] { endOfListExp, enumeratorSrc, enumeratorDest }, new Expression[] { assignInitEndOfListExp, assignToEnumSrc, assignToEnumDest, loopExpression });
+            return blockExpression;
+        }
+
+        private static LoopExpression CreateLoopExpression(Expression doMoveNextSrc, BlockExpression innerLoopBlock)
+        {
             var brk = Expression.Label();
             var loopExpression = Expression.Loop(
                 Expression.IfThenElse(Expression.NotEqual(doMoveNextSrc, StaticExpressions.FalseConstant),
                     innerLoopBlock
                     , Expression.Break(brk))
                 , brk);
-
-            var blockExpression = Expression.Block(new[] { endOfListExp, enumeratorSrc, enumeratorDest }, new Expression[] { assignInitEndOfListExp, assignToEnumSrc, assignToEnumDest, loopExpression });
-            return blockExpression;
+            return loopExpression;
         }
 
         internal Expression IfElseExpr(Expression srcItmVarExp,
@@ -831,8 +834,6 @@ namespace ExpressMapper
         }
 
         internal LoopExpression CollectionLoopExpression(
-            Type sourceType,
-            Type destType,
             ParameterExpression destColl,
             ParameterExpression sourceColItmVariable,
             ParameterExpression destColItmVariable,
@@ -845,18 +846,12 @@ namespace ExpressMapper
 
             var ifTrueBlock = Expression.Block(new[] { sourceColItmVariable, destColItmVariable }, new[] { assignSourceItmFromProp, mapExprForType, addToNewColl });
 
-            var brk = Expression.Label();
-            var loopExpression = Expression.Loop(
-                Expression.IfThenElse(
-                    Expression.NotEqual(doMoveNext, StaticExpressions.FalseConstant),
-                    ifTrueBlock
-                    , Expression.Break(brk))
-                , brk);
+            var loopExpression = CreateLoopExpression(doMoveNext, ifTrueBlock);
 
             return loopExpression;
         }
 
-        internal Expression ConvertCollection(Type destPropType,
+        internal static Expression ConvertCollection(Type destPropType,
             Type destList,
             Type destType,
             Expression destColl)
@@ -978,13 +973,13 @@ namespace ExpressMapper
 
             var tCol =
                 sourceType.GetInterfaces()
-                    .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>)) ??
+                    .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == GenericEnumerableType) ??
                 (sourceType.IsGenericType
                     && sourceType.GetInterfaces().Any(t => t == typeof(IEnumerable)) ? sourceType
                     : null);
 
             var tnCol = destType.GetInterfaces()
-                .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>)) ??
+                .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == GenericEnumerableType) ??
                         (destType.IsGenericType && destType.GetInterfaces().Any(t => t == typeof(IEnumerable)) ? destType
                             : null);
 
@@ -1025,7 +1020,7 @@ namespace ExpressMapper
             var destAssign = Expression.Assign(destColl, newColl);
 
             var closedEnumeratorSourceType = typeof(IEnumerator<>).MakeGenericType(sourceType);
-            var closedEnumerableSourceType = typeof(IEnumerable<>).MakeGenericType(sourceType);
+            var closedEnumerableSourceType = GenericEnumerableType.MakeGenericType(sourceType);
             var enumerator = Expression.Variable(closedEnumeratorSourceType,
                 string.Format("{0}Enum", Guid.NewGuid().ToString().Replace("-", "_")));
             var assignToEnum = Expression.Assign(enumerator,
@@ -1040,7 +1035,7 @@ namespace ExpressMapper
             var destColItmVariable = Expression.Variable(destType,
                 string.Format("{0}ItmDest", Guid.NewGuid().ToString().Replace("-", "_")));
 
-            var loopExpression = CollectionLoopExpression(sourceType, destType, destColl, sourceColItmVariable, destColItmVariable,
+            var loopExpression = CollectionLoopExpression(destColl, sourceColItmVariable, destColItmVariable,
                 assignSourceItmFromProp, doMoveNext);
 
             Expression resultCollection = ConvertCollection(callSetPropMethod.Type, destList, destType, destColl);
@@ -1123,7 +1118,7 @@ namespace ExpressMapper
             var sourceVariable = Expression.Variable(sourceType,
                 string.Format("{0}_{1}Src", sourceType.Name, Guid.NewGuid().ToString().Replace("-", "_")));
             var assignSourceFromProp = Expression.Assign(sourceVariable, callGetPropMethod);
-            var mapExprForType = GetMapExpressions(sourceType, destType);
+            var mapExprForType = GetMapExpressions(sourceType, destType, false);
             var destVariable = Expression.Variable(destType,
                 string.Format("{0}_{1}Dest", destType.Name,
                     Guid.NewGuid().ToString().Replace("-", "_")));

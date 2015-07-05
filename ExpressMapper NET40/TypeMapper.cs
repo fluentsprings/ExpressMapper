@@ -102,10 +102,6 @@ namespace ExpressMapper
 
         public void CompileDestinationInstance()
         {
-            // TODO: _mappingService.IsDestinationInstance = true;
-
-            var destVariable = Expression.Parameter(typeof(TN), "dest");
-
             ProcessAutoProperties();
 
             var expressions = new List<Expression>();
@@ -113,7 +109,7 @@ namespace ExpressMapper
             if (_beforeMapHandler != null)
             {
                 Expression<Action<T, TN>> beforeExpression = (src, dest) => _beforeMapHandler(src, dest);
-                var beforeInvokeExpr = Expression.Invoke(beforeExpression, _sourceParameter, destVariable);
+                var beforeInvokeExpr = Expression.Invoke(beforeExpression, _sourceParameter, _destFakeParameter);
                 expressions.Add(beforeInvokeExpr);
             }
 
@@ -125,22 +121,20 @@ namespace ExpressMapper
             if (_afterMapHandler != null)
             {
                 Expression<Action<T, TN>> afterExpression = (src, dest) => _afterMapHandler(src, dest);
-                var afterInvokeExpr = Expression.Invoke(afterExpression, _sourceParameter, destVariable);
+                var afterInvokeExpr = Expression.Invoke(afterExpression, _sourceParameter, _destFakeParameter);
                 expressions.Add(afterInvokeExpr);
             }
 
-            expressions.Add(destVariable);
+            expressions.Add(_destFakeParameter);
 
             var variables = new List<ParameterExpression>();
 
             _finalExpression = Expression.Block(variables, expressions);
-            var substituteParameterVisitor = new SubstituteParameterVisitor(_sourceParameter, destVariable);
+            var substituteParameterVisitor = new SubstituteParameterVisitor(_sourceParameter, _destFakeParameter);
             var resultExpression = substituteParameterVisitor.Visit(_finalExpression) as BlockExpression;
 
-            var expression = Expression.Lambda<Func<T, TN, TN>>(resultExpression, _sourceParameter, destVariable);
+            var expression = Expression.Lambda<Func<T, TN, TN>>(resultExpression, _sourceParameter, _destFakeParameter);
             _mapDestInstFunc = expression.Compile();
-
-            // TODO: _mappingService.IsDestinationInstance = false;
         }
 
         #endregion
@@ -149,10 +143,11 @@ namespace ExpressMapper
 
         public Func<object, object> GetNonGenericMapFunc()
         {
+            CompileNonGenericMapFunc();
             return _nonGenericMapFunc;
         }
 
-        public List<Expression> GetMapExpressions(bool withDestinationInstance = false)
+        public List<Expression> GetMapExpressions(bool withDestinationInstance)
         {
             Compile();
             return withDestinationInstance ? _giveWithDestinationAway : _giveAway;
@@ -186,6 +181,16 @@ namespace ExpressMapper
 
         public void MapMember<TSourceMember, TDestMember>(Expression<Func<TN, TDestMember>> left, Expression<Func<T, TSourceMember>> right)
         {
+            if (left == null)
+            {
+                throw new ArgumentNullException("left");
+            }
+
+            if (right == null)
+            {
+                throw new ArgumentNullException("right");
+            }
+
             MapMember(left.Body as MemberExpression, right.Body);
         }
 

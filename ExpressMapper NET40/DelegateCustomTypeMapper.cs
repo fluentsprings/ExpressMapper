@@ -13,6 +13,10 @@ namespace ExpressMapper
 
         public TN Map(IMappingContext<T, TN> context)
         {
+            if (context == null)
+            {
+                throw new ArgumentNullException("context");
+            }
             return _mapFunc(context.Source);
         }
     }

@@ -10,7 +10,7 @@ namespace ExpressMapper
     public interface ITypeMapper
     {
         Func<object, object> GetNonGenericMapFunc();
-        List<Expression> GetMapExpressions(bool withDestinationInstance = false);
+        List<Expression> GetMapExpressions(bool withDestinationInstance);
         void Compile();
         void CompileDestinationInstance();
     }
