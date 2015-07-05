@@ -680,7 +680,7 @@ namespace ExpressMapper
                     , brkColRem);
 
                 var collRemoveExps = new List<Expression> { loopToDropColElements, equalsBlockExp };
-                var collRemoveBlockExp = Expression.Block(new ParameterExpression[] { }, collRemoveExps);
+                var collRemoveBlockExp = Expression.Block(collRemoveExps);
 
                 // List and Collection - if src count greater than dest
 
@@ -727,11 +727,9 @@ namespace ExpressMapper
                 // If destination list is empty
                 var mapExprForType = GetMemberMappingExpression(destItmVarExp, srcItmVarExp).Item1;
 
-                var ifFalseBlock = Expression.Block(new ParameterExpression[] { }, new[] { mapExprForType });
-
                 var ifTrueBlock = IfElseExpr(srcItmVarExp, destItmVarExp, assignDestItmFromProp);
 
-                var mapAndAddItemExp = Expression.IfThenElse(doMoveNextDest, ifTrueBlock, ifFalseBlock);
+                var mapAndAddItemExp = Expression.IfThenElse(doMoveNextDest, ifTrueBlock, mapExprForType);
                 var addToNewCollNew = Expression.Call(destVarExp, "Add", null, destItmVarExp);
 
                 var innerLoopBlock = Expression.Block(new[] { srcItmVarExp, destItmVarExp },

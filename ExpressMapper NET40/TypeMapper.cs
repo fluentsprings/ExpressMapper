@@ -127,11 +127,9 @@ namespace ExpressMapper
 
             expressions.Add(_destFakeParameter);
 
-            var variables = new List<ParameterExpression>();
-
-            var finalExpression = Expression.Block(variables, expressions);
+            var finalExpression = Expression.Block(expressions);
             var substituteParameterVisitor = new SubstituteParameterVisitor(_sourceParameter, _destFakeParameter);
-            var resultExpression = substituteParameterVisitor.Visit(finalExpression) as BlockExpression;
+            var resultExpression = substituteParameterVisitor.Visit(finalExpression);
 
             var expression = Expression.Lambda<Func<T, TN, TN>>(resultExpression, _sourceParameter, _destFakeParameter);
             _mapDestInstFunc = expression.Compile();
