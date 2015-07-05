@@ -20,5 +20,6 @@ namespace ExpressMapper.Tests.Model.Models
         public string Gender { get; set; }
         public GenderTypes? NullableGender { get; set; }
         public string[] StringCollection { get; set; }
+        public string CaseInsensitive { get; set; }
     }
 }

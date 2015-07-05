@@ -15,7 +15,6 @@ namespace ExpressMapper
 
         private readonly ParameterExpression _sourceParameter = Expression.Parameter(typeof(T), "src");
         private readonly ParameterExpression _destFakeParameter = Expression.Parameter(typeof(TN), "dest");
-        private BinaryExpression _destVariable;
         private Func<T, TN> _mapFunc;
         private Func<T, TN, TN> _mapDestInstFunc;
         private readonly List<string> _ignoreList = new List<string>();
@@ -28,7 +27,6 @@ namespace ExpressMapper
         private Action<T, TN> _beforeMapHandler;
         private Action<T, TN> _afterMapHandler;
         private Func<T, TN> _constructorFunc;
-        private BlockExpression _finalExpression;
 
         private Func<object, object> _nonGenericMapFunc;
 
@@ -53,48 +51,48 @@ namespace ExpressMapper
         {
             if (_mapFunc != null) return;
 
-                _destVariable = GetDestionationVariable();
+            var destVariable = GetDestionationVariable();
 
-                ProcessAutoProperties();
+            ProcessAutoProperties();
 
-                var expressions = new List<Expression> { _destVariable };
-                var expressionsWithDest = new List<Expression> { _destVariable };
+            var expressions = new List<Expression> { destVariable };
+            var expressionsWithDest = new List<Expression> { destVariable };
 
-                if (_beforeMapHandler != null)
-                {
-                    Expression<Action<T, TN>> beforeExpression = (src, dest) => _beforeMapHandler(src, dest);
-                    var beforeInvokeExpr = Expression.Invoke(beforeExpression, _sourceParameter, _destVariable.Left);
-                    expressions.Add(beforeInvokeExpr);
-                    expressionsWithDest.Add(beforeInvokeExpr);
-                }
+            if (_beforeMapHandler != null)
+            {
+                Expression<Action<T, TN>> beforeExpression = (src, dest) => _beforeMapHandler(src, dest);
+                var beforeInvokeExpr = Expression.Invoke(beforeExpression, _sourceParameter, destVariable.Left);
+                expressions.Add(beforeInvokeExpr);
+                expressionsWithDest.Add(beforeInvokeExpr);
+            }
 
-                expressions.AddRange(_propertyCache.Values);
-                expressionsWithDest.AddRange(_propertyDestInstCache.Values);
+            expressions.AddRange(_propertyCache.Values);
+            expressionsWithDest.AddRange(_propertyDestInstCache.Values);
 
-                var customProps = _customPropertyCache.Where(k => !_ignoreList.Contains(k.Key)).Select(k => k.Value);
-                var customDestProps = _customPropertyDestInstCache.Where(k => !_ignoreList.Contains(k.Key)).Select(k => k.Value);
-                expressions.AddRange(customProps);
-                expressionsWithDest.AddRange(customDestProps);
+            var customProps = _customPropertyCache.Where(k => !_ignoreList.Contains(k.Key)).Select(k => k.Value);
+            var customDestProps = _customPropertyDestInstCache.Where(k => !_ignoreList.Contains(k.Key)).Select(k => k.Value);
+            expressions.AddRange(customProps);
+            expressionsWithDest.AddRange(customDestProps);
 
-                if (_afterMapHandler != null)
-                {
-                    Expression<Action<T, TN>> afterExpression = (src, dest) => _afterMapHandler(src, dest);
-                    var afterInvokeExpr = Expression.Invoke(afterExpression, _sourceParameter, _destVariable.Left);
-                    expressions.Add(afterInvokeExpr);
-                    expressionsWithDest.Add(afterInvokeExpr);
-                }
+            if (_afterMapHandler != null)
+            {
+                Expression<Action<T, TN>> afterExpression = (src, dest) => _afterMapHandler(src, dest);
+                var afterInvokeExpr = Expression.Invoke(afterExpression, _sourceParameter, destVariable.Left);
+                expressions.Add(afterInvokeExpr);
+                expressionsWithDest.Add(afterInvokeExpr);
+            }
 
-                _giveAway.AddRange(expressions);
-                _giveWithDestinationAway.AddRange(expressionsWithDest);
+            _giveAway.AddRange(expressions);
+            _giveWithDestinationAway.AddRange(expressionsWithDest);
 
-                expressions.Add(_destVariable.Left);
+            expressions.Add(destVariable.Left);
 
-                var variables = new List<ParameterExpression> { _destVariable.Left as ParameterExpression };
+            var variables = new List<ParameterExpression> { destVariable.Left as ParameterExpression };
 
-                _finalExpression = Expression.Block(variables, expressions);
-                var substituteParameterVisitor = new SubstituteParameterVisitor(_sourceParameter,
-                    _destVariable.Left as ParameterExpression);
-                Expression resultExpression = substituteParameterVisitor.Visit(_finalExpression) as BlockExpression;
+            var finalExpression = Expression.Block(variables, expressions);
+            var substituteParameterVisitor = new SubstituteParameterVisitor(_sourceParameter,
+                destVariable.Left as ParameterExpression);
+            Expression resultExpression = substituteParameterVisitor.Visit(finalExpression) as BlockExpression;
 
             var expression = Expression.Lambda<Func<T, TN>>(resultExpression, _sourceParameter);
             _mapFunc = expression.Compile();
@@ -102,6 +100,8 @@ namespace ExpressMapper
 
         public void CompileDestinationInstance()
         {
+            if (_mapDestInstFunc != null) return;
+
             ProcessAutoProperties();
 
             var expressions = new List<Expression>();
@@ -129,9 +129,9 @@ namespace ExpressMapper
 
             var variables = new List<ParameterExpression>();
 
-            _finalExpression = Expression.Block(variables, expressions);
+            var finalExpression = Expression.Block(variables, expressions);
             var substituteParameterVisitor = new SubstituteParameterVisitor(_sourceParameter, _destFakeParameter);
-            var resultExpression = substituteParameterVisitor.Visit(_finalExpression) as BlockExpression;
+            var resultExpression = substituteParameterVisitor.Visit(finalExpression) as BlockExpression;
 
             var expression = Expression.Lambda<Func<T, TN, TN>>(resultExpression, _sourceParameter, _destFakeParameter);
             _mapDestInstFunc = expression.Compile();
@@ -290,29 +290,23 @@ namespace ExpressMapper
             var getProps =
                 typeof(T).GetProperties(BindingFlags.FlattenHierarchy | BindingFlags.Instance | BindingFlags.Public);
             var setProps =
-                typeof(TN).GetProperties(BindingFlags.FlattenHierarchy | BindingFlags.Instance | BindingFlags.Public)
-                    .ToDictionary((k => k.Name), (v => v));
-
-            var gets = new List<PropertyInfo>();
-            var sets = new List<PropertyInfo>();
+                typeof(TN).GetProperties(BindingFlags.FlattenHierarchy | BindingFlags.Instance | BindingFlags.Public);
 
             foreach (var prop in getProps)
             {
-                if (_ignoreList.Contains(prop.Name) || !setProps.ContainsKey(prop.Name) || _customPropertyCache.ContainsKey(prop.Name)) continue;
-                var setprop = setProps[prop.Name];
-                if (!(setprop.CanWrite && setprop.GetSetMethod(true).IsPublic))
+                if (_ignoreList.Contains(prop.Name) || _customPropertyCache.ContainsKey(prop.Name))
+                {
+                    continue;
+                }
+                var setprop = setProps.FirstOrDefault(x => String.Equals(x.Name, prop.Name, StringComparison.OrdinalIgnoreCase));
+
+                if (setprop == null || !setprop.CanWrite || !setprop.GetSetMethod(true).IsPublic)
                 {
                     _ignoreList.Add(prop.Name);
                     continue;
                 }
 
-                gets.Add(prop);
-                sets.Add(setprop);
-            }
-
-            for (var i = 0; i < gets.Count; i++)
-            {
-                AutoMapProperty(gets[i], sets[i]);
+                AutoMapProperty(prop, setprop);
             }
         }
 
