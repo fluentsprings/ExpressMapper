@@ -33,6 +33,8 @@ namespace Benchmarks.Mapping
                 .ForMember(dest => dest.OwnedArticles, src => src.ResolveUsing(m => m.Articles));
 
             Mapper.CreateMap<Item, ItemViewModel>();
+
+            Mapper.Configuration.Seal();
         }
 
         public static void InitAdvanced()
@@ -61,6 +63,8 @@ namespace Benchmarks.Mapping
                 .ForMember(dest => dest.OwnedArticles, src => src.ResolveUsing(m => m.Articles));
 
             Mapper.CreateMap<Item, ItemViewModel>();
+
+            Mapper.Configuration.Seal();
         }
     }
 }
