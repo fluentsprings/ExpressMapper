@@ -221,7 +221,8 @@ namespace ExpressMapper.Tests.Model.Generator
                         SortOrder = 2
                     }
                 },
-                Weight = 32
+                Weight = 32,
+                CaseInsensitive = "abc"
             };
 
             var result = new TestViewModel
@@ -253,7 +254,8 @@ namespace ExpressMapper.Tests.Model.Generator
                         SortOrder = 2
                     }
                 },
-                Weight = 32
+                Weight = 32,
+                CaSeInSeNsItIvE = "abc"
             };
 
             return new KeyValuePair<TestModel, TestViewModel>(src, result);

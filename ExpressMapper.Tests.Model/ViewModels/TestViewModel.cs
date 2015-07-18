@@ -22,6 +22,7 @@ namespace ExpressMapper.Tests.Model.ViewModels
         public string NullableGender { get; set; }
         public int GenderIndex { get; set; }
         public List<String> StringCollection { get; set; }
+        public string CaSeInSeNsItIvE { get; set; }
         public bool Equals(TestViewModel other)
         {
             var sizes = true;
@@ -36,7 +37,7 @@ namespace ExpressMapper.Tests.Model.ViewModels
                 }
             }
 
-            return Id == other.Id && Name == other.Name && Age == other.Age && NotNullable == other.NotNullable && Nullable.GetValueOrDefault() == other.Nullable.GetValueOrDefault() && Weight == other.Weight && BoolValue == other.BoolValue && Gender == other.Gender && NullableGender == other.NullableGender && GenderIndex == other.GenderIndex &&
+            return Id == other.Id && Name == other.Name && Age == other.Age && NotNullable == other.NotNullable && Nullable.GetValueOrDefault() == other.Nullable.GetValueOrDefault() && Weight == other.Weight && BoolValue == other.BoolValue && Gender == other.Gender && NullableGender == other.NullableGender && GenderIndex == other.GenderIndex && CaSeInSeNsItIvE == other.CaSeInSeNsItIvE &&
                    Created == other.Created && ((Country == null && other.Country == null) || Country.Equals(other.Country)) && sizes;
         }
     }

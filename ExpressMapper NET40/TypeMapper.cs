@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -16,7 +15,6 @@ namespace ExpressMapper
 
         private readonly ParameterExpression _sourceParameter = Expression.Parameter(typeof(T), "src");
         private readonly ParameterExpression _destFakeParameter = Expression.Parameter(typeof(TN), "dest");
-        private BinaryExpression _destVariable;
         private Func<T, TN> _mapFunc;
         private Func<T, TN, TN> _mapDestInstFunc;
         private readonly List<string> _ignoreList = new List<string>();
@@ -26,11 +24,9 @@ namespace ExpressMapper
         private readonly Dictionary<string, Expression> _propertyDestInstCache = new Dictionary<string, Expression>();
         private readonly Dictionary<string, Expression> _customPropertyDestInstCache = new Dictionary<string, Expression>();
 
-        private ICustomTypeMapper<T, TN> _customTypeMapper;
         private Action<T, TN> _beforeMapHandler;
         private Action<T, TN> _afterMapHandler;
         private Func<T, TN> _constructorFunc;
-        private BlockExpression _finalExpression;
 
         private Func<object, object> _nonGenericMapFunc;
 
@@ -43,73 +39,58 @@ namespace ExpressMapper
         public TypeMapper(MappingService mappingService)
         {
             _mappingService = mappingService;
-
-            CompileNonGenericMapFunc();
         }
 
         #endregion
 
         #region Compilation phase
 
-        public IQueryable ProcessQueryable(IEnumerable src, IQueryable dest)
-        {
-            throw new NotImplementedException();
-        }
-
         public void Compile()
         {
             if (_mapFunc != null) return;
 
-            Expression resultExpression;
-            if (_customTypeMapper != null)
+            var destVariable = GetDestionationVariable();
+
+            ProcessAutoProperties();
+
+            var expressions = new List<Expression> { destVariable };
+            var expressionsWithDest = new List<Expression> { destVariable };
+
+            if (_beforeMapHandler != null)
             {
-                resultExpression = CompileCustomType();
+                Expression<Action<T, TN>> beforeExpression = (src, dest) => _beforeMapHandler(src, dest);
+                var beforeInvokeExpr = Expression.Invoke(beforeExpression, _sourceParameter, destVariable.Left);
+                expressions.Add(beforeInvokeExpr);
+                expressionsWithDest.Add(beforeInvokeExpr);
             }
-            else
+
+            expressions.AddRange(_propertyCache.Values);
+            expressionsWithDest.AddRange(_propertyDestInstCache.Values);
+
+            var customProps = _customPropertyCache.Where(k => !_ignoreList.Contains(k.Key)).Select(k => k.Value);
+            var customDestProps = _customPropertyDestInstCache.Where(k => !_ignoreList.Contains(k.Key)).Select(k => k.Value);
+            expressions.AddRange(customProps);
+            expressionsWithDest.AddRange(customDestProps);
+
+            if (_afterMapHandler != null)
             {
-                _destVariable = GetDestionationVariable();
-
-                ProcessAutoProperties();
-
-                var expressions = new List<Expression> { _destVariable };
-                var expressionsWithDest = new List<Expression> { _destVariable };
-
-                if (_beforeMapHandler != null)
-                {
-                    Expression<Action<T, TN>> beforeExpression = (src, dest) => _beforeMapHandler(src, dest);
-                    var beforeInvokeExpr = Expression.Invoke(beforeExpression, _sourceParameter, _destVariable.Left);
-                    expressions.Add(beforeInvokeExpr);
-                    expressionsWithDest.Add(beforeInvokeExpr);
-                }
-
-                expressions.AddRange(_propertyCache.Values);
-                expressionsWithDest.AddRange(_propertyDestInstCache.Values);
-
-                var customProps = _customPropertyCache.Where(k => !_ignoreList.Contains(k.Key)).Select(k => k.Value);
-                var customDestProps = _customPropertyDestInstCache.Where(k => !_ignoreList.Contains(k.Key)).Select(k => k.Value);
-                expressions.AddRange(customProps);
-                expressionsWithDest.AddRange(customDestProps);
-
-                if (_afterMapHandler != null)
-                {
-                    Expression<Action<T, TN>> afterExpression = (src, dest) => _afterMapHandler(src, dest);
-                    var afterInvokeExpr = Expression.Invoke(afterExpression, _sourceParameter, _destVariable.Left);
-                    expressions.Add(afterInvokeExpr);
-                    expressionsWithDest.Add(afterInvokeExpr);
-                }
-
-                _giveAway.AddRange(expressions);
-                _giveWithDestinationAway.AddRange(expressionsWithDest);
-
-                expressions.Add(_destVariable.Left);
-
-                var variables = new List<ParameterExpression> { _destVariable.Left as ParameterExpression };
-
-                _finalExpression = Expression.Block(variables, expressions);
-                var substituteParameterVisitor = new SubstituteParameterVisitor(_sourceParameter,
-                    _destVariable.Left as ParameterExpression);
-                resultExpression = substituteParameterVisitor.Visit(_finalExpression) as BlockExpression;
+                Expression<Action<T, TN>> afterExpression = (src, dest) => _afterMapHandler(src, dest);
+                var afterInvokeExpr = Expression.Invoke(afterExpression, _sourceParameter, destVariable.Left);
+                expressions.Add(afterInvokeExpr);
+                expressionsWithDest.Add(afterInvokeExpr);
             }
+
+            _giveAway.AddRange(expressions);
+            _giveWithDestinationAway.AddRange(expressionsWithDest);
+
+            expressions.Add(destVariable.Left);
+
+            var variables = new List<ParameterExpression> { destVariable.Left as ParameterExpression };
+
+            var finalExpression = Expression.Block(variables, expressions);
+            var substituteParameterVisitor = new SubstituteParameterVisitor(_sourceParameter,
+                destVariable.Left as ParameterExpression);
+            Expression resultExpression = substituteParameterVisitor.Visit(finalExpression) as BlockExpression;
 
             var expression = Expression.Lambda<Func<T, TN>>(resultExpression, _sourceParameter);
             _mapFunc = expression.Compile();
@@ -117,9 +98,7 @@ namespace ExpressMapper
 
         public void CompileDestinationInstance()
         {
-            // TODO: _mappingService.IsDestinationInstance = true;
-
-            var destVariable = Expression.Parameter(typeof(TN), "dest");
+            if (_mapDestInstFunc != null) return;
 
             ProcessAutoProperties();
 
@@ -128,7 +107,7 @@ namespace ExpressMapper
             if (_beforeMapHandler != null)
             {
                 Expression<Action<T, TN>> beforeExpression = (src, dest) => _beforeMapHandler(src, dest);
-                var beforeInvokeExpr = Expression.Invoke(beforeExpression, _sourceParameter, destVariable);
+                var beforeInvokeExpr = Expression.Invoke(beforeExpression, _sourceParameter, _destFakeParameter);
                 expressions.Add(beforeInvokeExpr);
             }
 
@@ -140,34 +119,18 @@ namespace ExpressMapper
             if (_afterMapHandler != null)
             {
                 Expression<Action<T, TN>> afterExpression = (src, dest) => _afterMapHandler(src, dest);
-                var afterInvokeExpr = Expression.Invoke(afterExpression, _sourceParameter, destVariable);
+                var afterInvokeExpr = Expression.Invoke(afterExpression, _sourceParameter, _destFakeParameter);
                 expressions.Add(afterInvokeExpr);
             }
 
-            expressions.Add(destVariable);
+            expressions.Add(_destFakeParameter);
 
-            var variables = new List<ParameterExpression>();
+            var finalExpression = Expression.Block(expressions);
+            var substituteParameterVisitor = new SubstituteParameterVisitor(_sourceParameter, _destFakeParameter);
+            var resultExpression = substituteParameterVisitor.Visit(finalExpression);
 
-            _finalExpression = Expression.Block(variables, expressions);
-            var substituteParameterVisitor = new SubstituteParameterVisitor(_sourceParameter, destVariable);
-            var resultExpression = substituteParameterVisitor.Visit(_finalExpression) as BlockExpression;
-
-            var expression = Expression.Lambda<Func<T, TN, TN>>(resultExpression, _sourceParameter, destVariable);
+            var expression = Expression.Lambda<Func<T, TN, TN>>(resultExpression, _sourceParameter, _destFakeParameter);
             _mapDestInstFunc = expression.Compile();
-
-            // TODO: _mappingService.IsDestinationInstance = false;
-        }
-
-        private Expression CompileCustomType()
-        {
-            Expression<Func<T, TN>> customMapper = src => _customTypeMapper.Map(new DefaultMappingContext<T, TN> { Source = src });
-            var invocationExpression = Expression.Invoke(customMapper, _sourceParameter);
-            var parameterExpression = Expression.Variable(typeof(TN), "dest");
-            var binaryExpression = Expression.Assign(parameterExpression, invocationExpression);
-            _giveAway.Add(invocationExpression);
-            _giveAway.Add(binaryExpression);
-            var resultExpression = Expression.Block(new[] { parameterExpression }, _giveAway);
-            return resultExpression;
         }
 
         #endregion
@@ -176,56 +139,14 @@ namespace ExpressMapper
 
         public Func<object, object> GetNonGenericMapFunc()
         {
+            CompileNonGenericMapFunc();
             return _nonGenericMapFunc;
         }
 
-        public List<Expression> GetMapExpressions(bool withDestinationInstance = false)
+        public List<Expression> GetMapExpressions(bool withDestinationInstance)
         {
             Compile();
             return withDestinationInstance ? _giveWithDestinationAway : _giveAway;
-        }
-
-        public IList ProcessCollection(IEnumerable src)
-        {
-            var source = src as IEnumerable<T>;
-            var destination = new List<TN>(source.Count());
-            foreach (var item in source)
-            {
-                destination.Add(MapTo(item));
-            }
-            return destination;
-        }
-
-        public IEnumerable ProcessArray(IEnumerable src)
-        {
-            var source = src as T[];
-            var destination = new List<TN>(source.Length);
-            for (var i = 0; i < source.Length; i++)
-            {
-                destination.Add(MapTo(source[i]));
-            }
-            return destination.ToArray();
-        }
-
-        public IQueryable ProcessQueryable(IEnumerable src)
-        {
-            var source = src as IEnumerable<T>;
-            var destination = new List<TN>(source.Count());
-            foreach (var item in source)
-            {
-                destination.Add(MapTo(item));
-            }
-            return destination.AsQueryable();
-        }
-
-        public IList ProcessCollection(IEnumerable src, IList dest)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable ProcessArray(IEnumerable src, IEnumerable dest)
-        {
-            throw new NotImplementedException();
         }
 
         public void AfterMap(Action<T, TN> afterMap)
@@ -256,6 +177,16 @@ namespace ExpressMapper
 
         public void MapMember<TSourceMember, TDestMember>(Expression<Func<TN, TDestMember>> left, Expression<Func<T, TSourceMember>> right)
         {
+            if (left == null)
+            {
+                throw new ArgumentNullException("left");
+            }
+
+            if (right == null)
+            {
+                throw new ArgumentNullException("right");
+            }
+
             MapMember(left.Body as MemberExpression, right.Body);
         }
 
@@ -304,11 +235,6 @@ namespace ExpressMapper
             _ignoreList.Add(memberExpression.Member.Name);
         }
 
-        public void Custom(ICustomTypeMapper<T, TN> customTypeMapper)
-        {
-            _customTypeMapper = customTypeMapper;
-        }
-
         public TN MapTo(T src)
         {
             if (_mapFunc == null)
@@ -333,6 +259,11 @@ namespace ExpressMapper
 
         private void CompileNonGenericMapFunc()
         {
+            if (_nonGenericMapFunc != null)
+            {
+                return;
+            }
+
             var parameterExpression = Expression.Parameter(typeof(object), "src");
             var srcConverted = Expression.Convert(parameterExpression, typeof(T));
             var srcTypedExp = Expression.Variable(typeof(T), "srcTyped");
@@ -351,7 +282,6 @@ namespace ExpressMapper
 
             var blockExpression = Expression.Block(new[] { srcTypedExp, genVariable, resultVarExp }, new Expression[] { srcAssigned, assignExp, assignResult, resultVarExp });
             var lambda = Expression.Lambda<Func<object, object>>(blockExpression, parameterExpression);
-            //var lambda = Expression.Lambda<Func<object, object>>(mapCall, srcTypedExp, genVariable, parameterExpression);
             _nonGenericMapFunc = lambda.Compile();
         }
 
@@ -360,29 +290,23 @@ namespace ExpressMapper
             var getProps =
                 typeof(T).GetProperties(BindingFlags.FlattenHierarchy | BindingFlags.Instance | BindingFlags.Public);
             var setProps =
-                typeof(TN).GetProperties(BindingFlags.FlattenHierarchy | BindingFlags.Instance | BindingFlags.Public)
-                    .ToDictionary((k => k.Name), (v => v));
-
-            var gets = new List<PropertyInfo>();
-            var sets = new List<PropertyInfo>();
+                typeof(TN).GetProperties(BindingFlags.FlattenHierarchy | BindingFlags.Instance | BindingFlags.Public);
 
             foreach (var prop in getProps)
             {
-                if (_ignoreList.Contains(prop.Name) || !setProps.ContainsKey(prop.Name) || _customPropertyCache.ContainsKey(prop.Name)) continue;
-                var setprop = setProps[prop.Name];
-                if (!(setprop.CanWrite && setprop.GetSetMethod(true).IsPublic))
+                if (_ignoreList.Contains(prop.Name) || _customPropertyCache.ContainsKey(prop.Name))
+                {
+                    continue;
+                }
+                var setprop = setProps.FirstOrDefault(x => String.Equals(x.Name, prop.Name, StringComparison.OrdinalIgnoreCase));
+
+                if (setprop == null || !setprop.CanWrite || !setprop.GetSetMethod(true).IsPublic)
                 {
                     _ignoreList.Add(prop.Name);
                     continue;
                 }
 
-                gets.Add(prop);
-                sets.Add(setprop);
-            }
-
-            for (var i = 0; i < gets.Count; i++)
-            {
-                AutoMapProperty(gets[i], sets[i]);
+                AutoMapProperty(prop, setprop);
             }
         }
 

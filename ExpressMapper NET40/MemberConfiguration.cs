@@ -36,6 +36,11 @@ namespace ExpressMapper
 
         public IMemberConfiguration<T, TN> Member<TMember, TNMember>(Expression<Func<TN, TNMember>> dest, Expression<Func<T, TMember>> src)
         {
+            if (dest == null)
+            {
+                throw new ArgumentNullException("dest");
+            }
+
             var memberExpression = dest.Body as MemberExpression;
             if (memberExpression == null)
             {
@@ -70,6 +75,11 @@ namespace ExpressMapper
 
         public IMemberConfiguration<T, TN> Ignore<TMember>(Expression<Func<TN, TMember>> dest)
         {
+            if (dest == null)
+            {
+                throw new ArgumentNullException("dest");
+            }
+
             if (!(dest.Body is MemberExpression))
             {
                 throw new Exception("MemberExpression should return one of the properties of destination class");

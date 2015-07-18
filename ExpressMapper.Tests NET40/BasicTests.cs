@@ -351,6 +351,29 @@ namespace ExpressMapper.Tests
         }
 
         [Test]
+        public void ListNullToArray()
+        {
+            Mapper.Register<TestCollection, TestCollectionViewModel>();
+            Mapper.Register<TestItem, TestItemViewModel>()
+                .Member(dest => dest.Array, src => src.List)
+                .Ignore(dest => dest.Collection)
+                .Ignore(dest => dest.Enumerable)
+                .Ignore(dest => dest.List)
+                .Ignore(dest => dest.Queryable);
+
+            Mapper.Compile();
+
+            var typeCollTest = new TestItem()
+            {
+                List = null
+            };
+
+            var result = Mapper.Map<TestItem, TestItemViewModel>(typeCollTest);
+
+            Assert.IsNull(result.Array);
+        }
+
+        [Test]
         public void ListToQueriable()
         {
             Mapper.Register<TestCollection, TestCollectionViewModel>();
@@ -467,7 +490,6 @@ namespace ExpressMapper.Tests
             Mapper.Register<Country, CountryViewModel>();
             Mapper.Register<Size, SizeViewModel>();
 
-            Mapper.Compile();
             var sizeResult = Functional.ExistingDestinationSimpleMap();
 
             var testObjHash = sizeResult.Value.GetHashCode();

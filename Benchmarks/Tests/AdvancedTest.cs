@@ -17,7 +17,7 @@ namespace Benchmarks.Tests
 
         protected override void InitAutoMapper()
         {
-            AutoMapperMapping.Init();
+            AutoMapperMapping.InitAdvanced();
         }
 
         protected override void InitExpressMapper()
@@ -27,7 +27,7 @@ namespace Benchmarks.Tests
 
         protected override void InitOoMapper()
         {
-            OoMapperMappings.Init();
+            OoMapperMappings.InitAdvanced();
         }
 
         protected override void InitValueInjectorMapper()
