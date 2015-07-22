@@ -56,11 +56,11 @@ namespace Benchmarks.Mapping
 
             Mapper.AddMap<Author, AuthorViewModel>(src =>
             {
-                var articles = new ArticleViewModel[src.Articles.Count()];
+                var articles = new List<ArticleViewModel>(src.Articles.Count());
                 var authorViewModel = new AuthorViewModel();
                 authorViewModel.InjectFrom(src);
                 
-                for (var i = 0; i < articles.Length; i++)
+                for (var i = 0; i < articles.Count; i++)
                 {
                     articles[i] = Mapper.Map<Article, ArticleViewModel>(src.Articles.ElementAt(i));
                 }

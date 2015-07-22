@@ -9,6 +9,6 @@ namespace Benchmarks.Models
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public int Age { get; set; }
-        public IEnumerable<Article> Articles { get; set; }
+        public List<Article> Articles { get; set; }
     }
 }

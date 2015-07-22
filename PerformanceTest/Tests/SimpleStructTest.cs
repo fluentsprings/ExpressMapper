@@ -12,7 +12,6 @@ namespace Benchmarks.Tests
     {
         protected override List<Item> GetData()
         {
-
             return DataGenerator.GetItems(Count);
         }
 

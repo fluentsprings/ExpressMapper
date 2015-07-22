@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Benchmarks.ViewModels
 {
@@ -8,6 +9,6 @@ namespace Benchmarks.ViewModels
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public int Age { get; set; }
-        public ArticleViewModel[] OwnedArticles { get; set; }
+        public List<ArticleViewModel> OwnedArticles { get; set; }
     }
 }
