@@ -60,7 +60,9 @@
     <Compile Include="Ioc\DependencyResolver.cs" />
     <Compile Include="Ioc\IContainer.cs" />
     <Compile Include="MapNotImplemented.cs" />
-    <Compile Include="MappingServiceProvider.cs" />
+    <Compile Include="MappingServiceProvider.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="NullCheckNestedMemberVisitor.cs">
       <SubType>Code</SubType>
     </Compile>
