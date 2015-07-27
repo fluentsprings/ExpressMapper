@@ -36,6 +36,7 @@ namespace Benchmarks.Tests
 
             var src = GetData();
 
+            //ExpressMapperMap(src);
             ExpressMapperStopwatch = Stopwatch.StartNew();
             ExpressMapperMap(src);
             ExpressMapperStopwatch.Stop();

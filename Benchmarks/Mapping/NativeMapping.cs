@@ -9,15 +9,17 @@ namespace Benchmarks.Mapping
     {
         public static ItemViewModel Map(Item src)
         {
-            var dst = new ItemViewModel();
-            dst.Id = src.Id;
-            dst.Name = src.Name;
-            dst.Height = src.Height;
-            dst.Length = src.Length;
-            dst.Weight = src.Weight;
-            dst.Width = src.Width;
-            return dst;
+            return new ItemViewModel()
+            {
+                Id = src.Id,
+                Name = src.Name,
+                Height = src.Height,
+                Length = src.Length,
+                Weight = src.Weight,
+                Width = src.Width
+            };
         }
+
         public static TestViewModel Map(Test src)
         {
             if (src == null)
@@ -56,17 +58,14 @@ namespace Benchmarks.Mapping
 
         public static NewsViewModel Map(News src)
         {
-            if (src == null)
+            return new NewsViewModel()
             {
-                return default(NewsViewModel);
-            }
-            var dst = new NewsViewModel();
-            dst.Id = src.Id;
-            dst.IsXml = src.IsXml;
-            dst.Provider = src.Provider;
-            dst.StartDate = src.StartDate;
-            dst.Url = src.Url;
-            return dst;
+                Id = src.Id,
+                IsXml = src.IsXml,
+                Provider = src.Provider,
+                StartDate = src.StartDate,
+                Url = src.Url
+            };
         }
 
         public static ProductVariantViewModel Map(ProductVariant src)
@@ -143,7 +142,7 @@ namespace Benchmarks.Mapping
             dst.Age = src.Age;
             dst.FirstName = src.FirstName;
             dst.LastName = src.LastName;
-            dst.OwnedArticles = src.Articles.Select(Map).ToArray();
+            dst.OwnedArticles = src.Articles.Select(Map).ToList();
 
             return dst;
         }

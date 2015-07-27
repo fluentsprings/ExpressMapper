@@ -35,7 +35,7 @@ namespace Benchmarks.Mapping
             TinyMapper.Bind<Article, ArticleViewModel>();
             TinyMapper.Bind<Author, AuthorViewModel>(config =>
                 {
-                    //config.Bind(src => src.Articles, dest => dest.OwnedArticles);
+                    config.Bind(src => src.Articles, dest => dest.OwnedArticles);
                 });
 
             TinyMapper.Bind<Item, ItemViewModel>();

@@ -28,10 +28,9 @@ namespace Benchmarks.Mapping
                 .NewConfig()
                 .Map(dest => dest.BelongTo, src => TypeAdapter.Adapt<Role, RoleViewModel>(src.Role));
 
-
             TypeAdapterConfig<Author, AuthorViewModel>
                 .NewConfig()
-                .Map(dest => dest.OwnedArticles, src => TypeAdapter.Adapt<IEnumerable<Article>, ArticleViewModel[]>(src.Articles));
+                .Map(dest => dest.OwnedArticles, src => TypeAdapter.Adapt<List<Article>, List<ArticleViewModel>>(src.Articles));
         }
     }
 }
