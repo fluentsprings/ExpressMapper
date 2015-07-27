@@ -56,14 +56,18 @@
     <Compile Include="DefaultMappingContext.cs" />
     <Compile Include="DelegateCustomTypeMapper.cs" />
     <Compile Include="IMappingContext.cs" />
-    <Compile Include="IMappingService.cs" />
+    <Compile Include="IMappingServiceProvider.cs" />
     <Compile Include="Ioc\DependencyResolver.cs" />
     <Compile Include="Ioc\IContainer.cs" />
     <Compile Include="MapNotImplemented.cs" />
-    <Compile Include="MappingService.cs" />
+    <Compile Include="MappingServiceProvider.cs" />
     <Compile Include="NullCheckNestedMemberVisitor.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DestinationMappingService.cs" />
+    <Compile Include="IMappingService.cs" />
+    <Compile Include="MappingServiceBase.cs" />
+    <Compile Include="SourceMappingService.cs" />
     <Compile Include="StaticExpressions.cs" />
     <Compile Include="SubstituteParameterVisitor.cs" />
     <Compile Include="TypeMapper.cs" />
@@ -76,6 +80,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Expressmapper.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Refactoring\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

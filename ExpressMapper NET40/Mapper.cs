@@ -4,19 +4,11 @@ namespace ExpressMapper
 {
     public static class Mapper
     {
-        private static IMappingService _instance;
+        private static IMappingServiceProvider _instance;
 
-        public static IMappingService Instance
+        private static IMappingServiceProvider Instance
         {
-            get
-            {
-                if (_instance == null)
-                {
-                    _instance = new MappingService();
-                }
-
-                return _instance;
-            }
+            get { return _instance ?? (_instance = new MappingServiceProvider()); }
         }
 
         public static void Compile()
@@ -36,17 +28,17 @@ namespace ExpressMapper
 
         public static TN Map<T, TN>(T src, TN dest)
         {
-            return Instance.Map<T, TN>(src, dest);
+            return Instance.Map(src, dest);
         }
 
         public static object Map(object src, Type srcType, Type dstType)
         {
-            return Instance.Map(src, srcType, dstType);
+            return Instance.Map(srcType, dstType, src);
         }
 
         public static object Map(object src, object dest, Type srcType, Type dstType)
         {
-            return Instance.Map(src, dest, srcType, dstType);
+            return Instance.Map(srcType, dstType, src, dest);
         }
 
         public static IMemberConfiguration<T, TN> Register<T, TN>()

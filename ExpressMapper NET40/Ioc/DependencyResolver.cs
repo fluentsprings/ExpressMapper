@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -18,7 +19,8 @@ namespace ExpressMapper.Ioc
         #endregion
 
         #region Privates
-
+        
+        private IDictionary<Type, IList<object>> _singletons = new Dictionary<Type, IList<object>>();
         private readonly Dictionary<int, Dictionary<int, Delegate>> _cache = new Dictionary<int, Dictionary<int, Delegate>>();
         private static IContainer _container;
 
@@ -82,7 +84,7 @@ namespace ExpressMapper.Ioc
             var expressInterfaces = expressMapperAssembly.GetTypes().Where(t => t.IsInterface);
             foreach (var expressInterface in expressInterfaces)
             {
-                var implementations = expressMapperAssembly.GetTypes().Where(t => expressInterface.IsAssignableFrom(t));
+                var implementations = expressMapperAssembly.GetTypes().Where(t => expressInterface.IsAssignableFrom(t) && !t.IsAbstract);
                 Compile(expressInterface, implementations);
             }
 
@@ -92,6 +94,24 @@ namespace ExpressMapper.Ioc
         {
             foreach (var impl in implementations)
             {
+                var constructor = impl.GetConstructors().FirstOrDefault();
+                if (constructor != default(ConstructorInfo))
+                {
+                    var parameterInfos = constructor.GetParameters();
+                    foreach (var parameterInfo in parameterInfos)
+                    {
+                        //var collectionType =
+                        //    parameterInfo.ParameterType.GetInterfaces()
+                        //        .FirstOrDefault(
+                        //            t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof (IEnumerable<>)) ??
+                        //    (parameterInfo.ParameterType.IsGenericType
+                        //     && parameterInfo.ParameterType.GetInterfaces().Any(t => t == typeof (IEnumerable))
+                        //        ? parameterInfo.ParameterType
+                        //        : null);
+                        
+                    }
+                }
+
                 var interHash = inter.GetHashCode();
                 if (!_cache.ContainsKey(interHash))
                 {

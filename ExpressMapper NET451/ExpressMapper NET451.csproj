@@ -56,6 +56,9 @@
     <Compile Include="..\ExpressMapper NET40\DelegateCustomTypeMapper.cs">
       <Link>DelegateCustomTypeMapper.cs</Link>
     </Compile>
+    <Compile Include="..\ExpressMapper NET40\DestinationMappingService.cs">
+      <Link>DestinationMappingService.cs</Link>
+    </Compile>
     <Compile Include="..\ExpressMapper NET40\ICustomTypeMapper.cs">
       <Link>ICustomTypeMapper.cs</Link>
     </Compile>
@@ -64,6 +67,9 @@
     </Compile>
     <Compile Include="..\ExpressMapper NET40\IMappingService.cs">
       <Link>IMappingService.cs</Link>
+    </Compile>
+    <Compile Include="..\ExpressMapper NET40\IMappingServiceProvider.cs">
+      <Link>IMappingServiceProvider.cs</Link>
     </Compile>
     <Compile Include="..\ExpressMapper NET40\IMemberConfiguration.cs">
       <Link>IMemberConfiguration.cs</Link>
@@ -77,8 +83,11 @@
     <Compile Include="..\ExpressMapper NET40\Mapper.cs">
       <Link>Mapper.cs</Link>
     </Compile>
-    <Compile Include="..\ExpressMapper NET40\MappingService.cs">
-      <Link>MappingService.cs</Link>
+    <Compile Include="..\ExpressMapper NET40\MappingServiceBase.cs">
+      <Link>MappingServiceBase.cs</Link>
+    </Compile>
+    <Compile Include="..\ExpressMapper NET40\MappingServiceProvider.cs">
+      <Link>MappingServiceProvider.cs</Link>
     </Compile>
     <Compile Include="..\ExpressMapper NET40\MemberConfiguration.cs">
       <Link>MemberConfiguration.cs</Link>
@@ -88,6 +97,9 @@
     </Compile>
     <Compile Include="..\ExpressMapper NET40\Properties\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\ExpressMapper NET40\SourceMappingService.cs">
+      <Link>SourceMappingService.cs</Link>
     </Compile>
     <Compile Include="..\ExpressMapper NET40\StaticExpressions.cs">
       <Link>StaticExpressions.cs</Link>

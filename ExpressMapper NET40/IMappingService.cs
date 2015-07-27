@@ -1,18 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 
 namespace ExpressMapper
 {
-    public interface IMappingService
+    internal interface IMappingService
     {
-        void Compile();
+        IDictionary<int, MulticastDelegate> CollectionMappers { get; }
         void PrecompileCollection<T, TN>();
-        TN Map<T, TN>(T src);
-        TN Map<T, TN>(T src, TN dest);
-        object Map(object src, Type srcType, Type dstType);
-        object Map(object src, object dest, Type srcType, Type dstType);
-        IMemberConfiguration<T, TN> Register<T, TN>();
-        void RegisterCustom<T, TN, TMapper>() where TMapper : ICustomTypeMapper<T, TN>;
-        void RegisterCustom<T, TN>(Func<T, TN> mapFunc);
+        bool DestinationSupport { get; }
+        MulticastDelegate MapCollection(int cacheKey);
         void Reset();
+        BlockExpression MapCollection(Type srcColtype, Type destColType, Expression srcExpression, Expression destExpression);
+        Expression GetDifferentTypeMemberMappingExpression(Expression srcExpression, Expression destExpression);
+        BlockExpression MapProperty(Type srcType, Type destType, Expression srcExpression, Expression destExpression);
     }
 }

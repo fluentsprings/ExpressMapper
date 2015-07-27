@@ -30,15 +30,15 @@ namespace ExpressMapper
 
         private Func<object, object> _nonGenericMapFunc;
 
-        private readonly MappingService _mappingService;
+        private readonly MappingServiceProvider _mappingServiceProvider;
 
         #endregion
 
         #region Constructors
 
-        public TypeMapper(MappingService mappingService)
+        public TypeMapper(MappingServiceProvider mappingServiceProvider)
         {
-            _mappingService = mappingService;
+            _mappingServiceProvider = mappingServiceProvider;
         }
 
         #endregion
@@ -192,7 +192,7 @@ namespace ExpressMapper
 
         private void MapMember(MemberExpression left, Expression right)
         {
-            var mappingExpression = _mappingService.GetMemberMappingExpression(left, right);
+            var mappingExpression = _mappingServiceProvider.GetMemberMappingExpression(left, right);
 
             _customPropertyCache[left.Member.Name] = mappingExpression.Item1;
             _customPropertyDestInstCache[left.Member.Name] = mappingExpression.Item2;
@@ -207,7 +207,7 @@ namespace ExpressMapper
             var rightExpression = Expression.Invoke(expr, parameterExpression);
             if (typeof(TNMember) != typeof(TMember))
             {
-                var mapComplexResult = _mappingService.GetDifferentTypeMemberMappingExpression(rightExpression, left.Body as MemberExpression);
+                var mapComplexResult = _mappingServiceProvider.GetDifferentTypeMemberMappingExpression(rightExpression, left.Body as MemberExpression);
                 _customPropertyCache[memberExpression.Member.Name] = mapComplexResult.Item1;
                 _customPropertyDestInstCache[memberExpression.Member.Name] = mapComplexResult.Item2;
             }
