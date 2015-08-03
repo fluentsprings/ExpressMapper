@@ -1,31 +1,41 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace ExpressMapper
 {
     public class MemberConfiguration<T, TN> : IMemberConfiguration<T, TN>
     {
-        private readonly ITypeMapper<T, TN> _typeMapper;
-        public MemberConfiguration(ITypeMapper<T, TN> typeMapper)
+        private readonly ITypeMapper<T, TN>[] _typeMappers;
+        public MemberConfiguration(ITypeMapper<T, TN>[] typeMappers)
         {
-            _typeMapper = typeMapper;
+            _typeMappers = typeMappers;
         }
 
         public IMemberConfiguration<T, TN> Instantiate(Func<T, TN> constructor)
         {
-            _typeMapper.Instantiate(constructor);
+            foreach (var typeMapper in _typeMappers)
+            {
+                typeMapper.Instantiate(constructor);
+            }
             return this;
         }
 
         public IMemberConfiguration<T, TN> Before(Action<T, TN> beforeHandler)
         {
-            _typeMapper.BeforeMap(beforeHandler);
+            foreach (var typeMapper in _typeMappers)
+            {
+                typeMapper.BeforeMap(beforeHandler);
+            }
             return this;
         }
 
         public IMemberConfiguration<T, TN> After(Action<T, TN> afterHandler)
         {
-            _typeMapper.AfterMap(afterHandler);
+            foreach (var typeMapper in _typeMappers)
+            {
+                typeMapper.AfterMap(afterHandler);
+            }
             return this;
         }
 
@@ -51,7 +61,10 @@ namespace ExpressMapper
 
             if (propertyInfo.CanWrite && propertyInfo.GetSetMethod(true).IsPublic)
             {
-                _typeMapper.MapMember(dest, src);
+                foreach (var typeMapper in _typeMappers)
+                {
+                    typeMapper.MapMember(dest, src);
+                }
             }
             return this;
         }
@@ -68,7 +81,10 @@ namespace ExpressMapper
 
             if (propertyInfo.CanWrite && propertyInfo.GetSetMethod(true).IsPublic)
             {
-                _typeMapper.MapFunction(dest, src);
+                foreach (var typeMapper in _typeMappers)
+                {
+                    typeMapper.MapFunction(dest, src);
+                }
             }
             return this;
         }
@@ -84,7 +100,10 @@ namespace ExpressMapper
             {
                 throw new Exception("MemberExpression should return one of the properties of destination class");
             }
-            _typeMapper.Ignore(dest);
+            foreach (var typeMapper in _typeMappers)
+            {
+                typeMapper.Ignore(dest);
+            }
             return this;
         }
 
@@ -94,12 +113,7 @@ namespace ExpressMapper
             {
                 throw new Exception("MemberExpression should return one of the properties of destination class");
             }
-            return Member<TNMember, TNMember>(dest, x => value);
+            return Member(dest, x => value);
         }
-
-        //public void Custom(ICustomTypeMapper<T, TN> customTypeMapper)
-        //{
-        //    _typeMapper.Custom(customTypeMapper);
-        //}
     }
 }

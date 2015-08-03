@@ -59,6 +59,9 @@
     <Compile Include="..\ExpressMapper NET40\DestinationMappingService.cs">
       <Link>DestinationMappingService.cs</Link>
     </Compile>
+    <Compile Include="..\ExpressMapper NET40\DestinationTypeMapper.cs">
+      <Link>DestinationTypeMapper.cs</Link>
+    </Compile>
     <Compile Include="..\ExpressMapper NET40\ICustomTypeMapper.cs">
       <Link>ICustomTypeMapper.cs</Link>
     </Compile>
@@ -101,14 +104,17 @@
     <Compile Include="..\ExpressMapper NET40\SourceMappingService.cs">
       <Link>SourceMappingService.cs</Link>
     </Compile>
+    <Compile Include="..\ExpressMapper NET40\SourceTypeMapper.cs">
+      <Link>SourceTypeMapper.cs</Link>
+    </Compile>
     <Compile Include="..\ExpressMapper NET40\StaticExpressions.cs">
       <Link>StaticExpressions.cs</Link>
     </Compile>
     <Compile Include="..\ExpressMapper NET40\SubstituteParameterVisitor.cs">
       <Link>SubstituteParameterVisitor.cs</Link>
     </Compile>
-    <Compile Include="..\ExpressMapper NET40\TypeMapper.cs">
-      <Link>TypeMapper.cs</Link>
+    <Compile Include="..\ExpressMapper NET40\TypeMapperBase.cs">
+      <Link>TypeMapperBase.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>

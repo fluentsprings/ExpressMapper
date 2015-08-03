@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 
 namespace ExpressMapper
 {
@@ -14,8 +13,7 @@ namespace ExpressMapper
         void RegisterCustom<T, TN, TMapper>() where TMapper : ICustomTypeMapper<T, TN>;
         void RegisterCustom<T, TN>(Func<T, TN> mapFunc);
         void Reset();
-        Tuple<Expression, Expression> GetMemberMappingExpression(Expression left, Expression right);
         int CalculateCacheKey(Type src, Type dest);
-        IList<Expression> GetMapExpressions(Type src, Type dest, bool withDestinationInstance);
+        Dictionary<int, Func<ICustomTypeMapper>> CustomMappers { get; }
     }
 }

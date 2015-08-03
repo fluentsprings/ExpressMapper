@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 
 namespace ExpressMapper
 {
-    internal class DestinationMappingService : MappingServiceBase
+    internal class DestinationMappingService : MappingServiceBase, IMappingService
     {
         #region Constructors
 
@@ -79,7 +79,8 @@ namespace ExpressMapper
                 string.Format("{0}_{1}Src", srcType.Name, Guid.NewGuid().ToString().Replace("-", "_")));
 
             var assignSourceFromProp = Expression.Assign(sourceVariable, srcExpression);
-            var mapExprForType = new List<Expression>(MappingServiceProvider.GetMapExpressions(srcType, destType, true));
+            
+            var mapExprForType = new List<Expression>(GetMapExpressions(srcType, destType));
             var destVariable = Expression.Variable(destType,
                 string.Format("{0}_{1}Dest", destType.Name,
                     Guid.NewGuid().ToString().Replace("-", "_")));
@@ -243,7 +244,7 @@ namespace ExpressMapper
 
 
                 // If destination list is empty
-                var mapExprForType = MappingServiceProvider.GetMemberMappingExpression(destItmVarExp, srcItmVarExp).Item1;
+                var mapExprForType = GetMemberMappingExpression(destItmVarExp, srcItmVarExp);
 
                 var ifTrueBlock = IfElseExpr(srcItmVarExp, destItmVarExp, assignDestItmFromProp);
 
@@ -303,7 +304,7 @@ namespace ExpressMapper
             var destItmVarExp = Expression.Variable(destType, "ItmDest");
             var assignDestItmFromProp = Expression.Assign(destItmVarExp, currentDest);
 
-            var mapExprForType = MappingServiceProvider.GetMemberMappingExpression(destItmVarExp, srcItmVarExp).Item2;
+            var mapExprForType = GetMemberMappingExpression(destItmVarExp, srcItmVarExp);
 
             var ifTrueBlock = Expression.Block(new[] {srcItmVarExp, destItmVarExp},
                 new[] {assignSourceItmFromProp, assignDestItmFromProp, mapExprForType});
@@ -359,7 +360,7 @@ namespace ExpressMapper
             var ifTrueBlock = IfElseExpr(srcItmVarExp, destItmVarExp, assignDestItmFromProp);
 
             // If destination list is empty
-            var mapExprForType = MappingServiceProvider.GetMemberMappingExpression(destItmVarExp, srcItmVarExp).Item1;
+            var mapExprForType = GetMemberMappingExpression(destItmVarExp, srcItmVarExp);
 
             var destCollection = typeof (ICollection<>).MakeGenericType(destType);
 
@@ -390,7 +391,7 @@ namespace ExpressMapper
             Expression assignDestItmFromProp)
         {
             // TODO: Change name
-            var mapExprForType = MappingServiceProvider.GetMemberMappingExpression(destItmVarExp, srcItmVarExp).Item2;
+            var mapExprForType = GetMemberMappingExpression(destItmVarExp, srcItmVarExp);
 
             return Expression.Block(new ParameterExpression[] {}, new[] {assignDestItmFromProp, mapExprForType});
         }

@@ -45,6 +45,11 @@ namespace ExpressMapper
 
         #region Compilation phase
 
+        public List<Expression> GetMapExpressions()
+        {
+            throw new NotImplementedException();
+        }
+
         public void Compile()
         {
             if (_mapFunc != null) return;
@@ -270,7 +275,7 @@ namespace ExpressMapper
             var srcAssigned = Expression.Assign(srcTypedExp, srcConverted);
 
             var customGenericType = typeof(ITypeMapper<,>).MakeGenericType(typeof(T), typeof(TN));
-            var castToCustomGeneric = Expression.Convert(Expression.Constant((ITypeMapper)this), customGenericType);
+            var castToCustomGeneric = Expression.Convert(Expression.Constant(this), customGenericType);
             var genVariable = Expression.Variable(customGenericType);
             var assignExp = Expression.Assign(genVariable, castToCustomGeneric);
             var methodInfo = customGenericType.GetMethod("MapTo", new[] { typeof(T) });

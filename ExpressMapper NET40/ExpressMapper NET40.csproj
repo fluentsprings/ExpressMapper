@@ -55,6 +55,7 @@
     <Compile Include="Constants.cs" />
     <Compile Include="DefaultMappingContext.cs" />
     <Compile Include="DelegateCustomTypeMapper.cs" />
+    <Compile Include="DestinationTypeMapper.cs" />
     <Compile Include="IMappingContext.cs" />
     <Compile Include="IMappingServiceProvider.cs" />
     <Compile Include="Ioc\DependencyResolver.cs" />
@@ -70,22 +71,21 @@
     <Compile Include="IMappingService.cs" />
     <Compile Include="MappingServiceBase.cs" />
     <Compile Include="SourceMappingService.cs" />
+    <Compile Include="SourceTypeMapper.cs" />
     <Compile Include="StaticExpressions.cs" />
     <Compile Include="SubstituteParameterVisitor.cs" />
-    <Compile Include="TypeMapper.cs" />
     <Compile Include="ITypeMapper.cs" />
     <Compile Include="ICustomTypeMapper.cs" />
     <Compile Include="IMemberConfiguration.cs" />
     <Compile Include="Mapper.cs" />
     <Compile Include="MemberConfiguration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TypeMapperBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Expressmapper.snk" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Refactoring\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -10,9 +10,8 @@ namespace ExpressMapper
     public interface ITypeMapper
     {
         Func<object, object> GetNonGenericMapFunc();
-        List<Expression> GetMapExpressions(bool withDestinationInstance);
+        List<Expression> GetMapExpressions();
         void Compile();
-        void CompileDestinationInstance();
     }
 
     /// <summary>
@@ -22,7 +21,6 @@ namespace ExpressMapper
     /// <typeparam name="TN">destination</typeparam>
     public interface ITypeMapper<T, TN> : ITypeMapper
     {
-        TN MapTo(T src);
         TN MapTo(T src, TN dest);
         void Ignore<TMember>(Expression<Func<TN, TMember>> left);
         void MapMember<TMember, TNMember>(Expression<Func<TN, TNMember>> left, Expression<Func<T, TMember>> right);

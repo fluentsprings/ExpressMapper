@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 
 namespace ExpressMapper
 {
-    internal class SourceMappingService : MappingServiceBase
+    internal class SourceMappingService : MappingServiceBase, IMappingService
     {
         #region Constructors
 
@@ -56,7 +56,7 @@ namespace ExpressMapper
             var sourceVariable = Expression.Variable(srcType,
                 string.Format("{0}_{1}Src", srcType.Name, Guid.NewGuid().ToString().Replace("-", "_")));
             var assignSourceFromProp = Expression.Assign(sourceVariable, srcExpression);
-            var mapExprForType = MappingServiceProvider.GetMapExpressions(srcType, destType, false);
+            var mapExprForType = GetMapExpressions(srcType, destType);
             var destVariable = Expression.Variable(destType,
                 string.Format("{0}_{1}Dest", destType.Name,
                     Guid.NewGuid().ToString().Replace("-", "_")));
