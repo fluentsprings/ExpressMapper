@@ -15,6 +15,21 @@ namespace ExpressMapper.Tests
     public class BasicTests : BaseTestClass
     {
         [Test]
+        public void MappingOrderLessTest()
+        {
+            Mapper.Register<Composition, CompositionViewModel>()
+                .Member(dest => dest.Booking, src => src.Booking);
+            Mapper.Register<Booking, BookingViewModel>();
+            //Mapper.Compile();
+
+            var srcAndDest = Functional.RecursiveCompilationAssociationTestMap();
+
+            var bvm = Mapper.Map<Booking, BookingViewModel>(srcAndDest.Key);
+
+            Assert.AreEqual(bvm, srcAndDest.Value);
+        }
+
+        [Test]
         public void RecursiveCompilationDirectCollectionTest()
         {
             Mapper.Register<Employee, EmployeeViewModel>();
