@@ -20,7 +20,6 @@ namespace ExpressMapper.Tests
             Mapper.Register<Composition, CompositionViewModel>()
                 .Member(dest => dest.Booking, src => src.Booking);
             Mapper.Register<Booking, BookingViewModel>();
-            //Mapper.Compile();
 
             var srcAndDest = Functional.RecursiveCompilationAssociationTestMap();
 
