@@ -14,6 +14,227 @@ namespace ExpressMapper.Tests.Model.Generator
     {
         #region Basics
 
+        public static KeyValuePair<Booking, BookingViewModel> RecursiveCompilationAssociationTestMap()
+        {
+            var compositionLvl1 = Guid.NewGuid();
+            var bookingLvl2 = Guid.NewGuid();
+            var compositionLvl3 = Guid.NewGuid();
+            var booking = new Booking
+            {
+                Id = Guid.Empty,
+                Composition = new Composition
+                {
+                    Id = compositionLvl1,
+                    Name = "Test composition",
+                    Booking = new Booking
+                    {
+                        Id = bookingLvl2,
+                        Name = "New booking",
+                        Composition = new Composition
+                        {
+                            Id = compositionLvl3,
+                            Name = "Recent Composition"
+                        }
+                    }
+                },
+                Name = "Booking!"
+            };
+
+            var bookingViewModel = new BookingViewModel
+            {
+                Id = Guid.Empty,
+                Composition = new CompositionViewModel
+                {
+                    Id = compositionLvl1,
+                    Name = "Test composition",
+                    Booking = new BookingViewModel
+                    {
+                        Id = bookingLvl2,
+                        Name = "New booking",
+                        Composition = new CompositionViewModel
+                        {
+                            Id = compositionLvl3,
+                            Name = "Recent Composition"
+                        }
+                    }
+                },
+                Name = "Booking!"
+            };
+            return new KeyValuePair<Booking, BookingViewModel>(booking, bookingViewModel);
+        }
+
+        public static KeyValuePair<Employee, EmployeeViewModel> RecursiveCompilationDirectCollectionTestMap()
+        {
+            var employeeId = Guid.NewGuid();
+            var employee = new Employee
+            {
+                Id = employeeId,
+                LastName = "Just a last one",
+                FirstName = "First name",
+                Employees = new List<Employee>
+                {
+                    new Employee
+                    {
+                        Id = employeeId,
+                        FirstName = "1",
+                        LastName = "2",
+                        Employees = new List<Employee>
+                        {
+                            new Employee
+                            {
+                                Id = employeeId,
+                                LastName = "2",
+                                FirstName = "2"
+                            }
+                        }
+                    },
+                    new Employee
+                    {
+                        Id = employeeId,
+                        FirstName = "3",
+                        LastName = "3",
+                        Employees = new List<Employee>
+                        {
+                            new Employee
+                            {
+                                Id = employeeId,
+                                LastName = "4",
+                                FirstName = "4"
+                            }
+                        }
+                    }
+                }
+            };
+
+            var employeeViewModel = new EmployeeViewModel
+            {
+                Id = employeeId,
+                LastName = "Just a last one",
+                FirstName = "First name",
+                Employees = new List<EmployeeViewModel>
+                {
+                    new EmployeeViewModel
+                    {
+                        Id = employeeId,
+                        FirstName = "1",
+                        LastName = "2",
+                        Employees = new List<EmployeeViewModel>
+                        {
+                            new EmployeeViewModel
+                            {
+                                Id = employeeId,
+                                LastName = "2",
+                                FirstName = "2"
+                            }
+                        }
+                    },
+                    new EmployeeViewModel
+                    {
+                        Id = employeeId,
+                        FirstName = "3",
+                        LastName = "3",
+                        Employees = new List<EmployeeViewModel>
+                        {
+                            new EmployeeViewModel
+                            {
+                                Id = employeeId,
+                                LastName = "4",
+                                FirstName = "4"
+                            }
+                        }
+                    }
+                }
+            };
+
+            return new KeyValuePair<Employee, EmployeeViewModel>(employee, employeeViewModel);
+        }
+
+        public static KeyValuePair<Engine, EngineViewModel> RecursiveCompilationCollectionTestMap()
+        {
+            var engineId = Guid.NewGuid();
+            var cylinderId = Guid.NewGuid();
+
+            var engine = new Engine
+            {
+                Id = engineId,
+                Capacity = "3.5 V6",
+                Cylinders = new List<Cylinder>
+                {
+                    new Cylinder
+                    {
+                        Id = cylinderId,
+                        Engine = new Engine
+                        {
+                            Id = engineId,
+                            Capacity = "2.4",
+                            Cylinders = new List<Cylinder> {new Cylinder { Id = cylinderId, Capacity = 5.2M} }
+                        }
+                    },
+                    new Cylinder
+                    {
+                        Id = cylinderId,
+                        Engine = new Engine {Id = engineId, Capacity = "2.4"}
+                    },
+                    new Cylinder
+                    {
+                        Id = cylinderId,
+                        Engine = new Engine {Id = engineId, Capacity = "2.4"}
+                    },
+                    new Cylinder
+                    {
+                        Id = cylinderId,
+                        Engine = new Engine {Id = engineId, Capacity = "2.4"}
+                    },
+                    new Cylinder
+                    {
+                        Id = cylinderId,
+                        Engine = new Engine {Id = engineId, Capacity = "2.4"}
+                    }
+                }
+            };
+
+            var engineVm = new EngineViewModel
+            {
+                Id = engineId,
+                Capacity = "3.5 V6",
+                Cylinders = new List<CylinderViewModel>
+                {
+                    new CylinderViewModel
+                    {
+                        Id = cylinderId,
+                        Engine = new EngineViewModel
+                        {
+                            Id = engineId,
+                            Capacity = "2.4",
+                            Cylinders = new List<CylinderViewModel> {new CylinderViewModel { Id = cylinderId, Capacity = 5.2M} }
+                        }
+                    },
+                    new CylinderViewModel
+                    {
+                        Id = cylinderId,
+                        Engine = new EngineViewModel {Id = engineId, Capacity = "2.4"}
+                    },
+                    new CylinderViewModel
+                    {
+                        Id = cylinderId,
+                        Engine = new EngineViewModel {Id = engineId, Capacity = "2.4"}
+                    },
+                    new CylinderViewModel
+                    {
+                        Id = cylinderId,
+                        Engine = new EngineViewModel {Id = engineId, Capacity = "2.4"}
+                    },
+                    new CylinderViewModel
+                    {
+                        Id = cylinderId,
+                        Engine = new EngineViewModel {Id = engineId, Capacity = "2.4"}
+                    }
+                }
+            };
+
+            return new KeyValuePair<Engine, EngineViewModel>(engine, engineVm);
+        }
+
         public static KeyValuePair<Item, ItemViewModel> StructWithCollectionMap()
         {
             var id = Guid.NewGuid();

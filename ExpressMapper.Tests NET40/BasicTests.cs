@@ -15,6 +15,46 @@ namespace ExpressMapper.Tests
     public class BasicTests : BaseTestClass
     {
         [Test]
+        public void RecursiveCompilationDirectCollectionTest()
+        {
+            Mapper.Register<Employee, EmployeeViewModel>();
+            Mapper.Compile();
+
+            var srcAndDest = Functional.RecursiveCompilationDirectCollectionTestMap();
+
+            var bvm = Mapper.Map<Employee, EmployeeViewModel>(srcAndDest.Key);
+
+            Assert.AreEqual(bvm, srcAndDest.Value);
+        }
+
+        [Test]
+        public void RecursiveCompilationAssociationTest()
+        {
+            Mapper.Register<Booking, BookingViewModel>();
+            Mapper.Register<Composition, CompositionViewModel>();
+            Mapper.Compile();
+
+            var srcAndDest = Functional.RecursiveCompilationAssociationTestMap();
+
+            var bvm = Mapper.Map<Booking, BookingViewModel>(srcAndDest.Key);
+
+            Assert.AreEqual(bvm, srcAndDest.Value);
+        }
+
+        [Test]
+        public void RecursiveCompilationCollectionTest()
+        {
+            Mapper.Register<Engine, EngineViewModel>();
+            Mapper.Register<Cylinder, CylinderViewModel>();
+            Mapper.Compile();
+
+            var srcAndDest = Functional.RecursiveCompilationCollectionTestMap();
+            var engineViewModel = Mapper.Map<Engine, EngineViewModel>(srcAndDest.Key);
+            Assert.AreEqual(engineViewModel, srcAndDest.Value);
+        }
+
+
+        [Test]
         public void CompilelessMap()
         {
             Mapper.Register<TestModel, TestViewModel>();

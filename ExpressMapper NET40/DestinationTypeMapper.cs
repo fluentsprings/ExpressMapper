@@ -8,10 +8,23 @@ namespace ExpressMapper
     public class DestinationTypeMapper<T, TN> : TypeMapperBase<T, TN>, ITypeMapper<T, TN>
     {
         public DestinationTypeMapper(IMappingService service) : base(service){}
-        public override void Compile()
+
+        protected override void InitializeRecursiveMappings()
+        {
+            var mapMethod =
+                typeof (Mapper).GetMethods()
+                    .First(mi => mi.Name == "Map" && mi.GetParameters().Length == 2)
+                    .MakeGenericMethod(typeof (T), typeof (TN));
+            RecursiveExpressionResult.Add(Expression.Assign(DestFakeParameter, Expression.Call(mapMethod, SourceParameter, DestFakeParameter)));
+        }
+
+        protected override void CompileInternal()
         {
             if (ResultMapFunction != null) return;
 
+
+            ProcessCustomMembers();
+            ProcessCustomFunctionMembers();
             ProcessAutoProperties();
 
             var expressions = new List<Expression>();

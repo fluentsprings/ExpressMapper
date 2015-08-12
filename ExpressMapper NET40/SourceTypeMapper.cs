@@ -9,12 +9,24 @@ namespace ExpressMapper
     {
         public SourceTypeMapper(IMappingService service) : base(service){}
 
-        public override void Compile()
+        protected override void InitializeRecursiveMappings()
+        {
+            var mapMethod =
+                typeof (Mapper).GetMethods()
+                    .First(mi => mi.Name == "Map" && mi.GetParameters().Length == 1)
+                    .MakeGenericMethod(typeof (T), typeof (TN));
+            
+            RecursiveExpressionResult.Add(Expression.Assign(DestFakeParameter, Expression.Call(mapMethod, SourceParameter)));
+        }
+
+        protected override void CompileInternal()
         {
             if (ResultMapFunction != null) return;
 
             var destVariable = GetDestionationVariable();
 
+            ProcessCustomMembers();
+            ProcessCustomFunctionMembers();
             ProcessAutoProperties();
 
             var expressions = new List<Expression> { destVariable };

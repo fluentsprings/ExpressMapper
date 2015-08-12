@@ -8,18 +8,23 @@ namespace ExpressMapper
 {
     public abstract class TypeMapperBase<T, TN>
     {
+        private bool _compiling;
         protected ParameterExpression DestFakeParameter = Expression.Parameter(typeof(TN), "dest");
         protected IMappingService MappingService { get; set; }
+        protected List<KeyValuePair<MemberExpression, Expression>> CustomMembers = new List<KeyValuePair<MemberExpression, Expression>>();
+        protected List<KeyValuePair<MemberExpression, Expression>> CustomFunctionMembers = new List<KeyValuePair<MemberExpression, Expression>>();
 
         #region Constructors
 
         protected TypeMapperBase(IMappingService service)
         {
             ResultExpressionList = new List<Expression>();
+            RecursiveExpressionResult = new List<Expression>();
             PropertyCache = new Dictionary<string, Expression>();
             CustomPropertyCache = new Dictionary<string, Expression>();
             IgnoreMemberList = new List<string>();
             MappingService = service;
+            InitializeRecursiveMappings();
         }
 
         #endregion
@@ -28,6 +33,7 @@ namespace ExpressMapper
         #region Properties
         
         protected ParameterExpression SourceParameter = Expression.Parameter(typeof(T), "src");
+        protected List<Expression> RecursiveExpressionResult { get; private set; } 
         protected List<Expression> ResultExpressionList { get; private set; }
         protected Func<T, TN, TN> ResultMapFunction { get; set; }
         protected List<string> IgnoreMemberList { get; private set; }
@@ -40,7 +46,27 @@ namespace ExpressMapper
 
         #endregion
 
-        public abstract void Compile();
+        protected abstract void InitializeRecursiveMappings();
+
+        public void Compile()
+        {
+            if (_compiling)
+            {   
+                return;
+            }
+
+            try
+            {
+                _compiling = true;
+                CompileInternal();
+            }
+            finally
+            {
+                _compiling = false;
+            }
+        }
+
+        protected abstract void CompileInternal();
 
         public void AfterMap(Action<T, TN> afterMap)
         {
@@ -49,6 +75,11 @@ namespace ExpressMapper
 
         public List<Expression> GetMapExpressions()
         {
+            if (_compiling)
+            {
+                return RecursiveExpressionResult;
+            }
+
             Compile();
             return ResultExpressionList;
         }
@@ -103,10 +134,11 @@ namespace ExpressMapper
                 throw new ArgumentNullException("right");
             }
 
-            MapMember(left.Body as MemberExpression, right.Body);
+            CustomMembers.Add(new KeyValuePair<MemberExpression, Expression>(left.Body as MemberExpression, right.Body));
+            //MapMember(left.Body as MemberExpression, right.Body);
         }
 
-        private void MapMember(MemberExpression left, Expression right)
+        protected void MapMember(MemberExpression left, Expression right)
         {
             var mappingExpression = MappingService.GetMemberMappingExpression(left, right);
             CustomPropertyCache[left.Member.Name] = mappingExpression;
@@ -180,15 +212,38 @@ namespace ExpressMapper
 
             var parameterExpression = Expression.Parameter(typeof(T));
             var rightExpression = Expression.Invoke(expr, parameterExpression);
-            if (typeof(TNMember) != typeof(TMember))
+
+            CustomFunctionMembers.Add(new KeyValuePair<MemberExpression, Expression>(memberExpression, rightExpression));
+            //MapFunction<TMember, TNMember>(left, rightExpression, memberExpression);
+        }
+
+        protected void MapFunction(MemberExpression left, Expression rightExpression)
+        {
+            if (left.Member.DeclaringType != rightExpression.Type)
             {
-                var mapComplexResult = MappingService.GetDifferentTypeMemberMappingExpression(rightExpression, left.Body as MemberExpression);
-                CustomPropertyCache[memberExpression.Member.Name] = mapComplexResult;
+                var mapComplexResult = MappingService.GetDifferentTypeMemberMappingExpression(rightExpression, left);
+                CustomPropertyCache[left.Member.Name] = mapComplexResult;
             }
             else
             {
-                var binaryExpression = Expression.Assign(memberExpression, rightExpression);
-                CustomPropertyCache.Add(memberExpression.Member.Name, binaryExpression);
+                var binaryExpression = Expression.Assign(left, rightExpression);
+                CustomPropertyCache.Add(left.Member.Name, binaryExpression);
+            }
+        }
+
+        protected void ProcessCustomMembers()
+        {
+            foreach (var customMember in CustomMembers)
+            {
+                MapMember(customMember.Key, customMember.Value);
+            }
+        }
+
+        protected void ProcessCustomFunctionMembers()
+        {
+            foreach (var customMember in CustomFunctionMembers)
+            {
+                MapMember(customMember.Key, customMember.Value);
             }
         }
     }

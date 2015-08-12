@@ -9,8 +9,8 @@ namespace ExpressMapper
     public sealed class MappingServiceProvider : IMappingServiceProvider
     {
         public Dictionary<int, Func<ICustomTypeMapper>> CustomMappers { get; set; }
-        private readonly Dictionary<int, Func<object, object, object>> CustomTypeMapperCache = new Dictionary<int, Func<object, object, object>>();
-        private readonly List<int> NonGenericCollectionMappingCache = new List<int>();
+        private readonly Dictionary<int, Func<object, object, object>> _customTypeMapperCache = new Dictionary<int, Func<object, object, object>>();
+        private readonly List<int> _nonGenericCollectionMappingCache = new List<int>();
 
         private static readonly Type GenericEnumerableType = typeof(IEnumerable<>);
         private readonly IList<IMappingService> _mappingServices;
@@ -188,11 +188,11 @@ namespace ExpressMapper
 
                 var typeMapper = customTypeMapper();
 
-                if (!CustomTypeMapperCache.ContainsKey(cacheKey))
+                if (!_customTypeMapperCache.ContainsKey(cacheKey))
                 {
                     CompileNonGenericCustomTypeMapper(srcType, dstType, typeMapper, cacheKey);
                 }
-                return CustomTypeMapperCache[cacheKey](src, dest);
+                return _customTypeMapperCache[cacheKey](src, dest);
             }
 
             var mappingService = dest == null ? SourceService : DestinationService;
@@ -239,7 +239,7 @@ namespace ExpressMapper
         private void CompileNonGenericCollectionMapping(Type srcType, Type dstType)
         {
             var cacheKey = CalculateCacheKey(srcType, dstType);
-            if (NonGenericCollectionMappingCache.Contains(cacheKey)) return;
+            if (_nonGenericCollectionMappingCache.Contains(cacheKey)) return;
 
             var methodInfo = GetType().GetMethod("PrecompileCollection");
             var makeGenericMethod = methodInfo.MakeGenericMethod(srcType, dstType);
@@ -292,7 +292,7 @@ namespace ExpressMapper
                 srcAssigned, dstAssigned, assignExp, assignContextExp, sourceAssignedExp, destAssignedExp, /*destinationAssignedExp,*/ resultAssignExp, resultVarExp);
 
             var lambda = Expression.Lambda<Func<object, object, object>>(blockExpression, sourceExpression, destinationExpression);
-            CustomTypeMapperCache.Add(cacheKey, lambda.Compile());
+            _customTypeMapperCache.Add(cacheKey, lambda.Compile());
         }
 
         internal static Type GetCollectionElementType(Type type)
