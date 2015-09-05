@@ -45,7 +45,7 @@ namespace ExpressMapper
             return CustomTypeMapperExpCache[cacheKey];
         }
 
-        protected IEnumerable<Expression> GetMapExpressions(Type src, Type dest)
+        protected Tuple<List<Expression>, ParameterExpression, ParameterExpression> GetMapExpressions(Type src, Type dest)
         {
             var cacheKey = MappingServiceProvider.CalculateCacheKey(src, dest);
             if (TypeMappers.ContainsKey(cacheKey))
@@ -80,12 +80,18 @@ namespace ExpressMapper
             var destAssignedExp = Expression.Assign(destExp, dstTypedExp);
 
             var mapCall = Expression.Call(genVariable, methodInfo, contextVarExp);
-            var resultVarExp = Expression.Variable(dstType, "result");
-            var resultAssignExp = Expression.Assign(resultVarExp, mapCall);
-            
+            //var resultVarExp = Expression.Variable(dstType, "result");
+            //var resultAssignExp = Expression.Assign(resultVarExp, mapCall);
+            var resultAssignExp = Expression.Assign(dstTypedExp, mapCall);
+
             var blockExpression = Expression.Block(new[] { genVariable, contextVarExp }, assignExp, assignContextExp, sourceAssignedExp, destAssignedExp, resultAssignExp);
 
             CustomTypeMapperExpCache[cacheKey] = Expression.Block(new ParameterExpression[] { }, blockExpression);
+        }
+
+        protected virtual bool ComplexMapCondition(Type src, Type dst)
+        {
+            return src != dst;
         }
 
         public Expression GetMemberMappingExpression(Expression left, Expression right)
@@ -99,7 +105,7 @@ namespace ExpressMapper
             var destType = destNullableType ?? left.Type;
             var sourceType = sourceNullableType ?? right.Type;
 
-            if (destType != sourceType)
+            if (ComplexMapCondition(sourceType, destType))
             {
                 var customMapExpression = GetCustomMapExpression(right.Type, left.Type);
                 if (customMapExpression != null)
@@ -109,10 +115,17 @@ namespace ExpressMapper
                     var assignSrcExp = Expression.Assign(srcExp, right);
 
                     var destExp = Expression.Variable(left.Type,
-                        string.Format("{0}Dest", Guid.NewGuid().ToString("N")));
+                        string.Format("{0}Dst", Guid.NewGuid().ToString("N")));
                     var assignDestExp = Expression.Assign(destExp, left);
 
-                    var substituteParameterVisitor = new SubstituteParameterVisitor(srcExp, destExp);
+                    // try precise substitute visitor
+                    var substituteParameterVisitor =
+                        new PreciseSubstituteParameterVisitor(
+                            new KeyValuePair<ParameterExpression, ParameterExpression>(
+                                Expression.Variable(right.Type, "srcTyped"), srcExp),
+                            new KeyValuePair<ParameterExpression, ParameterExpression>(
+                                Expression.Variable(left.Type, "dstTyped"), destExp));
+
                     var blockExpression = substituteParameterVisitor.Visit(customMapExpression) as BlockExpression;
 
                     var assignResultExp = Expression.Assign(left, destExp);
@@ -126,6 +139,7 @@ namespace ExpressMapper
 
                     return releaseExp;
                 }
+
                 if (typeof(IConvertible).IsAssignableFrom(destType) &&
                     typeof(IConvertible).IsAssignableFrom(sourceType))
                 {
@@ -207,7 +221,7 @@ namespace ExpressMapper
             var assignSourceFromProp = Expression.Assign(sourceVariable, srcExpression);
 
             var destList = typeof(List<>).MakeGenericType(destType);
-            var destColl = Expression.Variable(destList, string.Format("{0}Dest", Guid.NewGuid().ToString().Replace("-", "_")));
+            var destColl = Expression.Variable(destList, string.Format("{0}Dst", Guid.NewGuid().ToString().Replace("-", "_")));
 
             var newColl = Expression.New(destList);
             var destAssign = Expression.Assign(destColl, newColl);
@@ -226,7 +240,7 @@ namespace ExpressMapper
             var assignSourceItmFromProp = Expression.Assign(sourceColItmVariable, current);
 
             var destColItmVariable = Expression.Variable(destType,
-                string.Format("{0}ItmDest", Guid.NewGuid().ToString().Replace("-", "_")));
+                string.Format("{0}ItmDst", Guid.NewGuid().ToString().Replace("-", "_")));
 
             var loopExpression = CollectionLoopExpression(destColl, sourceColItmVariable, destColItmVariable,
                 assignSourceItmFromProp, doMoveNext);
@@ -315,7 +329,7 @@ namespace ExpressMapper
             var sourceColItmVariable = Expression.Variable(sourceType, "ItmSrc");
             var assignSourceItmFromProp = Expression.Assign(sourceColItmVariable, current);
 
-            var destColItmVariable = Expression.Variable(destType, "ItmDest");
+            var destColItmVariable = Expression.Variable(destType, "ItmDst");
 
             var loopExpression = CollectionLoopExpression(destColl, sourceColItmVariable, destColItmVariable,
                 assignSourceItmFromProp, doMoveNext);

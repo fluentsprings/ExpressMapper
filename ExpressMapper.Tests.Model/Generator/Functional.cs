@@ -149,6 +149,39 @@ namespace ExpressMapper.Tests.Model.Generator
             return new KeyValuePair<Employee, EmployeeViewModel>(employee, employeeViewModel);
         }
 
+        public static KeyValuePair<Person, PersonViewModel> RecursiveCompilationDirectAssociationTestMap()
+        {
+            var personId = Guid.NewGuid();
+            var personName = "Mike Watson";
+
+            var relativeId = Guid.NewGuid();
+            var relativeName = "Sherlock Hommes";
+
+            var person = new Person
+            {
+                Id = personId,
+                Name = personName,
+                Relative = new Person
+                {
+                    Id = relativeId,
+                    Name = relativeName
+                }
+            };
+
+            var personVm = new PersonViewModel
+            {
+                Id = personId,
+                Name = personName,
+                Relative = new PersonViewModel
+                {
+                    Id = relativeId,
+                    Name = relativeName
+                }
+            };
+
+            return new KeyValuePair<Person, PersonViewModel>(person, personVm);
+        }
+
         public static KeyValuePair<Engine, EngineViewModel> RecursiveCompilationCollectionTestMap()
         {
             var engineId = Guid.NewGuid();

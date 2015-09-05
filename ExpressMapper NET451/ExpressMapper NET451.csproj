@@ -98,6 +98,9 @@
     <Compile Include="..\ExpressMapper NET40\NullCheckNestedMemberVisitor.cs">
       <Link>NullCheckNestedMemberVisitor.cs</Link>
     </Compile>
+    <Compile Include="..\ExpressMapper NET40\PreciseSubstituteParameterVisitor.cs">
+      <Link>PreciseSubstituteParameterVisitor.cs</Link>
+    </Compile>
     <Compile Include="..\ExpressMapper NET40\Properties\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>

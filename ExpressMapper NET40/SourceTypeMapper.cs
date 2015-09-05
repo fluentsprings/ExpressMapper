@@ -56,8 +56,17 @@ namespace ExpressMapper
             var variables = new List<ParameterExpression>();
 
             var finalExpression = Expression.Block(variables, expressions);
-            var substituteParameterVisitor = new SubstituteParameterVisitor(SourceParameter,
-                destVariable.Left as ParameterExpression);
+
+            var destExpression = destVariable.Left as ParameterExpression;
+
+            var substituteParameterVisitor =
+                new PreciseSubstituteParameterVisitor(
+                    new KeyValuePair<ParameterExpression, ParameterExpression>(SourceParameter, SourceParameter),
+                    new KeyValuePair<ParameterExpression, ParameterExpression>(destExpression, destExpression));
+
+            //var substituteParameterVisitor = new SubstituteParameterVisitor(SourceParameter,
+            //    destVariable.Left as ParameterExpression);
+
             var resultExpression = substituteParameterVisitor.Visit(finalExpression) as BlockExpression;
 
             var expression = Expression.Lambda<Func<T, TN, TN>>(resultExpression, SourceParameter, DestFakeParameter);

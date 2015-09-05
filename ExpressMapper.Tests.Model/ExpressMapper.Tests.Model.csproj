@@ -56,6 +56,7 @@
     <Compile Include="Models\Engine.cs" />
     <Compile Include="Models\FashionProduct.cs" />
     <Compile Include="Models\ItemModel.cs" />
+    <Compile Include="Models\Person.cs" />
     <Compile Include="Models\Product.cs" />
     <Compile Include="Models\ProductOption.cs" />
     <Compile Include="Models\Size.cs" />
@@ -83,6 +84,7 @@
     <Compile Include="ViewModels\EngineViewModel.cs" />
     <Compile Include="ViewModels\FashionProductViewModel.cs" />
     <Compile Include="ViewModels\ItemModelViewModel.cs" />
+    <Compile Include="ViewModels\PersonViewModel.cs" />
     <Compile Include="ViewModels\ProductOptionViewModel.cs" />
     <Compile Include="ViewModels\ProductViewModel.cs" />
     <Compile Include="ViewModels\SizeViewModel.cs" />

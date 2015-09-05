@@ -79,10 +79,11 @@ namespace ExpressMapper
                 string.Format("{0}_{1}Src", srcType.Name, Guid.NewGuid().ToString().Replace("-", "_")));
 
             var assignSourceFromProp = Expression.Assign(sourceVariable, srcExpression);
-            
-            var mapExprForType = new List<Expression>(GetMapExpressions(srcType, destType));
+
+            var mapExpressions = GetMapExpressions(srcType, destType);
+            var mapExprForType = mapExpressions.Item1;
             var destVariable = Expression.Variable(destType,
-                string.Format("{0}_{1}Dest", destType.Name,
+                string.Format("{0}_{1}Dst", destType.Name,
                     Guid.NewGuid().ToString().Replace("-", "_")));
             var assignDestFromProp = Expression.Assign(destVariable, destExpression);
 
@@ -103,8 +104,15 @@ namespace ExpressMapper
 
             var blockForSubstitution = Expression.Block(mapExprForType);
             var substBlock =
-                new SubstituteParameterVisitor(sourceVariable, destVariable).Visit(blockForSubstitution) as
+                new PreciseSubstituteParameterVisitor(
+                    new KeyValuePair<ParameterExpression, ParameterExpression>(mapExpressions.Item2, sourceVariable),
+                    new KeyValuePair<ParameterExpression, ParameterExpression>(mapExpressions.Item3, destVariable))
+                    .Visit(blockForSubstitution) as
                     BlockExpression;
+
+            //var substBlock =
+            //    new SubstituteParameterVisitor(sourceVariable, destVariable).Visit(blockForSubstitution) as
+            //        BlockExpression;
             var resultMapExprForType = substBlock.Expressions;
 
             var assignExp = Expression.Assign(destExpression, destVariable);
@@ -128,7 +136,7 @@ namespace ExpressMapper
             var destType = GetCollectionElementType(typeof (TN));
 
             var sourceVariable = Expression.Parameter(typeof (T), "source");
-            var destVariable = Expression.Parameter(typeof (TN), "dest");
+            var destVariable = Expression.Parameter(typeof (TN), "dst");
 
             var srcCount = Expression.Call(typeof (Enumerable), "Count", new[] {sourceType}, sourceVariable);
             var destCount = Expression.Call(typeof (Enumerable), "Count", new[] {destType}, destVariable);
@@ -160,7 +168,7 @@ namespace ExpressMapper
 
         #endregion
 
-        #region Helper mathods
+        #region Helper methods
 
         private BlockExpression MapCollectionNotCountEquals(Type tCol, Type tnCol, Expression sourceVariable,
             Expression destVariable)
@@ -212,7 +220,7 @@ namespace ExpressMapper
                 // Else
 
                 var destListType = typeof (List<>).MakeGenericType(destType);
-                var destVarExp = Expression.Variable(destListType, "InterimDest");
+                var destVarExp = Expression.Variable(destListType, string.Format("{0}InterimDst", Guid.NewGuid().ToString("N")));
                 var constructorInfo = destListType.GetConstructor(new Type[] {typeof (int)});
 
                 var newColl = Expression.New(constructorInfo, srcCount);
@@ -221,25 +229,25 @@ namespace ExpressMapper
                 // Source enumeration
                 var closedEnumeratorSourceType = typeof (IEnumerator<>).MakeGenericType(sourceType);
                 var closedEnumerableSourceType = GenericEnumerableType.MakeGenericType(sourceType);
-                var enumeratorSrc = Expression.Variable(closedEnumeratorSourceType, "EnumSrc");
+                var enumeratorSrc = Expression.Variable(closedEnumeratorSourceType, string.Format("{0}EnumSrc", Guid.NewGuid().ToString("N")));
                 var assignToEnumSrc = Expression.Assign(enumeratorSrc,
                     Expression.Call(sourceVariable, closedEnumerableSourceType.GetMethod("GetEnumerator")));
                 var doMoveNextSrc = Expression.Call(enumeratorSrc, typeof (IEnumerator).GetMethod("MoveNext"));
                 var currentSrc = Expression.Property(enumeratorSrc, "Current");
 
-                var srcItmVarExp = Expression.Variable(sourceType, "ItmSrc");
+                var srcItmVarExp = Expression.Variable(sourceType, string.Format("{0}ItmSrc", Guid.NewGuid().ToString("N")));
                 var assignSourceItmFromProp = Expression.Assign(srcItmVarExp, currentSrc);
 
                 // dest enumeration
                 var closedEnumeratorDestType = typeof (IEnumerator<>).MakeGenericType(destType);
                 var closedEnumerableDestType = GenericEnumerableType.MakeGenericType(destType);
-                var enumeratorDest = Expression.Variable(closedEnumeratorDestType, "EnumDest");
+                var enumeratorDest = Expression.Variable(closedEnumeratorDestType, string.Format("{0}EnumDst", Guid.NewGuid().ToString("N")));
                 var assignToEnumDest = Expression.Assign(enumeratorDest,
                     Expression.Call(destVariable, closedEnumerableDestType.GetMethod("GetEnumerator")));
                 var doMoveNextDest = Expression.Call(enumeratorDest, typeof (IEnumerator).GetMethod("MoveNext"));
 
                 var currentDest = Expression.Property(enumeratorDest, "Current");
-                var destItmVarExp = Expression.Variable(destType, "ItmDest");
+                var destItmVarExp = Expression.Variable(destType, string.Format("{0}ItmDst", Guid.NewGuid().ToString("N")));
                 var assignDestItmFromProp = Expression.Assign(destItmVarExp, currentDest);
 
 
@@ -285,23 +293,23 @@ namespace ExpressMapper
             // Source enumeration
             var closedEnumeratorSourceType = typeof (IEnumerator<>).MakeGenericType(sourceType);
             var closedEnumerableSourceType = GenericEnumerableType.MakeGenericType(sourceType);
-            var enumeratorSrc = Expression.Variable(closedEnumeratorSourceType, "EnumSrc");
+            var enumeratorSrc = Expression.Variable(closedEnumeratorSourceType, string.Format("{0}EnumSrc", Guid.NewGuid().ToString("N")));
             var assignToEnumSrc = Expression.Assign(enumeratorSrc,
                 Expression.Call(sourceVariable, closedEnumerableSourceType.GetMethod("GetEnumerator")));
             var doMoveNextSrc = Expression.Call(enumeratorSrc, typeof (IEnumerator).GetMethod("MoveNext"));
             var currentSrc = Expression.Property(enumeratorSrc, "Current");
-            var srcItmVarExp = Expression.Variable(sourceType, "ItmSrc");
+            var srcItmVarExp = Expression.Variable(sourceType, string.Format("{0}ItmSrc", Guid.NewGuid().ToString("N")));
             var assignSourceItmFromProp = Expression.Assign(srcItmVarExp, currentSrc);
 
             // dest enumeration
             var closedEnumeratorDestType = typeof (IEnumerator<>).MakeGenericType(destType);
             var closedEnumerableDestType = GenericEnumerableType.MakeGenericType(destType);
-            var enumeratorDest = Expression.Variable(closedEnumeratorDestType, "EnumDest");
+            var enumeratorDest = Expression.Variable(closedEnumeratorDestType, string.Format("{0}EnumDst", Guid.NewGuid().ToString("N")));
             var assignToEnumDest = Expression.Assign(enumeratorDest,
                 Expression.Call(destVariable, closedEnumerableDestType.GetMethod("GetEnumerator")));
             var doMoveNextDest = Expression.Call(enumeratorDest, typeof (IEnumerator).GetMethod("MoveNext"));
             var currentDest = Expression.Property(enumeratorDest, "Current");
-            var destItmVarExp = Expression.Variable(destType, "ItmDest");
+            var destItmVarExp = Expression.Variable(destType, string.Format("{0}ItmDst", Guid.NewGuid().ToString("N")));
             var assignDestItmFromProp = Expression.Assign(destItmVarExp, currentDest);
 
             var mapExprForType = GetMemberMappingExpression(destItmVarExp, srcItmVarExp);
@@ -336,25 +344,25 @@ namespace ExpressMapper
             // Source enumeration
             var closedEnumeratorSourceType = typeof (IEnumerator<>).MakeGenericType(sourceType);
             var closedEnumerableSourceType = GenericEnumerableType.MakeGenericType(sourceType);
-            var enumeratorSrc = Expression.Variable(closedEnumeratorSourceType, "EnumSrc");
+            var enumeratorSrc = Expression.Variable(closedEnumeratorSourceType, string.Format("{0}EnumSrc", Guid.NewGuid().ToString("N")));
             var assignToEnumSrc = Expression.Assign(enumeratorSrc,
                 Expression.Call(sourceVariable, closedEnumerableSourceType.GetMethod("GetEnumerator")));
             var doMoveNextSrc = Expression.Call(enumeratorSrc, typeof (IEnumerator).GetMethod("MoveNext"));
             var currentSrc = Expression.Property(enumeratorSrc, "Current");
 
-            var srcItmVarExp = Expression.Variable(sourceType, "ItmSrc");
+            var srcItmVarExp = Expression.Variable(sourceType, string.Format("{0}ItmSrc", Guid.NewGuid().ToString("N")));
             var assignSourceItmFromProp = Expression.Assign(srcItmVarExp, currentSrc);
 
             // dest enumeration
             var closedEnumeratorDestType = typeof (IEnumerator<>).MakeGenericType(destType);
             var closedEnumerableDestType = GenericEnumerableType.MakeGenericType(destType);
-            var enumeratorDest = Expression.Variable(closedEnumeratorDestType, "EnumDest");
+            var enumeratorDest = Expression.Variable(closedEnumeratorDestType, string.Format("{0}EnumDst", Guid.NewGuid().ToString("N")));
             var assignToEnumDest = Expression.Assign(enumeratorDest,
                 Expression.Call(destVariable, closedEnumerableDestType.GetMethod("GetEnumerator")));
             var doMoveNextDest = Expression.Call(enumeratorDest, typeof (IEnumerator).GetMethod("MoveNext"));
 
             var currentDest = Expression.Property(enumeratorDest, "Current");
-            var destItmVarExp = Expression.Variable(destType, "ItmDest");
+            var destItmVarExp = Expression.Variable(destType, string.Format("{0}ItmDst", Guid.NewGuid().ToString("N")));
             var assignDestItmFromProp = Expression.Assign(destItmVarExp, currentDest);
 
             var ifTrueBlock = IfElseExpr(srcItmVarExp, destItmVarExp, assignDestItmFromProp);

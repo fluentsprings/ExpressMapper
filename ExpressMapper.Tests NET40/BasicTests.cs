@@ -42,6 +42,18 @@ namespace ExpressMapper.Tests
         }
 
         [Test]
+        public void RecursiveCompilationDirectAssociationTest()
+        {
+            Mapper.Register<Person, PersonViewModel>();
+            Mapper.Compile();
+
+            var srcAndDest = Functional.RecursiveCompilationDirectAssociationTestMap();
+            var bvm = Mapper.Map<Person, PersonViewModel>(srcAndDest.Key);
+
+            Assert.AreEqual(bvm, srcAndDest.Value);
+        }
+
+        [Test]
         public void RecursiveCompilationAssociationTest()
         {
             Mapper.Register<Booking, BookingViewModel>();
@@ -95,6 +107,27 @@ namespace ExpressMapper.Tests
             var testViewModel = Mapper.Map<TestModel, TestViewModel>(test.Key);
 
             Assert.AreEqual(testViewModel, test.Value);
+        }
+
+        [Test]
+        public void AutoMemberMapDeepCopy()
+        {
+            Mapper.Register<TestModel, TestModel>();
+            Mapper.Register<Size, Size>();
+            Mapper.Register<Country, Country>();
+            Mapper.Compile();
+
+            var test = Functional.AutoMemberMap();
+
+            var deepCopy = Mapper.Map<TestModel, TestModel>(test.Key);
+
+            Assert.AreNotEqual(deepCopy.GetHashCode(), test.Key.GetHashCode());
+            Assert.AreNotEqual(deepCopy.Country.GetHashCode(), test.Key.Country.GetHashCode());
+            for (var i = 0; i < deepCopy.Sizes.Count; i++)
+            {
+                Assert.AreNotEqual(deepCopy.Sizes[i].GetHashCode(), test.Key.Sizes[i].GetHashCode());
+            }
+            Assert.AreEqual(deepCopy, test.Key);
         }
 
         [Test]
@@ -244,6 +277,25 @@ namespace ExpressMapper.Tests
             var sizeResult = Functional.CustomNestedCollectionMap();
             var result = Mapper.Map<TestModel, TestViewModel>(sizeResult.Key);
             Assert.AreEqual(result, sizeResult.Value);
+        }
+
+        [Test]
+        public void DeepCopyCustomMapWithSupportedNestedCollectionMaps()
+        {
+            Mapper.Register<TestModel, TestModel>();
+            Mapper.Register<Country, Country>();
+            Mapper.RegisterCustom<Size, Size, DeepCopySizeMapper>();
+            Mapper.Compile();
+            var sizeResult = Functional.CustomNestedCollectionMap();
+            var deepCopy = Mapper.Map<TestModel, TestModel>(sizeResult.Key);
+
+            Assert.AreNotEqual(deepCopy.GetHashCode(), sizeResult.Key.GetHashCode());
+            Assert.AreNotEqual(deepCopy.Country.GetHashCode(), sizeResult.Key.Country.GetHashCode());
+            for (var i = 0; i < deepCopy.Sizes.Count; i++)
+            {
+                Assert.AreNotEqual(deepCopy.Sizes[i].GetHashCode(), sizeResult.Key.Sizes[i].GetHashCode());
+            }
+            Assert.AreEqual(deepCopy, sizeResult.Key);
         }
 
         [Test]

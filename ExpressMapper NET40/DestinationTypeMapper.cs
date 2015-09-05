@@ -7,13 +7,19 @@ namespace ExpressMapper
 {
     public class DestinationTypeMapper<T, TN> : TypeMapperBase<T, TN>, ITypeMapper<T, TN>
     {
+        #region Const
+
+        private const string MapStr = "Map";
+
+        #endregion
+
         public DestinationTypeMapper(IMappingService service) : base(service){}
 
         protected override void InitializeRecursiveMappings()
         {
             var mapMethod =
                 typeof (Mapper).GetMethods()
-                    .First(mi => mi.Name == "Map" && mi.GetParameters().Length == 2)
+                    .First(mi => mi.Name == MapStr && mi.GetParameters().Length == 2)
                     .MakeGenericMethod(typeof (T), typeof (TN));
             RecursiveExpressionResult.Add(Expression.Assign(DestFakeParameter, Expression.Call(mapMethod, SourceParameter, DestFakeParameter)));
         }
@@ -21,7 +27,6 @@ namespace ExpressMapper
         protected override void CompileInternal()
         {
             if (ResultMapFunction != null) return;
-
 
             ProcessCustomMembers();
             ProcessCustomFunctionMembers();
@@ -54,7 +59,14 @@ namespace ExpressMapper
             expressions.Add(DestFakeParameter);
 
             var finalExpression = Expression.Block(expressions);
-            var substituteParameterVisitor = new SubstituteParameterVisitor(SourceParameter, DestFakeParameter);
+
+            var substituteParameterVisitor =
+                new PreciseSubstituteParameterVisitor(
+                    new KeyValuePair<ParameterExpression, ParameterExpression>(SourceParameter, SourceParameter),
+                    new KeyValuePair<ParameterExpression, ParameterExpression>(DestFakeParameter, DestFakeParameter));
+
+            //var substituteParameterVisitor = new SubstituteParameterVisitor(SourceParameter, DestFakeParameter);
+
             var resultExpression = substituteParameterVisitor.Visit(finalExpression);
 
             var expression = Expression.Lambda<Func<T, TN, TN>>(resultExpression, SourceParameter, DestFakeParameter);

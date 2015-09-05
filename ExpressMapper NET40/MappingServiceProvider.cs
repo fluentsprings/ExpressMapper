@@ -252,13 +252,13 @@ namespace ExpressMapper
         private void CompileNonGenericCustomTypeMapper(Type srcType, Type dstType, ICustomTypeMapper typeMapper, int cacheKey)
         {
             var sourceExpression = Expression.Parameter(typeof(object), "src");
-            var destinationExpression = Expression.Parameter(typeof(object), "dest");
+            var destinationExpression = Expression.Parameter(typeof(object), "dst");
             var srcConverted = Expression.Convert(sourceExpression, srcType);
             var srcTypedExp = Expression.Variable(srcType, "srcTyped");
             var srcAssigned = Expression.Assign(srcTypedExp, srcConverted);
 
             var dstConverted = Expression.Convert(destinationExpression, dstType);
-            var dstTypedExp = Expression.Variable(dstType, "destTyped");
+            var dstTypedExp = Expression.Variable(dstType, "dstTyped");
             var dstAssigned = Expression.Assign(dstTypedExp,
                 Expression.Condition(Expression.Equal(destinationExpression, Expression.Constant(null)),
                     Expression.Default(dstType), dstConverted));

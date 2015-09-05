@@ -53,6 +53,7 @@
     <Compile Include="BaseTestClass.cs" />
     <Compile Include="CollectionTests.cs" />
     <Compile Include="BasicTests.cs" />
+    <Compile Include="DeepCopySizeMapper.cs" />
     <Compile Include="ExceptionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SizeListMapper.cs" />

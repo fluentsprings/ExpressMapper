@@ -48,7 +48,7 @@ namespace ExpressMapper
         {
             if (dest == null)
             {
-                throw new ArgumentNullException("dest");
+                throw new ArgumentNullException("dst");
             }
 
             var memberExpression = dest.Body as MemberExpression;
@@ -93,7 +93,7 @@ namespace ExpressMapper
         {
             if (dest == null)
             {
-                throw new ArgumentNullException("dest");
+                throw new ArgumentNullException("dst");
             }
 
             if (!(dest.Body is MemberExpression))

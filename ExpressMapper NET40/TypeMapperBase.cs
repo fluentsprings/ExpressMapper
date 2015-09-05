@@ -9,7 +9,7 @@ namespace ExpressMapper
     public abstract class TypeMapperBase<T, TN>
     {
         private bool _compiling;
-        protected ParameterExpression DestFakeParameter = Expression.Parameter(typeof(TN), "dest");
+        protected ParameterExpression DestFakeParameter = Expression.Parameter(typeof(TN), "dst");
         protected IMappingService MappingService { get; set; }
         protected List<KeyValuePair<MemberExpression, Expression>> CustomMembers = new List<KeyValuePair<MemberExpression, Expression>>();
         protected List<KeyValuePair<MemberExpression, Expression>> CustomFunctionMembers = new List<KeyValuePair<MemberExpression, Expression>>();
@@ -73,15 +73,15 @@ namespace ExpressMapper
             AfterMapHandler = afterMap;
         }
 
-        public List<Expression> GetMapExpressions()
+        public Tuple<List<Expression>, ParameterExpression, ParameterExpression> GetMapExpressions()
         {
             if (_compiling)
             {
-                return RecursiveExpressionResult;
+                return new Tuple<List<Expression>, ParameterExpression, ParameterExpression>(new List<Expression>(RecursiveExpressionResult), SourceParameter, DestFakeParameter);
             }
 
             Compile();
-            return ResultExpressionList;
+            return new Tuple<List<Expression>, ParameterExpression, ParameterExpression>(new List<Expression>(ResultExpressionList), SourceParameter, DestFakeParameter); ;
         }
 
         public Func<object, object> GetNonGenericMapFunc()
@@ -233,17 +233,25 @@ namespace ExpressMapper
 
         protected void ProcessCustomMembers()
         {
-            foreach (var customMember in CustomMembers)
-            {
-                MapMember(customMember.Key, customMember.Value);
-            }
+            TranslateExpression(CustomMembers);
         }
 
         protected void ProcessCustomFunctionMembers()
         {
-            foreach (var customMember in CustomFunctionMembers)
+            TranslateExpression(CustomFunctionMembers);
+        }
+
+        private void TranslateExpression(IEnumerable<KeyValuePair<MemberExpression, Expression>> expressions)
+        {
+            foreach (var customMember in expressions)
             {
-                MapMember(customMember.Key, customMember.Value);
+                var substVisitorDest = new SubstituteParameterVisitor(DestFakeParameter);
+                var dest = substVisitorDest.Visit(customMember.Key) as MemberExpression;
+
+                var substVisitorSrc = new SubstituteParameterVisitor(SourceParameter);
+                var src = substVisitorSrc.Visit(customMember.Value);
+
+                MapMember(dest, src);
             }
         }
     }
