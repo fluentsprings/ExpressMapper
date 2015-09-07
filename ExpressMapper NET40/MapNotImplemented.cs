@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Runtime.Serialization;
 
 namespace ExpressMapper
 {
     /// <summary>
     /// Mapping not implemented exception
     /// </summary>
-    [Serializable]
+    /// Serializable turned off - PCL support
+    //[Serializable]
     public class MapNotImplementedException : Exception
     {
         public MapNotImplementedException()
@@ -22,9 +22,10 @@ namespace ExpressMapper
         {
         }
 
-        protected MapNotImplementedException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-        }
+        // Serializable turned off - PCL support
+        //protected MapNotImplementedException(SerializationInfo info, StreamingContext context)
+        //    : base(info, context)
+        //{
+        //}
     }
 }

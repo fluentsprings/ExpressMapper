@@ -178,7 +178,8 @@ namespace ExpressMapper
             if (setNullableType == null && getNullableType != null)
             {
                 // Nullable to non nullable map
-                right = Expression.Call(getMethod, "GetValueOrDefault", Type.EmptyTypes);
+                // Type.EmptyTypes is not being used - PCL support
+                right = Expression.Call(getMethod, "GetValueOrDefault", /*Type.EmptyTypes*/null);
             }
             else if (setNullableType != null && getNullableType == null)
             {

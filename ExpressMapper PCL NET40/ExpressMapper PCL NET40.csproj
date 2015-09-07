@@ -1,0 +1,131 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <MinimumVisualStudioVersion>10.0</MinimumVisualStudioVersion>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{3BBD6945-50CC-4400-BFEB-4E8AF4EACF5C}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ExpressMapper</RootNamespace>
+    <AssemblyName>ExpressMapper</AssemblyName>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <TargetFrameworkProfile>Profile328</TargetFrameworkProfile>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\ExpressMapper NET40\Expressmapper.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- A reference to the entire .NET Framework is automatically included -->
+    <None Include="..\ExpressMapper NET40\Expressmapper.snk">
+      <Link>Expressmapper.snk</Link>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\ExpressMapper NET40\CollectionTypes.cs">
+      <Link>CollectionTypes.cs</Link>
+    </Compile>
+    <Compile Include="..\ExpressMapper NET40\Constants.cs">
+      <Link>Constants.cs</Link>
+    </Compile>
+    <Compile Include="..\ExpressMapper NET40\DefaultMappingContext.cs">
+      <Link>DefaultMappingContext.cs</Link>
+    </Compile>
+    <Compile Include="..\ExpressMapper NET40\DelegateCustomTypeMapper.cs">
+      <Link>DelegateCustomTypeMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\ExpressMapper NET40\DestinationMappingService.cs">
+      <Link>DestinationMappingService.cs</Link>
+    </Compile>
+    <Compile Include="..\ExpressMapper NET40\DestinationTypeMapper.cs">
+      <Link>DestinationTypeMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\ExpressMapper NET40\ICustomTypeMapper.cs">
+      <Link>ICustomTypeMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\ExpressMapper NET40\IMappingContext.cs">
+      <Link>IMappingContext.cs</Link>
+    </Compile>
+    <Compile Include="..\ExpressMapper NET40\IMappingService.cs">
+      <Link>IMappingService.cs</Link>
+    </Compile>
+    <Compile Include="..\ExpressMapper NET40\IMappingServiceProvider.cs">
+      <Link>IMappingServiceProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\ExpressMapper NET40\IMemberConfiguration.cs">
+      <Link>IMemberConfiguration.cs</Link>
+    </Compile>
+    <Compile Include="..\ExpressMapper NET40\ITypeMapper.cs">
+      <Link>ITypeMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\ExpressMapper NET40\MapNotImplemented.cs">
+      <Link>MapNotImplemented.cs</Link>
+    </Compile>
+    <Compile Include="..\ExpressMapper NET40\Mapper.cs">
+      <Link>Mapper.cs</Link>
+    </Compile>
+    <Compile Include="..\ExpressMapper NET40\MappingServiceBase.cs">
+      <Link>MappingServiceBase.cs</Link>
+    </Compile>
+    <Compile Include="..\ExpressMapper NET40\MappingServiceProvider.cs">
+      <Link>MappingServiceProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\ExpressMapper NET40\MemberConfiguration.cs">
+      <Link>MemberConfiguration.cs</Link>
+    </Compile>
+    <Compile Include="..\ExpressMapper NET40\NullCheckNestedMemberVisitor.cs">
+      <Link>NullCheckNestedMemberVisitor.cs</Link>
+    </Compile>
+    <Compile Include="..\ExpressMapper NET40\PreciseSubstituteParameterVisitor.cs">
+      <Link>PreciseSubstituteParameterVisitor.cs</Link>
+    </Compile>
+    <Compile Include="..\ExpressMapper NET40\SourceMappingService.cs">
+      <Link>SourceMappingService.cs</Link>
+    </Compile>
+    <Compile Include="..\ExpressMapper NET40\SourceTypeMapper.cs">
+      <Link>SourceTypeMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\ExpressMapper NET40\StaticExpressions.cs">
+      <Link>StaticExpressions.cs</Link>
+    </Compile>
+    <Compile Include="..\ExpressMapper NET40\SubstituteParameterVisitor.cs">
+      <Link>SubstituteParameterVisitor.cs</Link>
+    </Compile>
+    <Compile Include="..\ExpressMapper NET40\TypeMapperBase.cs">
+      <Link>TypeMapperBase.cs</Link>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
