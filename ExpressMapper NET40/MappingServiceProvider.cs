@@ -178,6 +178,11 @@ namespace ExpressMapper
             return result;
         }
 
+        public TN Map<T, TN>(T src, ICustomTypeMapper<T, TN> customMapper, TN dest = default(TN))
+        {
+            return customMapper.Map(new DefaultMappingContext<T, TN> {Source = src, Destination = dest});
+        }
+
         public object Map(Type srcType, Type dstType, object src, object dest = null)
         {
             var cacheKey = CalculateCacheKey(srcType, dstType);
