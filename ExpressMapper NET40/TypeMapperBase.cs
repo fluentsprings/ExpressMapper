@@ -29,7 +29,6 @@ namespace ExpressMapper
 
         #endregion
 
-
         #region Properties
         
         protected ParameterExpression SourceParameter = Expression.Parameter(typeof(T), "src");
@@ -51,7 +50,7 @@ namespace ExpressMapper
         public void Compile()
         {
             if (_compiling)
-            {   
+            {
                 return;
             }
 
@@ -114,10 +113,10 @@ namespace ExpressMapper
             return NonGenericMapFunc;
         }
 
-        protected void AutoMapProperty(PropertyInfo propertyGet, PropertyInfo propertySet)
+        protected void AutoMapProperty(MemberInfo propertyGet, MemberInfo propertySet)
         {
-            var callSetPropMethod = Expression.Property(DestFakeParameter, propertySet);
-            var callGetPropMethod = Expression.Property(SourceParameter, propertyGet);
+            var callSetPropMethod = Expression.PropertyOrField(DestFakeParameter, propertySet.Name);
+            var callGetPropMethod = Expression.PropertyOrField(SourceParameter, propertyGet.Name);
 
             MapMember(callSetPropMethod, callGetPropMethod);
         }
@@ -158,20 +157,29 @@ namespace ExpressMapper
 
         protected void ProcessAutoProperties()
         {
+            var getFields =
+                typeof(T).GetFields(BindingFlags.FlattenHierarchy | BindingFlags.Instance | BindingFlags.Public);
+            var setFields =
+                typeof(TN).GetFields(BindingFlags.FlattenHierarchy | BindingFlags.Instance | BindingFlags.Public);
+
             var getProps =
                 typeof(T).GetProperties(BindingFlags.FlattenHierarchy | BindingFlags.Instance | BindingFlags.Public);
             var setProps =
                 typeof(TN).GetProperties(BindingFlags.FlattenHierarchy | BindingFlags.Instance | BindingFlags.Public);
 
-            foreach (var prop in getProps)
+            var sourceMembers = getFields.Cast<MemberInfo>().Union(getProps);
+            var destMembers = setFields.Cast<MemberInfo>().Union(setProps);
+
+            foreach (var prop in sourceMembers)
             {
                 if (IgnoreMemberList.Contains(prop.Name) || CustomPropertyCache.ContainsKey(prop.Name))
                 {
                     continue;
                 }
-                var setprop = setProps.FirstOrDefault(x => string.Equals(x.Name, prop.Name, StringComparison.OrdinalIgnoreCase));
+                var setprop = destMembers.FirstOrDefault(x => string.Equals(x.Name, prop.Name, StringComparison.OrdinalIgnoreCase));
 
-                if (setprop == null || !setprop.CanWrite || !setprop.GetSetMethod(true).IsPublic)
+                var propertyInfo = setprop as PropertyInfo;
+                if ((propertyInfo == null && setprop == null) || (propertyInfo != null && (!propertyInfo.CanWrite || !propertyInfo.GetSetMethod(true).IsPublic)))
                 {
                     IgnoreMemberList.Add(prop.Name);
                     continue;

@@ -3,7 +3,6 @@ using ExpressMapper.Tests.Model.Models;
 using ExpressMapper.Tests.Model.ViewModels;
 using NUnit.Framework;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace ExpressMapper.Tests
@@ -166,6 +165,31 @@ namespace ExpressMapper.Tests
             {
                 Assert.AreEqual(result[i], testData.Value[i]);
                 Assert.AreEqual(itemHashes[i], result[i].GetHashCode());
+            }
+        }
+
+        [Test]
+        public void AutoMemberMapCollectionDeepCopy()
+        {
+            Mapper.Register<TestModel, TestModel>();
+            Mapper.Register<Size, Size>();
+            Mapper.Register<Country, Country>();
+            Mapper.Compile();
+
+            var test = Functional.AutoMemberMapCollection();
+
+            var deepCopies = Mapper.Map<List<TestModel>, List<TestModel>>(test.Key);
+
+            Assert.AreEqual(deepCopies.Count, test.Key.Count);
+            for(var i = 0; i < deepCopies.Count; i++)
+            {
+                Assert.AreNotEqual(deepCopies[i].GetHashCode(), test.Key[i].GetHashCode());
+                Assert.AreNotEqual(deepCopies[i].Country.GetHashCode(), test.Key[i].Country.GetHashCode());
+                for (var j = 0; j < deepCopies[i].Sizes.Count; j++)
+                {
+                    Assert.AreNotEqual(deepCopies[i].Sizes[j].GetHashCode(), test.Key[i].Sizes[j].GetHashCode());
+                }
+                Assert.AreEqual(deepCopies[i], test.Key[i]);
             }
         }
     }

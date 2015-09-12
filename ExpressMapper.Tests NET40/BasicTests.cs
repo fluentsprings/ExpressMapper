@@ -15,6 +15,22 @@ namespace ExpressMapper.Tests
     public class BasicTests : BaseTestClass
     {
         [Test]
+        public void FieldsTest()
+        {
+            Mapper.Register<Brand, BrandViewModel>();
+            Mapper.Register<Table, TableViewModel>();
+            Mapper.Register<Size, SizeViewModel>();
+            Mapper.Register<Country, CountryViewModel>();
+            Mapper.Compile();
+
+            var srcAndDest = Functional.FieldsTestMap();
+
+            var bvm = Mapper.Map<Table, TableViewModel>(srcAndDest.Key);
+
+            Assert.AreEqual(bvm, srcAndDest.Value);
+        }
+
+        [Test]
         public void MappingOrderLessTest()
         {
             Mapper.Register<Composition, CompositionViewModel>()

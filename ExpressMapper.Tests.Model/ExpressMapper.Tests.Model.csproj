@@ -65,6 +65,7 @@
     <Compile Include="Models\SubItem.cs" />
     <Compile Include="Models\SubUnit.cs" />
     <Compile Include="Models\Supplier.cs" />
+    <Compile Include="Models\Table.cs" />
     <Compile Include="Models\TestCollection.cs" />
     <Compile Include="Models\TestItem.cs" />
     <Compile Include="Models\TestModel.cs" />
@@ -93,6 +94,7 @@
     <Compile Include="ViewModels\SubItemViewModel.cs" />
     <Compile Include="ViewModels\SubUnitViewModel.cs" />
     <Compile Include="ViewModels\SupplierViewModel.cs" />
+    <Compile Include="ViewModels\TableViewModel.cs" />
     <Compile Include="ViewModels\TestCollectionViewModel.cs" />
     <Compile Include="ViewModels\TestItemViewModel.cs" />
     <Compile Include="ViewModels\TestViewModel.cs" />

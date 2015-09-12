@@ -14,6 +14,83 @@ namespace ExpressMapper.Tests.Model.Generator
     {
         #region Basics
 
+        public static KeyValuePair<Table, TableViewModel> FieldsTestMap()
+        {
+            var idTable = Guid.NewGuid();
+            var tableName = "Just a table!";
+            var countryName = "Cuba";
+            var countryId = Guid.NewGuid();
+
+            var table = new Table
+            {
+                Id = idTable,
+                Name = tableName,
+                Manufacturer = new Country
+                {
+                    Id = countryId,
+                    Name = countryName
+                },
+                Sizes = new List<Size>(),
+                Brands = new List<Brand>()
+            };
+
+            var tableViewModel = new TableViewModel
+            {
+                Id = idTable,
+                Name = tableName,
+                Manufacturer = new CountryViewModel
+                {
+                    Id = countryId,
+                    Name = countryName
+                },
+                Sizes = new List<SizeViewModel>(),
+                Brands = new List<BrandViewModel>()
+            };
+
+            for (var i = 0; i < 10; i++)
+            {
+                var brandId = Guid.NewGuid();
+                var name = string.Format("Brand {0}", i);
+                var brand = new Brand
+                {
+                    Id = brandId,
+                    Name = name,
+                };
+
+                var brandViewModel = new BrandViewModel
+                {
+                    Id = brandId,
+                    Name = name,
+                };
+
+                table.Brands.Add(brand);
+                tableViewModel.Brands.Add(brandViewModel);
+            }
+
+            for (var i = 0; i < 5; i++)
+            {
+                var sizeId = Guid.NewGuid();
+                var name = string.Format("Size {0}", i);
+                var size = new Size
+                {
+                    Id = sizeId,
+                    Name = name,
+                };
+
+                var sizeViewModel = new SizeViewModel
+                {
+                    Id = sizeId,
+                    Name = name,
+
+                };
+
+                table.Sizes.Add(size);
+                tableViewModel.Sizes.Add(sizeViewModel);
+            }
+
+            return new KeyValuePair<Table, TableViewModel>(table, tableViewModel);
+        }
+
         public static KeyValuePair<Booking, BookingViewModel> RecursiveCompilationAssociationTestMap()
         {
             var compositionLvl1 = Guid.NewGuid();
@@ -513,6 +590,91 @@ namespace ExpressMapper.Tests.Model.Generator
             };
 
             return new KeyValuePair<TestModel, TestViewModel>(src, result);
+        }
+
+        public static KeyValuePair<List<TestModel>, List<TestViewModel>> AutoMemberMapCollection()
+        {
+            var models = new List<TestModel>();
+            var viewModels = new List<TestViewModel>();
+            for (var i = 0; i < 10; i++)
+            {
+                var testId = Guid.NewGuid();
+                var countryId = Guid.NewGuid();
+
+                var created = DateTime.UtcNow;
+                var xxlId = Guid.NewGuid();
+                var xlId = Guid.NewGuid();
+                var src = new TestModel
+                {
+                    Id = testId,
+                    Age = 18,
+                    Country = new Country
+                    {
+                        Id = countryId,
+                        Name = "USA",
+                        Code = "US"
+                    },
+                    Created = created,
+                    Name = "AutoMemberMap",
+                    Sizes = new List<Size>
+                {
+                    new Size
+                    {
+                        Id = xxlId,
+                        Name = "XXL size",
+                        Alias = "XXL",
+                        SortOrder = 3
+                    },
+                    new Size
+                    {
+                        Id = xlId,
+                        Name = "XL size",
+                        Alias = "XL",
+                        SortOrder = 2
+                    }
+                },
+                    Weight = 32,
+                    CaseInsensitive = "abc"
+                };
+                models.Add(src);
+
+                var result = new TestViewModel
+                {
+                    Id = testId,
+                    Age = 18,
+                    Country = new CountryViewModel
+                    {
+                        Id = countryId,
+                        Name = "USA",
+                        Code = "US"
+                    },
+                    Created = created,
+                    Name = "AutoMemberMap",
+                    Sizes = new List<SizeViewModel>
+                {
+                    new SizeViewModel
+                    {
+                        Id = xxlId,
+                        Name = "XXL size",
+                        Alias = "XXL",
+                        SortOrder = 3
+                    },
+                    new SizeViewModel
+                    {
+                        Id = xlId,
+                        Name = "XL size",
+                        Alias = "XL",
+                        SortOrder = 2
+                    }
+                },
+                    Weight = 32,
+                    CaSeInSeNsItIvE = "abc"
+                };
+                viewModels.Add(result);
+            }
+            
+
+            return new KeyValuePair<List<TestModel>, List<TestViewModel>>(models, viewModels);
         }
 
         public static KeyValuePair<TestItem, TestItemViewModel> ExistingDestCollEquals()
