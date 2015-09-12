@@ -4,6 +4,7 @@ namespace ExpressMapper
 {
     public static class Mapper
     {
+        private static readonly object _lock = new object();
         private static IMappingServiceProvider _instance;
 
         // todo: via Internal DependencyResolver 
@@ -14,12 +15,18 @@ namespace ExpressMapper
 
         public static void Compile()
         {
-            Instance.Compile();
+            lock (_lock)
+            {
+                Instance.Compile();
+            }
         }
 
         public static void PrecompileCollection<T,TN>()
         {
-            Instance.PrecompileCollection<T, TN>();
+            lock (_lock)
+            {
+                Instance.PrecompileCollection<T, TN>();
+            }
         }
 
         public static TN Map<T, TN>(T src)
@@ -49,23 +56,35 @@ namespace ExpressMapper
 
         public static IMemberConfiguration<T, TN> Register<T, TN>()
         {
-            return Instance.Register<T, TN>();
+            lock (_lock)
+            {
+                return Instance.Register<T, TN>();
+            }
         }
 
         public static void RegisterCustom<T, TN, TMapper>()
             where TMapper : ICustomTypeMapper<T, TN>
         {
-            Instance.RegisterCustom<T, TN, TMapper>();
+            lock (_lock)
+            {
+                Instance.RegisterCustom<T, TN, TMapper>();
+            }
         }
 
         public static void RegisterCustom<T, TN>(Func<T, TN> mapFunc)
         {
-            Instance.RegisterCustom<T, TN>(mapFunc);
+            lock (_lock)
+            {
+                Instance.RegisterCustom<T, TN>(mapFunc);
+            }
         }
 
         public static void Reset()
         {
-            Instance.Reset();
+            lock (_lock)
+            {
+                Instance.Reset();
+            }
         }
     }
 }

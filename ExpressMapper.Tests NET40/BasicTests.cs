@@ -8,12 +8,31 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace ExpressMapper.Tests
 {
     [TestFixture]
     public class BasicTests : BaseTestClass
     {
+        [Test]
+        public void ParallelPrecompileCollectionTest()
+        {
+            Mapper.Register<Composition, CompositionViewModel>()
+                .Member(dest => dest.Booking, src => src.Booking);
+            Mapper.Register<Booking, BookingViewModel>();
+            Mapper.Compile();
+
+            var actions = new List<Action>();
+
+            for (var i = 0; i < 100; i++)
+            {
+                actions.Add(() => Mapper.PrecompileCollection<List<Booking>, IEnumerable<BookingViewModel>>());
+            }
+
+            Parallel.Invoke(actions.ToArray());
+        }
+
         [Test]
         public void FieldsTest()
         {
