@@ -35,6 +35,23 @@ namespace ExpressMapper
             CustomMappers = new Dictionary<int, Func<ICustomTypeMapper>>();
         }
 
+        public IQueryable<TN> Project<T, TN>(IQueryable<T> source)
+        {
+            var srcType = typeof(T);
+            var destType = typeof(TN);
+            var cacheKey = CalculateCacheKey(srcType, destType);
+
+            if (!SourceService.TypeMappers.ContainsKey(cacheKey)) return null;
+
+            var typeMapper = SourceService.TypeMappers[cacheKey];
+            var mapper = typeMapper as ITypeMapper<T, TN>;
+            if (mapper.QueryableExpression == null)
+            {
+                mapper.Compile();
+            }
+            return source.Select(mapper.QueryableExpression);
+        }
+
         public IMemberConfiguration<T, TN> Register<T, TN>()
         {
             var src = typeof(T);

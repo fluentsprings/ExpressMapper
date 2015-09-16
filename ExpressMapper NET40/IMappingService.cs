@@ -16,6 +16,7 @@ namespace ExpressMapper
         Expression GetDifferentTypeMemberMappingExpression(Expression srcExpression, Expression destExpression);
         BlockExpression MapProperty(Type srcType, Type destType, Expression srcExpression, Expression destExpression);
         Expression GetMemberMappingExpression(Expression left, Expression right);
+        Expression GetMemberQueryableExpression(Type srcType, Type dstType);
         void Compile();
     }
 }

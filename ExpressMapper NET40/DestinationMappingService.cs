@@ -127,6 +127,11 @@ namespace ExpressMapper
             return blockExpression;
         }
 
+        public Expression GetMemberQueryableExpression(Type srcType, Type dstType)
+        {
+            throw new NotImplementedException();
+        }
+
         public override void PrecompileCollection<T, TN>()
         {
             var cacheKey = MappingServiceProvider.CalculateCacheKey(typeof(T), typeof(TN));

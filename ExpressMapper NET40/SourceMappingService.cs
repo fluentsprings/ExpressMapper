@@ -111,6 +111,19 @@ namespace ExpressMapper
             return blockExpression;
         }
 
+        public Expression GetMemberQueryableExpression(Type srcType, Type dstType)
+        {
+            var cacheKey = MappingServiceProvider.CalculateCacheKey(srcType, dstType);
+            if (!TypeMappers.ContainsKey(cacheKey)) return null;
+
+            var typeMapper = TypeMappers[cacheKey];
+            if (typeMapper.QueryableGeneralExpression == null)
+            {
+                typeMapper.Compile();
+            }
+            return typeMapper.QueryableGeneralExpression;
+        }
+
         #endregion
     }
 }

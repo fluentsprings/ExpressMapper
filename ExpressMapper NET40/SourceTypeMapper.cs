@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -7,6 +8,8 @@ namespace ExpressMapper
 {
     public class SourceTypeMapper<T, TN> : TypeMapperBase<T, TN>, ITypeMapper<T, TN>
     {
+        private readonly Dictionary<string, MemberBinding> _bindingExpressions = new Dictionary<string, MemberBinding>();
+
         public SourceTypeMapper(IMappingService service) : base(service){}
 
         protected override void InitializeRecursiveMappings()
@@ -28,6 +31,8 @@ namespace ExpressMapper
             ProcessCustomMembers();
             ProcessCustomFunctionMembers();
             ProcessAutoProperties();
+
+            //CreateQueryableProjection();
 
             var expressions = new List<Expression> { destVariable };
 
@@ -71,6 +76,55 @@ namespace ExpressMapper
 
             var expression = Expression.Lambda<Func<T, TN, TN>>(resultExpression, SourceParameter, DestFakeParameter);
             ResultMapFunction = expression.Compile();
+        }
+
+        private void CreateQueryableProjection()
+        {
+            try
+            {
+                foreach (var customMember in CustomMembers)
+                {
+                    var memberQueryableExpression =
+                        MappingService.GetMemberQueryableExpression(customMember.Key.Member.DeclaringType,
+                            customMember.Value.Type);
+                    var expression = memberQueryableExpression ?? customMember.Value;
+                    _bindingExpressions.Add(customMember.Key.Member.Name,
+                        Expression.Bind(customMember.Key.Member, expression));
+                }
+
+                foreach (var customMember in CustomFunctionMembers)
+                {
+                    if (_bindingExpressions.ContainsKey(customMember.Key.Member.Name)) continue;
+
+                    var memberQueryableExpression =
+                        MappingService.GetMemberQueryableExpression(customMember.Key.Member.DeclaringType,
+                            customMember.Value.Type);
+                    var expression = memberQueryableExpression ?? customMember.Value;
+                    _bindingExpressions.Add(customMember.Key.Member.Name,
+                        Expression.Bind(customMember.Key.Member, expression));
+                }
+
+                foreach (var autoMember in AutoMembers)
+                {
+                    if (_bindingExpressions.ContainsKey(autoMember.Value.Name)) continue;
+
+                    var memberQueryableExpression =
+                        MappingService.GetMemberQueryableExpression(autoMember.Key.DeclaringType,
+                            autoMember.Value.DeclaringType);
+                    var expression = memberQueryableExpression ??
+                                     Expression.PropertyOrField(SourceParameter, autoMember.Key.Name);
+                    _bindingExpressions.Add(autoMember.Value.Name,
+                        Expression.Bind(autoMember.Value, expression));
+                }
+
+                QueryableExpression =
+                    Expression.Lambda<Func<T, TN>>(
+                        Expression.MemberInit(Expression.New(typeof (TN)), _bindingExpressions.Values), SourceParameter);
+            }
+            catch (Exception ex)
+            {
+                Debug.Fail(string.Format("Queryable projection is not supported for such mapping. Exception: {0}", ex));
+            }
         }
     }
 }

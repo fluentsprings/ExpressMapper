@@ -11,8 +11,15 @@ namespace ExpressMapper
         private bool _compiling;
         protected ParameterExpression DestFakeParameter = Expression.Parameter(typeof(TN), "dst");
         protected IMappingService MappingService { get; set; }
+        protected Dictionary<MemberInfo, MemberInfo> AutoMembers = new Dictionary<MemberInfo, MemberInfo>();
         protected List<KeyValuePair<MemberExpression, Expression>> CustomMembers = new List<KeyValuePair<MemberExpression, Expression>>();
         protected List<KeyValuePair<MemberExpression, Expression>> CustomFunctionMembers = new List<KeyValuePair<MemberExpression, Expression>>();
+        public Expression<Func<T, TN>> QueryableExpression { get; protected set; }
+
+        public Expression QueryableGeneralExpression
+        {
+            get { return QueryableExpression; }
+        }
 
         #region Constructors
 
@@ -184,7 +191,7 @@ namespace ExpressMapper
                     IgnoreMemberList.Add(prop.Name);
                     continue;
                 }
-
+                AutoMembers.Add(prop, setprop);
                 AutoMapProperty(prop, setprop);
             }
         }
@@ -241,16 +248,25 @@ namespace ExpressMapper
 
         protected void ProcessCustomMembers()
         {
-            TranslateExpression(CustomMembers);
+            CustomMembers = TranslateExpression(CustomMembers);
+            foreach (var keyValue in CustomMembers)
+            {
+                MapMember(keyValue.Key, keyValue.Value);
+            }
         }
 
         protected void ProcessCustomFunctionMembers()
         {
-            TranslateExpression(CustomFunctionMembers);
+            CustomFunctionMembers = TranslateExpression(CustomFunctionMembers);
+            foreach (var keyValue in CustomFunctionMembers)
+            {
+                MapMember(keyValue.Key, keyValue.Value);
+            }
         }
 
-        private void TranslateExpression(IEnumerable<KeyValuePair<MemberExpression, Expression>> expressions)
+        protected List<KeyValuePair<MemberExpression, Expression>> TranslateExpression(IEnumerable<KeyValuePair<MemberExpression, Expression>> expressions)
         {
+            var result = new List<KeyValuePair<MemberExpression, Expression>>(expressions.Count());
             foreach (var customMember in expressions)
             {
                 var substVisitorDest = new SubstituteParameterVisitor(DestFakeParameter);
@@ -258,9 +274,9 @@ namespace ExpressMapper
 
                 var substVisitorSrc = new SubstituteParameterVisitor(SourceParameter);
                 var src = substVisitorSrc.Visit(customMember.Value);
-
-                MapMember(dest, src);
+                result.Add(new KeyValuePair<MemberExpression, Expression>(dest, src));
             }
+            return result;
         }
     }
 }

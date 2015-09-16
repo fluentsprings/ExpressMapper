@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ExpressMapper
 {
@@ -16,5 +17,6 @@ namespace ExpressMapper
         void Reset();
         int CalculateCacheKey(Type src, Type dest);
         Dictionary<int, Func<ICustomTypeMapper>> CustomMappers { get; }
+        IQueryable<TN> Project<T, TN>(IQueryable<T> source);
     }
 }
