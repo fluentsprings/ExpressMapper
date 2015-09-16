@@ -9,7 +9,7 @@ namespace ExpressMapper
         private static IMappingServiceProvider _instance;
 
         // todo: via Internal DependencyResolver 
-        private static IMappingServiceProvider Instance
+        public static IMappingServiceProvider Instance
         {
             get { return _instance ?? (_instance = new MappingServiceProvider()); }
         }

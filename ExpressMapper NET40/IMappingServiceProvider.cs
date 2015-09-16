@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace ExpressMapper
 {
-    internal interface IMappingServiceProvider
+    public interface IMappingServiceProvider
     {
         void Compile();
         void PrecompileCollection<T, TN>();
