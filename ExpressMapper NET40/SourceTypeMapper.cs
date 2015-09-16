@@ -123,7 +123,7 @@ namespace ExpressMapper
             }
             catch (Exception ex)
             {
-                Debug.Fail(string.Format("Queryable projection is not supported for such mapping. Exception: {0}", ex));
+                Debug.WriteLine(string.Format("Queryable projection is not supported for such mapping. Exception: {0}", ex));
             }
         }
     }
