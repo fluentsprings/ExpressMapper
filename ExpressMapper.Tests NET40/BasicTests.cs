@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ExpressMapper.Extensions;
 
 namespace ExpressMapper.Tests
 {
@@ -310,7 +311,7 @@ namespace ExpressMapper.Tests
             Mapper.RegisterCustom<Size, SizeViewModel, SizeMapper>();
             Mapper.Compile();
             var sizeResult = Functional.CustomNestedCollectionMap();
-            var result = Mapper.Map<TestModel, TestViewModel>(sizeResult.Key);
+            var result = sizeResult.Key.Map<TestModel, TestViewModel>();
             Assert.AreEqual(result, sizeResult.Value);
         }
 
@@ -639,8 +640,7 @@ namespace ExpressMapper.Tests
             var sizeHashesList = new List<int>(sizeResult.Value.Sizes.Count);
             sizeHashesList.AddRange(sizeResult.Value.Sizes.Select(size => size.GetHashCode()));
 
-
-            var result = Mapper.Map<TestModel, TestViewModel>(sizeResult.Key, sizeResult.Value);
+            var result = sizeResult.Key.Map(sizeResult.Value);
             Assert.AreEqual(result, sizeResult.Value);
             Assert.AreEqual(result.GetHashCode(), testObjHash);
             Assert.AreEqual(result.Country.GetHashCode(), countryHash);

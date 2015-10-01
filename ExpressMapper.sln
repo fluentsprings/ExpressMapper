@@ -19,7 +19,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpressMapper.Tests NET45",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmarks", "Benchmarks\Benchmarks.csproj", "{DA9915F0-7F27-4E73-8AC0-422363E80A5A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpressMapper Net46", "ExpressMapper Net46\ExpressMapper Net46.csproj", "{0B7A5BDB-6D9F-4A9E-A35D-081D0424D577}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpressMapper NET46", "ExpressMapper Net46\ExpressMapper NET46.csproj", "{0B7A5BDB-6D9F-4A9E-A35D-081D0424D577}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpressMapper PCL NET40", "ExpressMapper PCL NET40\ExpressMapper PCL NET40.csproj", "{3BBD6945-50CC-4400-BFEB-4E8AF4EACF5C}"
 EndProject
