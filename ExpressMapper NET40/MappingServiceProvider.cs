@@ -8,6 +8,8 @@ namespace ExpressMapper
 {
     public sealed class MappingServiceProvider : IMappingServiceProvider
     {
+        private static readonly object _lock = new object();
+
         public Dictionary<int, Func<ICustomTypeMapper>> CustomMappers { get; set; }
         private readonly Dictionary<int, Func<object, object, object>> _customTypeMapperCache = new Dictionary<int, Func<object, object, object>>();
         private readonly List<int> _nonGenericCollectionMappingCache = new List<int>();
@@ -54,89 +56,115 @@ namespace ExpressMapper
 
         public IMemberConfiguration<T, TN> Register<T, TN>()
         {
-            var src = typeof(T);
-            var dest = typeof(TN);
-            var cacheKey = CalculateCacheKey(src, dest);
-
-
-            if (SourceService.TypeMappers.ContainsKey(cacheKey) && DestinationService.TypeMappers.ContainsKey(cacheKey))
+            lock (_lock)
             {
-                throw new InvalidOperationException(string.Format("Mapping from {0} to {1} is already registered", src.FullName, dest.FullName));
+                var src = typeof (T);
+                var dest = typeof (TN);
+                var cacheKey = CalculateCacheKey(src, dest);
+
+
+                if (SourceService.TypeMappers.ContainsKey(cacheKey) &&
+                    DestinationService.TypeMappers.ContainsKey(cacheKey))
+                {
+                    throw new InvalidOperationException(string.Format("Mapping from {0} to {1} is already registered",
+                        src.FullName, dest.FullName));
+                }
+
+
+                var sourceClassMapper = new SourceTypeMapper<T, TN>(SourceService);
+                var destinationClassMapper = new DestinationTypeMapper<T, TN>(DestinationService);
+
+                SourceService.TypeMappers[cacheKey] = sourceClassMapper;
+                DestinationService.TypeMappers[cacheKey] = destinationClassMapper;
+                return
+                    new MemberConfiguration<T, TN>(new ITypeMapper<T, TN>[] {sourceClassMapper, destinationClassMapper});
             }
-
-
-            var sourceClassMapper = new SourceTypeMapper<T, TN>(SourceService);
-            var destinationClassMapper = new DestinationTypeMapper<T, TN>(DestinationService);
-
-            SourceService.TypeMappers[cacheKey] = sourceClassMapper;
-            DestinationService.TypeMappers[cacheKey] = destinationClassMapper;
-            return new MemberConfiguration<T, TN>(new ITypeMapper<T, TN>[]{sourceClassMapper, destinationClassMapper});
         }
 
         public void Compile()
         {
-            foreach (var mappingService in _mappingServices)
+            lock (_lock)
             {
-                mappingService.Compile();
+                foreach (var mappingService in _mappingServices)
+                {
+                    mappingService.Compile();
+                }
             }
         }
 
         public void PrecompileCollection<T, TN>()
         {
-            foreach (var mappingService in _mappingServices)
+            lock (_lock)
             {
-                mappingService.PrecompileCollection<T, TN>();
+                foreach (var mappingService in _mappingServices)
+                {
+                    mappingService.PrecompileCollection<T, TN>();
+                }
             }
         }
 
         public void Reset()
         {
-            foreach (var mappingService in _mappingServices)
+            lock (_lock)
             {
-                mappingService.TypeMappers.Clear();
-            }
+                foreach (var mappingService in _mappingServices)
+                {
+                    mappingService.TypeMappers.Clear();
+                }
 
-            CustomMappers.Clear();
+                CustomMappers.Clear();
 
-            foreach (var mappingService in _mappingServices)
-            {
-                mappingService.Reset();
+                foreach (var mappingService in _mappingServices)
+                {
+                    mappingService.Reset();
+                }
             }
         }
 
         public void RegisterCustom<T, TN>(Func<T, TN> mapFunc)
         {
-            var src = typeof(T);
-            var dest = typeof(TN);
-            var cacheKey = CalculateCacheKey(src, dest);
-
-            if (CustomMappers.ContainsKey(cacheKey))
+            lock (_lock)
             {
-                throw new InvalidOperationException(string.Format("Mapping from {0} to {1} is already registered", src.FullName, dest.FullName));
-            }
+                var src = typeof (T);
+                var dest = typeof (TN);
+                var cacheKey = CalculateCacheKey(src, dest);
 
-            var delegateMapperType = typeof(DelegateCustomTypeMapper<,>).MakeGenericType(src, dest);
-            var newExpression = Expression.New(delegateMapperType.GetConstructor(new Type[] { typeof(Func<,>).MakeGenericType(src, dest) }), Expression.Constant(mapFunc));
-            var newLambda = Expression.Lambda<Func<ICustomTypeMapper<T, TN>>>(newExpression);
-            var compile = newLambda.Compile();
-            CustomMappers.Add(cacheKey, compile);
+                if (CustomMappers.ContainsKey(cacheKey))
+                {
+                    throw new InvalidOperationException(string.Format("Mapping from {0} to {1} is already registered",
+                        src.FullName, dest.FullName));
+                }
+
+                var delegateMapperType = typeof (DelegateCustomTypeMapper<,>).MakeGenericType(src, dest);
+                var newExpression =
+                    Expression.New(
+                        delegateMapperType.GetConstructor(new Type[] {typeof (Func<,>).MakeGenericType(src, dest)}),
+                        Expression.Constant(mapFunc));
+                var newLambda = Expression.Lambda<Func<ICustomTypeMapper<T, TN>>>(newExpression);
+                var compile = newLambda.Compile();
+                CustomMappers.Add(cacheKey, compile);
+            }
         }
 
         public void RegisterCustom<T, TN, TMapper>() where TMapper : ICustomTypeMapper<T, TN>
         {
-            var src = typeof(T);
-            var dest = typeof(TN);
-            var cacheKey = CalculateCacheKey(src, dest);
-
-            if (CustomMappers.ContainsKey(cacheKey))
+            lock (_lock)
             {
-                throw new InvalidOperationException(string.Format("Mapping from {0} to {1} is already registered", src.FullName, dest.FullName));
-            }
+                var src = typeof (T);
+                var dest = typeof (TN);
+                var cacheKey = CalculateCacheKey(src, dest);
 
-            var newExpression = Expression.New(typeof(TMapper));
-            var newLambda = Expression.Lambda<Func<ICustomTypeMapper<T, TN>>>(newExpression);
-            var compile = newLambda.Compile();
-            CustomMappers.Add(cacheKey, compile);
+                if (CustomMappers.ContainsKey(cacheKey))
+                {
+                    throw new InvalidOperationException(string.Format("Mapping from {0} to {1} is already registered",
+                        src.FullName, dest.FullName));
+                }
+
+                var newExpression = Expression.New(typeof (TMapper));
+                var newLambda = Expression.Lambda<Func<ICustomTypeMapper<T, TN>>>(newExpression);
+                var compile = newLambda.Compile();
+                CustomMappers[cacheKey] = compile;
+            }
         }
 
         public TN Map<T, TN>(T src, TN dest = default(TN))
@@ -314,7 +342,7 @@ namespace ExpressMapper
                 srcAssigned, dstAssigned, assignExp, assignContextExp, sourceAssignedExp, destAssignedExp, /*destinationAssignedExp,*/ resultAssignExp, resultVarExp);
 
             var lambda = Expression.Lambda<Func<object, object, object>>(blockExpression, sourceExpression, destinationExpression);
-            _customTypeMapperCache.Add(cacheKey, lambda.Compile());
+            _customTypeMapperCache[cacheKey] = lambda.Compile();
         }
 
         internal static Type GetCollectionElementType(Type type)

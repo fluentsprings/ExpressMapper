@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace ExpressMapper
 {
@@ -108,11 +109,33 @@ namespace ExpressMapper
                 {
                     if (_bindingExpressions.ContainsKey(autoMember.Value.Name)) continue;
 
+                    var source = autoMember.Key as PropertyInfo;
+                    var destination = autoMember.Value as PropertyInfo;
+
                     var memberQueryableExpression =
-                        MappingService.GetMemberQueryableExpression(autoMember.Key.DeclaringType,
-                            autoMember.Value.DeclaringType);
-                    var expression = memberQueryableExpression ??
-                                     Expression.PropertyOrField(SourceParameter, autoMember.Key.Name);
+                        MappingService.GetMemberQueryableExpression(source.PropertyType,
+                            destination.PropertyType);
+
+                    var propertyOrField = Expression.PropertyOrField(SourceParameter, autoMember.Key.Name);
+
+                    Expression expression;
+                    if (memberQueryableExpression != null)
+                    {
+                        var lambdaExpression = memberQueryableExpression as LambdaExpression;
+                        var projectionAccessMemberVisitor = new ProjectionAccessMemberVisitor(propertyOrField.Type, propertyOrField);
+                        var clearanceExp = projectionAccessMemberVisitor.Visit(lambdaExpression.Body);
+                        expression =
+                            Expression.Condition(
+                                Expression.Equal(propertyOrField, Expression.Constant(null, propertyOrField.Type)),
+                                Expression.Constant(null, ((PropertyInfo) autoMember.Value).PropertyType), clearanceExp);
+                    }
+                    else
+                    {
+                        expression = propertyOrField;
+                    }
+                    
+                    
+
                     _bindingExpressions.Add(autoMember.Value.Name,
                         Expression.Bind(autoMember.Value, expression));
                 }

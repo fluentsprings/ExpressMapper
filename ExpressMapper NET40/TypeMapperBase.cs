@@ -191,7 +191,7 @@ namespace ExpressMapper
                     IgnoreMemberList.Add(prop.Name);
                     continue;
                 }
-                AutoMembers.Add(prop, setprop);
+                AutoMembers[prop] = setprop;
                 AutoMapProperty(prop, setprop);
             }
         }
@@ -242,7 +242,7 @@ namespace ExpressMapper
             else
             {
                 var binaryExpression = Expression.Assign(left, rightExpression);
-                CustomPropertyCache.Add(left.Member.Name, binaryExpression);
+                CustomPropertyCache[left.Member.Name] = binaryExpression;
             }
         }
 

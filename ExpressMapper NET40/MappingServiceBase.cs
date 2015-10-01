@@ -403,9 +403,22 @@ namespace ExpressMapper
             {
                 return Expression.Call(typeof(Queryable), "AsQueryable", new[] { destType }, destColl);
             }
-            var collectionType = typeof(Collection<>).MakeGenericType(destType);
 
-            return destPropType == collectionType ? Expression.New(collectionType.GetConstructor(new Type[] { destList }), destColl) : destColl;
+            if (destPropType.IsInterface && destColl.Type.IsSubclassOf(destPropType))
+            {
+                return destColl;
+            }
+
+            if (destPropType.IsClass)
+            {
+
+            }
+
+            return destPropType.IsClass ? Expression.New(destPropType.GetConstructor(new Type[] { destList }), destColl) : destColl;
+
+            //var collectionType = typeof(Collection<>).MakeGenericType(destType);
+
+            //return destPropType == collectionType ? Expression.New(collectionType.GetConstructor(new Type[] { destList }), destColl) : destColl;
         }
     }
 }

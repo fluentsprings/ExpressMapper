@@ -168,7 +168,7 @@ namespace ExpressMapper
             var lambda = Expression.Lambda<Func<T, TN, TN>>(block, sourceVariable, destVariable);
             var compiledFunc = lambda.Compile();
 
-            CollectionMappers.Add(cacheKey, compiledFunc);
+            CollectionMappers[cacheKey] = compiledFunc;
         }
 
         #endregion

@@ -716,6 +716,26 @@ namespace ExpressMapper.Tests
         }
 
         [Test]
+        public void OtherCollectionTypesTest()
+        {
+            Mapper.Register<TestCollection, TestCollectionViewModel>();
+            Mapper.Register<TestItem, TestItemViewModel>()
+                .Member(dest => dest.ObservableCollection, src => src.Array)
+                .Ignore(dest => dest.Array);
+
+            Mapper.Compile();
+            var testResult = Functional.OtherCollectionMapTest();
+
+            var result = Mapper.Map<TestItem, TestItemViewModel>(testResult.Key);
+            Assert.AreEqual(result.ObservableCollection.Count, testResult.Key.Array.Length);
+
+            for (var i = 0; i < result.ObservableCollection.Count; i++)
+            {
+                Assert.AreEqual(result.ObservableCollection[i], testResult.Value.ObservableCollection[i]);
+            }
+        }
+
+        [Test]
         public void ExistingSrcCollGreater()
         {
             Mapper.Register<TestCollection, TestCollectionViewModel>();

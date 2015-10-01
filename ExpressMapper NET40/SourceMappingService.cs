@@ -43,7 +43,7 @@ namespace ExpressMapper
             var blockExp = CompileCollectionInternal<T, TN>(sourceParameterExp);
             var lambda = Expression.Lambda<Func<T, TN>>(blockExp, sourceParameterExp);
             var compiledFunc = lambda.Compile();
-            CollectionMappers.Add(cacheKey, compiledFunc);
+            CollectionMappers[cacheKey] = compiledFunc;
         }
 
         public override bool DestinationSupport

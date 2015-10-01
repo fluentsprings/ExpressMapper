@@ -712,6 +712,40 @@ namespace ExpressMapper.Tests.Model.Generator
             return new KeyValuePair<TestItem, TestItemViewModel>(testItem, testItemVm);
         }
 
+        public static KeyValuePair<TestItem, TestItemViewModel> OtherCollectionMapTest()
+        {
+            var testItem = new TestItem();
+            var testItemVm = new TestItemViewModel();
+
+            var testItems = new List<TestCollection>();
+            var testItemsVm = new List<TestCollectionViewModel>();
+
+            for (var i = 0; i < 5; i++)
+            {
+                var id = Guid.NewGuid();
+                var format = string.Format("Name - {0}", i);
+
+                var testCollection = new TestCollection
+                {
+                    Id = id,
+                    Name = format
+                };
+
+                var testCollectionVm = new TestCollectionViewModel
+                {
+                    Id = id,
+                    Name = format
+                };
+
+                testItems.Add(testCollection);
+                testItemsVm.Add(testCollectionVm);
+            }
+            testItem.Array = testItems.ToArray();
+            testItemVm.ObservableCollection = new ObservableCollection<TestCollectionViewModel>(testItemsVm);
+
+            return new KeyValuePair<TestItem, TestItemViewModel>(testItem, testItemVm);
+        }
+
         public static KeyValuePair<TestItem, TestItemViewModel> ExistingDestCollEqualsWithNullElement()
         {
             var testItem = new TestItem();
