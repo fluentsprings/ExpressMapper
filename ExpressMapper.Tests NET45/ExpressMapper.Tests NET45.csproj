@@ -57,9 +57,6 @@
     <Compile Include="..\ExpressMapper.Tests NET40\DeepCopySizeMapper.cs">
       <Link>DeepCopySizeMapper.cs</Link>
     </Compile>
-    <Compile Include="..\ExpressMapper.Tests NET40\ExceptionTests.cs">
-      <Link>ExceptionTests.cs</Link>
-    </Compile>
     <Compile Include="..\ExpressMapper.Tests NET40\SizeListMapper.cs">
       <Link>SizeListMapper.cs</Link>
     </Compile>

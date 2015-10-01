@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
+using ExpressMapper.Extensions;
 
 namespace ExpressMapper
 {
@@ -31,7 +32,8 @@ namespace ExpressMapper
 
         public void Compile()
         {
-            foreach (var typeMapper in TypeMappers)
+            var typeMappers = new Dictionary<int, ITypeMapper>(TypeMappers);
+            foreach (var typeMapper in typeMappers)
             {
                 typeMapper.Value.Compile();
             }
@@ -52,7 +54,21 @@ namespace ExpressMapper
             {
                 return TypeMappers[cacheKey].GetMapExpressions();
             }
+            
+            dynamic srcInst = Activator.CreateInstance(src);
+            dynamic destInst = Activator.CreateInstance(dest);
+            RegisterDynamic(srcInst, destInst);
+            if (TypeMappers.ContainsKey(cacheKey))
+            {
+                return TypeMappers[cacheKey].GetMapExpressions();
+            }
+
             throw new MapNotImplementedException(string.Format("There is no mapping has bee found. Source Type: {0}, Destination Type: {1}", src.FullName, dest.FullName));
+        }
+
+        private static void RegisterDynamic<T, TN>(T src, TN dest)
+        {
+            Mapper.Register<T, TN>();
         }
 
         protected void CompileGenericCustomTypeMapper(Type srcType, Type dstType, ICustomTypeMapper typeMapper, int cacheKey)

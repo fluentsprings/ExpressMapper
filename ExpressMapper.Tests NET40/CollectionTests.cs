@@ -31,6 +31,19 @@ namespace ExpressMapper.Tests
         }
 
         [Test]
+        public void DirectDynamicCollectionMapTest()
+        {
+            var testData = Functional.CollectionAutoMemberMap();
+            var result = Mapper.Map<List<TestModel>, List<TestViewModel>>(testData.Key);
+            Assert.AreEqual(result.Count, testData.Value.Count);
+
+            for (var i = 0; i < result.Count; i++)
+            {
+                Assert.AreEqual(result[i], testData.Value[i]);
+            }
+        }
+
+        [Test]
         public void EnumerationToListTypeMap()
         {
             Mapper.Register<TestCollection, TestCollectionViewModel>();

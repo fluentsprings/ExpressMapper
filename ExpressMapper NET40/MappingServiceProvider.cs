@@ -62,7 +62,6 @@ namespace ExpressMapper
                 var dest = typeof (TN);
                 var cacheKey = CalculateCacheKey(src, dest);
 
-
                 if (SourceService.TypeMappers.ContainsKey(cacheKey) &&
                     DestinationService.TypeMappers.ContainsKey(cacheKey))
                 {
@@ -169,6 +168,11 @@ namespace ExpressMapper
 
         public TN Map<T, TN>(T src, TN dest = default(TN))
         {
+            return MapInternal<T, TN>(src, dest);
+        }
+
+        private TN MapInternal<T, TN>(T src, TN dest = default(TN), bool dynamicTrial = false)
+        {
             var srcType = typeof(T);
             var destType = typeof(TN);
             var cacheKey = CalculateCacheKey(srcType, destType);
@@ -180,7 +184,6 @@ namespace ExpressMapper
                 var context = new DefaultMappingContext<T, TN> { Source = src, Destination = dest };
                 return typeMapper.Map(context);
             }
-
 
             var mappingService = EqualityComparer<TN>.Default.Equals(dest, default(TN)) ? SourceService : DestinationService;
 
@@ -209,10 +212,18 @@ namespace ExpressMapper
                          (typeof(TN).IsGenericType && typeof(TN).GetInterfaces().Any(t => t == typeof(IEnumerable)) ? typeof(TN)
                              : null);
 
-            if (tCol == null || tnCol == null)
-                throw new MapNotImplementedException(
-                    string.Format("There is no mapping has bee found. Source Type: {0}, Destination Type: {1}",
-                        srcType.FullName, destType.FullName));
+            if ((tCol == null || tnCol == null))
+            {
+                if (dynamicTrial)
+                {
+                    throw new MapNotImplementedException(
+                        string.Format("There is no mapping has bee found. Source Type: {0}, Destination Type: {1}",
+                            srcType.FullName, destType.FullName));
+                }
+                Register<T, TN>();
+                return MapInternal<T, TN>(src, dest, true);
+            }
+
 
             PrecompileCollection<T, TN>();
 

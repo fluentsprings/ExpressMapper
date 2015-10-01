@@ -115,6 +115,26 @@ namespace ExpressMapper.Tests
             Assert.AreEqual(engineViewModel, srcAndDest.Value);
         }
 
+        [Test]
+        public void DynamicMapCollectionPropertyTest()
+        {
+            Mapper.Register<Engine, EngineViewModel>();
+            Mapper.Compile();
+
+            var srcAndDest = Functional.RecursiveCompilationCollectionTestMap();
+            var engineViewModel = Mapper.Map<Engine, EngineViewModel>(srcAndDest.Key);
+            Assert.AreEqual(engineViewModel, srcAndDest.Value);
+        }
+
+
+        [Test]
+        public void DirectDynamicMapTest()
+        {
+            var srcAndDest = Functional.RecursiveCompilationCollectionTestMap();
+            var engineViewModel = Mapper.Map<Engine, EngineViewModel>(srcAndDest.Key);
+            Assert.AreEqual(engineViewModel, srcAndDest.Value);
+        }
+
 
         [Test]
         public void CompilelessMap()
@@ -127,6 +147,14 @@ namespace ExpressMapper.Tests
 
             var testViewModel = Mapper.Map<TestModel, TestViewModel>(test.Key);
 
+            Assert.AreEqual(testViewModel, test.Value);
+        }
+
+        [Test]
+        public void DynamicMapTest()
+        {
+            var test = Functional.AutoMemberMap();
+            var testViewModel = Mapper.Map<TestModel, TestViewModel>(test.Key);
             Assert.AreEqual(testViewModel, test.Value);
         }
 
