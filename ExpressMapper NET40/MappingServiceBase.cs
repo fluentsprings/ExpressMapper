@@ -156,6 +156,12 @@ namespace ExpressMapper
                     return releaseExp;
                 }
 
+                // If right is method call, assign
+                if (right.NodeType == ExpressionType.Call)
+                {
+                    return Expression.Assign(left, right);
+                }
+
                 if (typeof(IConvertible).IsAssignableFrom(destType) &&
                     typeof(IConvertible).IsAssignableFrom(sourceType))
                 {

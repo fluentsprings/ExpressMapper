@@ -2,9 +2,14 @@
 
 namespace ExpressMapper.Tests.Model.Models
 {
-    public class Person
+    public class Person : Contact
     {
-        public Guid Id { get; set; }
+        public Person()
+        {
+            IsOrganization = false;
+            IsPerson = true;
+        }
+
         public string Name { get; set; }
         public Person Relative { get; set; }
     }

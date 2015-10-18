@@ -1,4 +1,5 @@
-﻿using ExpressMapper.Tests.Model.Enums;
+﻿using ExpressMapper.Extensions;
+using ExpressMapper.Tests.Model.Enums;
 using ExpressMapper.Tests.Model.Generator;
 using ExpressMapper.Tests.Model.Models;
 using ExpressMapper.Tests.Model.Models.Structs;
@@ -9,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ExpressMapper.Extensions;
 
 namespace ExpressMapper.Tests
 {
@@ -977,6 +977,59 @@ namespace ExpressMapper.Tests
 
             Assert.AreEqual(1, testViewModel.GenderIndex);
             Assert.AreEqual(123, testViewModel.NotNullable);
+        }
+
+        [Test]
+        public void InheritanceFuncMap()
+        {
+            Mapper.Register<Contact, ContactViewModel>();
+            Mapper.Register<Mail, MailViewModel>().
+                Member(x => x.Contact, x => ResolveContact(x.Contact));
+            Mapper.Compile();
+
+            Guid contactId = Guid.NewGuid();
+
+            var test = new Mail()
+            {
+                From = "from",
+                Contact = new Organization()
+                {
+                    Id = contactId,
+                    Name = "org"
+                }
+            };
+
+            var testViewModel = Mapper.Map<Mail, MailViewModel>(test);
+
+            Assert.AreEqual("from", testViewModel.From);
+            Assert.AreEqual(contactId, testViewModel.Contact.Id);
+            Assert.IsInstanceOf(typeof(OrganizationViewModel), testViewModel.Contact);
+        }
+
+        private static ContactViewModel ResolveContact(Contact contact)
+        {
+            ContactViewModel destination = null;
+
+            if (contact.IsOrganization)
+            {
+                destination = new OrganizationViewModel();
+
+                Mapper.Map(contact, destination);
+            }
+            else if (contact.IsPerson)
+            {
+                destination = new PersonViewModel();
+
+                Mapper.Map(contact, destination);
+            }
+            else
+            {
+                destination = new ContactViewModel();
+
+                Mapper.Map(contact, destination);
+            }
+
+            return destination;
         }
     }
 }
