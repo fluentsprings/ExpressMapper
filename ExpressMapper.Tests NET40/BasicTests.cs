@@ -310,10 +310,38 @@ namespace ExpressMapper.Tests
         }
 
         [Test]
+        [ExpectedException(typeof(InvalidOperationException), ExpectedMessage = "BeforeMap already registered for ExpressMapper.Tests.Model.Models.Size")]
+        public void BeforeMapDuplicateTest()
+        {
+            Mapper.Register<Size, SizeViewModel>()
+                .Before((src, dest) => dest.Name = src.Name)
+                .Before((src, dest) => dest.Name = src.Name)
+                .Ignore(dest => dest.Name);
+            Mapper.Compile();
+
+            var sizeResult = Functional.BeforeMap();
+            var result = Mapper.Map<Size, SizeViewModel>(sizeResult.Key);
+            Assert.AreEqual(result, sizeResult.Value);
+        }
+
+        [Test]
         public void AfterMap()
         {
             Mapper.Register<Size, SizeViewModel>()
                 .After((src, dest) => dest.Name = "OVERRIDE BY AFTER MAP");
+            Mapper.Compile();
+            var sizeResult = Functional.AfterMap();
+            var result = Mapper.Map<Size, SizeViewModel>(sizeResult.Key);
+            Assert.AreEqual(result, sizeResult.Value);
+        }
+
+        [Test]
+        [ExpectedException(typeof(InvalidOperationException), ExpectedMessage = "AfterMap already registered for ExpressMapper.Tests.Model.Models.Size")]
+        public void AfterMapDuplicateTest()
+        {
+            Mapper.Register<Size, SizeViewModel>()
+                .After((src, dest) => dest.Name = "OVERRIDE BY AFTER MAP")
+                .After((src, dest) => dest.Name = "Duplicate map");
             Mapper.Compile();
             var sizeResult = Functional.AfterMap();
             var result = Mapper.Map<Size, SizeViewModel>(sizeResult.Key);

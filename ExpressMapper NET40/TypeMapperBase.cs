@@ -37,9 +37,9 @@ namespace ExpressMapper
         #endregion
 
         #region Properties
-        
+
         protected ParameterExpression SourceParameter = Expression.Parameter(typeof(T), "src");
-        protected List<Expression> RecursiveExpressionResult { get; private set; } 
+        protected List<Expression> RecursiveExpressionResult { get; private set; }
         protected List<Expression> ResultExpressionList { get; private set; }
         protected Func<T, TN, TN> ResultMapFunction { get; set; }
         protected List<string> IgnoreMemberList { get; private set; }
@@ -76,6 +76,16 @@ namespace ExpressMapper
 
         public void AfterMap(Action<T, TN> afterMap)
         {
+            if (afterMap == null)
+            {
+                throw new ArgumentNullException("afterMap");
+            }
+
+            if (AfterMapHandler != null)
+            {
+                throw new InvalidOperationException(String.Format("AfterMap already registered for {0}", typeof(T).FullName));
+            }
+
             AfterMapHandler = afterMap;
         }
 
@@ -116,7 +126,7 @@ namespace ExpressMapper
             var blockExpression = Expression.Block(new[] { srcTypedExp, genVariable, resultVarExp }, new Expression[] { srcAssigned, assignExp, assignResult, resultVarExp });
             var lambda = Expression.Lambda<Func<object, object>>(blockExpression, parameterExpression);
             NonGenericMapFunc = lambda.Compile();
-            
+
             return NonGenericMapFunc;
         }
 
@@ -202,6 +212,16 @@ namespace ExpressMapper
 
         public virtual void BeforeMap(Action<T, TN> beforeMap)
         {
+            if (beforeMap == null)
+            {
+                throw new ArgumentNullException("beforeMap");
+            }
+
+            if (BeforeMapHandler != null)
+            {
+                throw new InvalidOperationException(String.Format("BeforeMap already registered for {0}", typeof(T).FullName));
+            }
+
             BeforeMapHandler = beforeMap;
         }
 
