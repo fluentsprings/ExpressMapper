@@ -110,6 +110,9 @@
     <Compile Include="..\ExpressMapper NET40\Properties\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="..\ExpressMapper NET40\ReturnTypeDifferenceVisitor.cs">
+      <Link>ReturnTypeDifferenceVisitor.cs</Link>
+    </Compile>
     <Compile Include="..\ExpressMapper NET40\SourceMappingService.cs">
       <Link>SourceMappingService.cs</Link>
     </Compile>

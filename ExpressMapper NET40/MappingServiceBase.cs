@@ -156,8 +156,12 @@ namespace ExpressMapper
                     return releaseExp;
                 }
 
-                // If right is method call, assign
-                if (right.NodeType == ExpressionType.Call)
+                var returnTypeDifferenceVisitor = new ReturnTypeDifferenceVisitor(right);
+                returnTypeDifferenceVisitor.Visit(right);
+
+                // If right is custom member expression / func and return type matches left type
+                // just assign
+                if (left.Type == right.Type && returnTypeDifferenceVisitor.DifferentReturnTypes)
                 {
                     return Expression.Assign(left, right);
                 }

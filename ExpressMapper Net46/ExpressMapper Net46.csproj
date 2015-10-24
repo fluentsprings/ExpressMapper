@@ -109,6 +109,12 @@
     <Compile Include="..\ExpressMapper NET40\ProjectionAccessMemberVisitor.cs">
       <Link>ProjectionAccessMemberVisitor.cs</Link>
     </Compile>
+    <Compile Include="..\ExpressMapper NET40\Properties\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\ExpressMapper NET40\ReturnTypeDifferenceVisitor.cs">
+      <Link>ReturnTypeDifferenceVisitor.cs</Link>
+    </Compile>
     <Compile Include="..\ExpressMapper NET40\SourceMappingService.cs">
       <Link>SourceMappingService.cs</Link>
     </Compile>
@@ -124,7 +130,6 @@
     <Compile Include="..\ExpressMapper NET40\TypeMapperBase.cs">
       <Link>TypeMapperBase.cs</Link>
     </Compile>
-    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Expressmapper.snk" />

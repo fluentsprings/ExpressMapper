@@ -109,6 +109,9 @@
     <Compile Include="..\ExpressMapper NET40\ProjectionAccessMemberVisitor.cs">
       <Link>ProjectionAccessMemberVisitor.cs</Link>
     </Compile>
+    <Compile Include="..\ExpressMapper NET40\ReturnTypeDifferenceVisitor.cs">
+      <Link>ReturnTypeDifferenceVisitor.cs</Link>
+    </Compile>
     <Compile Include="..\ExpressMapper NET40\SourceMappingService.cs">
       <Link>SourceMappingService.cs</Link>
     </Compile>

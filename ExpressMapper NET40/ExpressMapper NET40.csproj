@@ -73,6 +73,7 @@
     <Compile Include="MappingServiceBase.cs" />
     <Compile Include="PreciseSubstituteParameterVisitor.cs" />
     <Compile Include="ProjectionAccessMemberVisitor.cs" />
+    <Compile Include="ReturnTypeDifferenceVisitor.cs" />
     <Compile Include="SourceMappingService.cs" />
     <Compile Include="SourceTypeMapper.cs" />
     <Compile Include="StaticExpressions.cs" />

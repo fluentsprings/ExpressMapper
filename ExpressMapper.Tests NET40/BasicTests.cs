@@ -1011,11 +1011,12 @@ namespace ExpressMapper.Tests
         public void InheritanceFuncMap()
         {
             Mapper.Register<Contact, ContactViewModel>();
-            Mapper.Register<Mail, MailViewModel>().
-                Member(x => x.Contact, x => ResolveContact(x.Contact));
+            Mapper.Register<Mail, MailViewModel>()
+                .Member(x => x.Contact, x => ResolveContact(x.Contact))
+                .Member(x => x.StandardContactVM, x => x.StandardContact);
             Mapper.Compile();
 
-            Guid contactId = Guid.NewGuid();
+            var contactId = Guid.NewGuid();
 
             var test = new Mail()
             {
