@@ -7,7 +7,7 @@ namespace ExpressMapper
     public interface ITypeMapper
     {
         Expression QueryableGeneralExpression { get; }
-        Func<object, object> GetNonGenericMapFunc();
+        Func<object, object, object> GetNonGenericMapFunc();
         Tuple<List<Expression>, ParameterExpression, ParameterExpression> GetMapExpressions();
         void Compile();
     }
