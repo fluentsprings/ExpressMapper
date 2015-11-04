@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpressMapper NET45", "ExpressMapper NET45\ExpressMapper NET45.csproj", "{67AC5D64-8CA8-481F-AD23-5788755F4A33}"
 EndProject
@@ -22,6 +22,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpressMapper NET46", "ExpressMapper Net46\ExpressMapper NET46.csproj", "{0B7A5BDB-6D9F-4A9E-A35D-081D0424D577}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpressMapper PCL NET45", "ExpressMapper PCL NET45\ExpressMapper PCL NET45.csproj", "{909366AD-7FF2-4197-A340-CC858C4B8AD1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpressMapper.Tests.Projections", "ExpressMapper.Tests.Projections\ExpressMapper.Tests.Projections.csproj", "{DD8BFECA-7F00-4AB2-B904-64682EA1C713}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -68,6 +70,10 @@ Global
 		{909366AD-7FF2-4197-A340-CC858C4B8AD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{909366AD-7FF2-4197-A340-CC858C4B8AD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{909366AD-7FF2-4197-A340-CC858C4B8AD1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD8BFECA-7F00-4AB2-B904-64682EA1C713}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD8BFECA-7F00-4AB2-B904-64682EA1C713}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD8BFECA-7F00-4AB2-B904-64682EA1C713}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD8BFECA-7F00-4AB2-B904-64682EA1C713}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

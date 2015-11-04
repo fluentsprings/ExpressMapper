@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace ExpressMapper
 {
@@ -32,10 +33,10 @@ namespace ExpressMapper
             return Instance.Map(src, dest);
         }
 
-        //public static IQueryable<TN> Project<T, TN>(this IQueryable<T> source)
-        //{
-        //    return Instance.Project<T, TN>(source);
-        //}
+        public static IQueryable<TN> Project<T, TN>(this IQueryable<T> source)
+        {
+            return Instance.Project<T, TN>(source);
+        }
 
         public static TN Map<T, TN>(T src, ICustomTypeMapper<T, TN> customMapper, TN dest = default(TN))
         {
