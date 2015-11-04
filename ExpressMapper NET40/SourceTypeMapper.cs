@@ -71,9 +71,6 @@ namespace ExpressMapper
                     new KeyValuePair<ParameterExpression, ParameterExpression>(SourceParameter, SourceParameter),
                     new KeyValuePair<ParameterExpression, ParameterExpression>(destExpression, destExpression));
 
-            //var substituteParameterVisitor = new SubstituteParameterVisitor(SourceParameter,
-            //    destVariable.Left as ParameterExpression);
-
             var resultExpression = substituteParameterVisitor.Visit(finalExpression) as BlockExpression;
 
             var expression = Expression.Lambda<Func<T, TN, TN>>(resultExpression, SourceParameter, DestFakeParameter);
@@ -110,70 +107,9 @@ namespace ExpressMapper
                 {
                     if (_bindingExpressions.ContainsKey(autoMember.Value.Name)) continue;
 
-                    var source = autoMember.Key as PropertyInfo;
                     var destination = autoMember.Value as PropertyInfo;
-
-                    var memberQueryableExpression =
-                        MappingService.GetMemberQueryableExpression(source.PropertyType,
-                            destination.PropertyType);
-
                     var propertyOrField = Expression.PropertyOrField(SourceParameter, autoMember.Key.Name);
-
-                    var tCol =
-                    source.PropertyType.GetInterfaces()
-                    .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>)) ??
-                    (source.PropertyType.IsGenericType
-                        && source.PropertyType.GetInterfaces().Any(t => t == typeof(IEnumerable)) ? source.PropertyType
-                        : null);
-
-                    var tnCol = destination.PropertyType.GetInterfaces()
-                        .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>)) ??
-                                 (destination.PropertyType.IsGenericType && destination.PropertyType.GetInterfaces().Any(t => t == typeof(IEnumerable)) ? destination.PropertyType
-                                     : null);
-
-                    if (source.PropertyType != typeof(string) && tCol != null && tnCol != null)
-                    {
-                        var sourceGenericType = source.PropertyType.GetGenericArguments()[0];
-                        var destGenericType = destination.PropertyType.GetGenericArguments()[0];
-
-                        var genericMemberQueryableExpression =
-                        MappingService.GetMemberQueryableExpression(sourceGenericType,
-                            destGenericType);
-
-                        MethodInfo selectMethod = null;
-                        foreach (MethodInfo m in typeof(Enumerable).GetMethods().Where(m => m.Name == "Select"))
-                            foreach (ParameterInfo p in m.GetParameters().Where(p => p.Name.Equals("selector")))
-                                if (p.ParameterType.GetGenericArguments().Count() == 2)
-                                    selectMethod = (MethodInfo)p.Member;
-
-                        var selectExpression = Expression.Call(
-                          null,
-                          selectMethod.MakeGenericMethod(new Type[] { sourceGenericType, destGenericType }),
-                          new Expression[] { propertyOrField, genericMemberQueryableExpression });
-
-                        _bindingExpressions.Add(autoMember.Value.Name,
-                        Expression.Bind(autoMember.Value, selectExpression));
-                    }
-                    else
-                    {
-                        Expression expression;
-                        if (memberQueryableExpression != null)
-                        {
-                            var lambdaExpression = memberQueryableExpression as LambdaExpression;
-                            var projectionAccessMemberVisitor = new ProjectionAccessMemberVisitor(propertyOrField.Type, propertyOrField);
-                            var clearanceExp = projectionAccessMemberVisitor.Visit(lambdaExpression.Body);
-                            expression =
-                                Expression.Condition(
-                                    Expression.Equal(propertyOrField, Expression.Constant(null, propertyOrField.Type)),
-                                    Expression.Constant(null, ((PropertyInfo)autoMember.Value).PropertyType), clearanceExp);
-                        }
-                        else
-                        {
-                            expression = propertyOrField;
-                        }
-                        _bindingExpressions.Add(autoMember.Value.Name,
-                            Expression.Bind(autoMember.Value, expression));
-                    }
+                    ProcessProjectingMember(propertyOrField, destination);
                 }
 
                 QueryableExpression =
@@ -183,6 +119,76 @@ namespace ExpressMapper
             catch (Exception ex)
             {
                 Debug.WriteLine("Queryable projection is not supported for such mapping. Exception: {0}", ex);
+            }
+        }
+
+        private void ProcessProjectingMember(MemberExpression sourceExp, PropertyInfo destProp)
+        {
+            var memberQueryableExpression =
+                MappingService.GetMemberQueryableExpression(sourceExp.Type,
+                    destProp.PropertyType);
+
+
+            var tCol =
+                sourceExp.Type.GetInterfaces()
+                    .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof (IEnumerable<>)) ??
+                (sourceExp.Type.IsGenericType
+                 && sourceExp.Type.GetInterfaces().Any(t => t == typeof(IEnumerable))
+                    ? sourceExp.Type
+                    : null);
+
+            var tnCol = destProp.PropertyType.GetInterfaces()
+                .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof (IEnumerable<>)) ??
+                        (destProp.PropertyType.IsGenericType &&
+                         destProp.PropertyType.GetInterfaces().Any(t => t == typeof (IEnumerable))
+                            ? destProp.PropertyType
+                            : null);
+
+            if (sourceExp.Type != typeof(string) && tCol != null && tnCol != null)
+            {
+                var sourceGenericType = sourceExp.Type.GetGenericArguments()[0];
+                var destGenericType = destProp.PropertyType.GetGenericArguments()[0];
+
+                var genericMemberQueryableExpression =
+                    MappingService.GetMemberQueryableExpression(sourceGenericType,
+                        destGenericType);
+
+
+                MethodInfo selectMethod = null;
+                foreach (
+                    var p in from m in typeof (Enumerable).GetMethods().Where(m => m.Name == "Select")
+                        from p in m.GetParameters().Where(p => p.Name.Equals("selector"))
+                        where p.ParameterType.GetGenericArguments().Count() == 2
+                        select p)
+                    selectMethod = (MethodInfo) p.Member;
+
+                var selectExpression = Expression.Call(
+                    null,
+                    selectMethod.MakeGenericMethod(sourceGenericType, destGenericType),
+                    new[] {sourceExp, genericMemberQueryableExpression});
+
+                _bindingExpressions.Add(destProp.Name,
+                    Expression.Bind(destProp, selectExpression));
+            }
+            else
+            {
+                Expression expression;
+                if (memberQueryableExpression != null)
+                {
+                    var lambdaExpression = memberQueryableExpression as LambdaExpression;
+                    var projectionAccessMemberVisitor = new ProjectionAccessMemberVisitor(sourceExp.Type, sourceExp);
+                    var clearanceExp = projectionAccessMemberVisitor.Visit(lambdaExpression.Body);
+                    expression =
+                        Expression.Condition(
+                            Expression.Equal(sourceExp, Expression.Constant(null, sourceExp.Type)),
+                            Expression.Constant(null, destProp.PropertyType), clearanceExp);
+                }
+                else
+                {
+                    expression = sourceExp;
+                }
+                _bindingExpressions.Add(destProp.Name,
+                    Expression.Bind(destProp, expression));
             }
         }
     }
