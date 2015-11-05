@@ -166,7 +166,12 @@ namespace ExpressMapper
             }
         }
 
-        public TN Map<T, TN>(T src, TN dest = default(TN))
+        public TN Map<T, TN>(T src)
+        {
+            return MapInternal<T, TN>(src);
+        }
+
+        public TN Map<T, TN>(T src, TN dest)
         {
             return MapInternal<T, TN>(src, dest);
         }
@@ -234,12 +239,27 @@ namespace ExpressMapper
             return result;
         }
 
-        public TN Map<T, TN>(T src, ICustomTypeMapper<T, TN> customMapper, TN dest = default(TN))
+        public TN Map<T, TN>(T src, ICustomTypeMapper<T, TN> customMapper)
         {
-            return customMapper.Map(new DefaultMappingContext<T, TN> {Source = src, Destination = dest});
+            return customMapper.Map(new DefaultMappingContext<T, TN> {Source = src, Destination = default(TN)});
         }
 
-        public object Map(Type srcType, Type dstType, object src, object dest = null)
+        public TN Map<T, TN>(T src, ICustomTypeMapper<T, TN> customMapper, TN dest)
+        {
+            return customMapper.Map(new DefaultMappingContext<T, TN> { Source = src, Destination = dest });
+        }
+
+        public object Map(Type srcType, Type dstType, object src)
+        {
+            return MapNonGenericInternal(srcType, dstType, src, null);
+        }
+
+        public object Map(Type srcType, Type dstType, object src, object dest)
+        {
+            return MapNonGenericInternal(srcType, dstType, src, dest);
+        }
+
+        private object MapNonGenericInternal(Type srcType, Type dstType, object src, object dest = null)
         {
             var cacheKey = CalculateCacheKey(srcType, dstType);
 
@@ -274,14 +294,16 @@ namespace ExpressMapper
             var tCol =
                 srcType.GetInterfaces()
                     .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == GenericEnumerableType) ??
-                    (srcType.IsGenericType
-                        && srcType.GetInterfaces().Any(t => t == typeof(IEnumerable)) ? srcType
-                        : null);
+                (srcType.IsGenericType
+                 && srcType.GetInterfaces().Any(t => t == typeof (IEnumerable))
+                    ? srcType
+                    : null);
 
             var tnCol = dstType.GetInterfaces()
                 .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == GenericEnumerableType) ??
-                         (dstType.IsGenericType && dstType.GetInterfaces().Any(t => t == typeof(IEnumerable)) ? dstType
-                             : null);
+                        (dstType.IsGenericType && dstType.GetInterfaces().Any(t => t == typeof (IEnumerable))
+                            ? dstType
+                            : null);
 
             if (tCol != null && tnCol != null)
             {
@@ -292,7 +314,9 @@ namespace ExpressMapper
                     : _mappingServices.First(m => m.DestinationSupport).MapCollection(cacheKey).DynamicInvoke(src, dest));
                 return result;
             }
-            throw new MapNotImplementedException(string.Format("There is no mapping has bee found. Source Type: {0}, Destination Type: {1}", srcType.FullName, dstType.FullName));
+            throw new MapNotImplementedException(
+                string.Format("There is no mapping has bee found. Source Type: {0}, Destination Type: {1}", srcType.FullName,
+                    dstType.FullName));
         }
 
         #region Helper methods
