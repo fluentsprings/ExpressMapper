@@ -268,7 +268,7 @@ namespace ExpressMapper
                 var mapper = mappingService.TypeMappers[cacheKey];
                 var nonGenericMapFunc = mapper.GetNonGenericMapFunc();
 
-                return nonGenericMapFunc(src);
+                return nonGenericMapFunc(src, dest);
             }
 
             var tCol =

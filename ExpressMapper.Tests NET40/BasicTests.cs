@@ -641,6 +641,23 @@ namespace ExpressMapper.Tests
         }
 
         [Test]
+        public void NonGenericSimpleWithDestinationMap()
+        {
+            Mapper.Register<TestModel, TestViewModel>();
+            Mapper.Register<Size, SizeViewModel>();
+            Mapper.Register<Country, CountryViewModel>();
+            Mapper.Compile();
+
+            var test = Functional.AutoMemberMap();
+
+            var resultInstanceHash = test.Value.GetHashCode();
+            var testViewModel = Mapper.Map(test.Key, test.Value, typeof(TestModel), typeof(TestViewModel)) as TestViewModel;
+
+            Assert.AreEqual(testViewModel.GetHashCode(), resultInstanceHash);
+            Assert.AreEqual(testViewModel, test.Value);
+        }
+
+        [Test]
         public void CustomMapNonGeneric()
         {
             Mapper.RegisterCustom<Size, SizeViewModel, SizeMapper>();

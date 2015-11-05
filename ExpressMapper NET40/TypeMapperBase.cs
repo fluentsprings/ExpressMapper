@@ -48,7 +48,7 @@ namespace ExpressMapper
         protected Action<T, TN> BeforeMapHandler { get; set; }
         protected Action<T, TN> AfterMapHandler { get; set; }
         protected Func<T, TN> ConstructorFunc { get; set; }
-        protected Func<object, object> NonGenericMapFunc { get; set; }
+        protected Func<object, object, object> NonGenericMapFunc { get; set; }
 
         #endregion
 
@@ -100,7 +100,7 @@ namespace ExpressMapper
             return new Tuple<List<Expression>, ParameterExpression, ParameterExpression>(new List<Expression>(ResultExpressionList), SourceParameter, DestFakeParameter); ;
         }
 
-        public Func<object, object> GetNonGenericMapFunc()
+        public Func<object, object, object> GetNonGenericMapFunc()
         {
             if (NonGenericMapFunc != null)
             {
@@ -112,19 +112,24 @@ namespace ExpressMapper
             var srcTypedExp = Expression.Variable(typeof(T), "srcTyped");
             var srcAssigned = Expression.Assign(srcTypedExp, srcConverted);
 
+            var destParameterExp = Expression.Parameter(typeof(object), "dst");
+            var dstConverted = Expression.Convert(destParameterExp, typeof(TN));
+            var dstTypedExp = Expression.Variable(typeof(TN), "dstTyped");
+            var dstAssigned = Expression.Assign(dstTypedExp, dstConverted);
+
             var customGenericType = typeof(ITypeMapper<,>).MakeGenericType(typeof(T), typeof(TN));
             var castToCustomGeneric = Expression.Convert(Expression.Constant((ITypeMapper)this), customGenericType);
             var genVariable = Expression.Variable(customGenericType);
             var assignExp = Expression.Assign(genVariable, castToCustomGeneric);
             var methodInfo = customGenericType.GetMethod("MapTo", new[] { typeof(T), typeof(TN) });
 
-            var mapCall = Expression.Call(genVariable, methodInfo, srcTypedExp, Expression.Default(typeof(TN)));
+            var mapCall = Expression.Call(genVariable, methodInfo, srcTypedExp, dstTypedExp);
             var resultVarExp = Expression.Variable(typeof(object), "result");
             var convertToObj = Expression.Convert(mapCall, typeof(object));
             var assignResult = Expression.Assign(resultVarExp, convertToObj);
 
-            var blockExpression = Expression.Block(new[] { srcTypedExp, genVariable, resultVarExp }, new Expression[] { srcAssigned, assignExp, assignResult, resultVarExp });
-            var lambda = Expression.Lambda<Func<object, object>>(blockExpression, parameterExpression);
+            var blockExpression = Expression.Block(new[] { srcTypedExp, dstTypedExp, genVariable, resultVarExp }, new Expression[] { srcAssigned, dstAssigned, assignExp, assignResult, resultVarExp });
+            var lambda = Expression.Lambda<Func<object, object, object>>(blockExpression, parameterExpression, destParameterExp);
             NonGenericMapFunc = lambda.Compile();
 
             return NonGenericMapFunc;
