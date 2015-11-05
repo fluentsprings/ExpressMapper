@@ -83,29 +83,13 @@ namespace ExpressMapper
             {
                 foreach (var customMember in CustomMembers)
                 {
-                    var memberQueryableExpression =
-                        MappingService.GetMemberQueryableExpression(customMember.Key.Member.DeclaringType,
-                            customMember.Value.Type);
-                    var expression = memberQueryableExpression ?? customMember.Value;
-                    _bindingExpressions.Add(customMember.Key.Member.Name,
-                        Expression.Bind(customMember.Key.Member, expression));
-                }
-
-                foreach (var customMember in CustomFunctionMembers)
-                {
-                    if (_bindingExpressions.ContainsKey(customMember.Key.Member.Name)) continue;
-
-                    var memberQueryableExpression =
-                        MappingService.GetMemberQueryableExpression(customMember.Key.Member.DeclaringType,
-                            customMember.Value.Type);
-                    var expression = memberQueryableExpression ?? customMember.Value;
-                    _bindingExpressions.Add(customMember.Key.Member.Name,
-                        Expression.Bind(customMember.Key.Member, expression));
+                    ProcessProjectingMember(customMember.Value, customMember.Key.Member as PropertyInfo);
                 }
 
                 foreach (var autoMember in AutoMembers)
                 {
-                    if (_bindingExpressions.ContainsKey(autoMember.Value.Name)) continue;
+
+                    if (_bindingExpressions.ContainsKey(autoMember.Value.Name) || IgnoreMemberList.Contains(autoMember.Value.Name)) continue;
 
                     var destination = autoMember.Value as PropertyInfo;
                     var propertyOrField = Expression.PropertyOrField(SourceParameter, autoMember.Key.Name);
@@ -122,7 +106,7 @@ namespace ExpressMapper
             }
         }
 
-        private void ProcessProjectingMember(MemberExpression sourceExp, PropertyInfo destProp)
+        private void ProcessProjectingMember(Expression sourceExp, PropertyInfo destProp)
         {
             var memberQueryableExpression =
                 MappingService.GetMemberQueryableExpression(sourceExp.Type,

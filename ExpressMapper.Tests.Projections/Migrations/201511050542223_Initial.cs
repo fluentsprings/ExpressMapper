@@ -44,13 +44,57 @@ namespace ExpressMapper.Tests.Projections.Migrations
                 .Index(t => t.VariantId);
             
             CreateTable(
-                "dbo.Categories",
+                "dbo.Category",
                 c => new
                     {
                         Id = c.Guid(nullable: false),
                         Name = c.String(),
                     })
                 .PrimaryKey(t => t.Id);
+            
+            CreateTable(
+                "dbo.Catalogue",
+                c => new
+                    {
+                        Id = c.Guid(nullable: false),
+                        Name = c.String(),
+                    })
+                .PrimaryKey(t => t.Id);
+            
+            CreateTable(
+                "dbo.CatalogueGroup",
+                c => new
+                    {
+                        Id = c.Guid(nullable: false),
+                        Name = c.String(),
+                    })
+                .PrimaryKey(t => t.Id);
+            
+            CreateTable(
+                "dbo.CatalogueGroupCatalogues",
+                c => new
+                    {
+                        CatalogueGroup_Id = c.Guid(nullable: false),
+                        Catalogue_Id = c.Guid(nullable: false),
+                    })
+                .PrimaryKey(t => new { t.CatalogueGroup_Id, t.Catalogue_Id })
+                .ForeignKey("dbo.CatalogueGroup", t => t.CatalogueGroup_Id, cascadeDelete: true)
+                .ForeignKey("dbo.Catalogue", t => t.Catalogue_Id, cascadeDelete: true)
+                .Index(t => t.CatalogueGroup_Id)
+                .Index(t => t.Catalogue_Id);
+            
+            CreateTable(
+                "dbo.CatalogueCategories",
+                c => new
+                    {
+                        Catalogue_Id = c.Guid(nullable: false),
+                        Category_Id = c.Guid(nullable: false),
+                    })
+                .PrimaryKey(t => new { t.Catalogue_Id, t.Category_Id })
+                .ForeignKey("dbo.Catalogue", t => t.Catalogue_Id, cascadeDelete: true)
+                .ForeignKey("dbo.Category", t => t.Category_Id, cascadeDelete: true)
+                .Index(t => t.Catalogue_Id)
+                .Index(t => t.Category_Id);
             
             CreateTable(
                 "dbo.CategoryProducts",
@@ -60,7 +104,7 @@ namespace ExpressMapper.Tests.Projections.Migrations
                         Product_Id = c.Guid(nullable: false),
                     })
                 .PrimaryKey(t => new { t.Category_Id, t.Product_Id })
-                .ForeignKey("dbo.Categories", t => t.Category_Id, cascadeDelete: true)
+                .ForeignKey("dbo.Category", t => t.Category_Id, cascadeDelete: true)
                 .ForeignKey("dbo.Product", t => t.Product_Id, cascadeDelete: true)
                 .Index(t => t.Category_Id)
                 .Index(t => t.Product_Id);
@@ -72,13 +116,25 @@ namespace ExpressMapper.Tests.Projections.Migrations
             DropForeignKey("dbo.ProductVariant", "SizeId", "dbo.Size");
             DropForeignKey("dbo.Product", "VariantId", "dbo.ProductVariant");
             DropForeignKey("dbo.CategoryProducts", "Product_Id", "dbo.Product");
-            DropForeignKey("dbo.CategoryProducts", "Category_Id", "dbo.Categories");
+            DropForeignKey("dbo.CategoryProducts", "Category_Id", "dbo.Category");
+            DropForeignKey("dbo.CatalogueCategories", "Category_Id", "dbo.Category");
+            DropForeignKey("dbo.CatalogueCategories", "Catalogue_Id", "dbo.Catalogue");
+            DropForeignKey("dbo.CatalogueGroupCatalogues", "Catalogue_Id", "dbo.Catalogue");
+            DropForeignKey("dbo.CatalogueGroupCatalogues", "CatalogueGroup_Id", "dbo.CatalogueGroup");
             DropIndex("dbo.CategoryProducts", new[] { "Product_Id" });
             DropIndex("dbo.CategoryProducts", new[] { "Category_Id" });
+            DropIndex("dbo.CatalogueCategories", new[] { "Category_Id" });
+            DropIndex("dbo.CatalogueCategories", new[] { "Catalogue_Id" });
+            DropIndex("dbo.CatalogueGroupCatalogues", new[] { "Catalogue_Id" });
+            DropIndex("dbo.CatalogueGroupCatalogues", new[] { "CatalogueGroup_Id" });
             DropIndex("dbo.Product", new[] { "VariantId" });
             DropIndex("dbo.ProductVariant", new[] { "SizeId" });
             DropTable("dbo.CategoryProducts");
-            DropTable("dbo.Categories");
+            DropTable("dbo.CatalogueCategories");
+            DropTable("dbo.CatalogueGroupCatalogues");
+            DropTable("dbo.CatalogueGroup");
+            DropTable("dbo.Catalogue");
+            DropTable("dbo.Category");
             DropTable("dbo.Product");
             DropTable("dbo.ProductVariant");
             DropTable("dbo.Size");

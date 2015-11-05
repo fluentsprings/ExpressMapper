@@ -33,7 +33,7 @@ namespace ExpressMapper
             return Instance.Map(src, dest);
         }
 
-        public static IQueryable<TN> Project<T, TN>(this IQueryable<T> source)
+        internal static IQueryable<TN> Project<T, TN>(IQueryable<T> source)
         {
             return Instance.Project<T, TN>(source);
         }

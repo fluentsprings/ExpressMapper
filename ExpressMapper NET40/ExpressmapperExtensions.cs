@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace ExpressMapper.Extensions
@@ -18,6 +19,11 @@ namespace ExpressMapper.Extensions
         public static object Map(this object source, Type srcType, Type destType)
         {
             return Mapper.Map(source, srcType, destType);
+        }
+
+        public static IQueryable<TN> Project<T, TN>(this IQueryable<T> source)
+        {
+            return Mapper.Project<T, TN>(source);
         }
     }
 }

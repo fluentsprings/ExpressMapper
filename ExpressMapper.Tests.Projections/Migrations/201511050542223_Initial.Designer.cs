@@ -13,7 +13,7 @@ namespace ExpressMapper.Tests.Projections.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "201510311929575_Initial"; }
+            get { return "201511050542223_Initial"; }
         }
         
         string IMigrationMetadata.Source

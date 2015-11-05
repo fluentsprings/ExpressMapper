@@ -10,6 +10,7 @@ namespace ExpressMapper.Tests.Projections.Tests
         [SetUp]
         public void Initialize()
         {
+            Mapper.Reset();
             Context = new ExpressContext();
             Context.Database.Delete();
             Context.Database.Create();
@@ -21,6 +22,7 @@ namespace ExpressMapper.Tests.Projections.Tests
         [TearDown]
         public void Cleanup()
         {
+            Mapper.Reset();
             Context.Database.Delete();
             Context.Dispose();
         }

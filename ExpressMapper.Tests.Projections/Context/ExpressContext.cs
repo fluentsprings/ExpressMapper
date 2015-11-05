@@ -11,6 +11,9 @@ namespace ExpressMapper.Tests.Projections.Context
             modelBuilder.Configurations.Add(new SizeConfiguration());
             modelBuilder.Configurations.Add(new ProductVariantConfiguration());
             modelBuilder.Configurations.Add(new ProductConfiguration());
+            modelBuilder.Configurations.Add(new CategoryConfiguration());
+            modelBuilder.Configurations.Add(new CatalogueConfiguration());
+            modelBuilder.Configurations.Add(new CatalogueGroupConfiguration());
         }
     }
 }
