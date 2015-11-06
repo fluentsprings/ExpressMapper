@@ -83,6 +83,7 @@
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tests\CustomMemberMappingTest.cs" />
+    <Compile Include="Tests\NestedAssociationNullChecktest.cs" />
     <Compile Include="Tests\RecursionExpressionHandlingTest.cs" />
     <Compile Include="ViewModel\CatalogueGroupViewModel.cs" />
     <Compile Include="ViewModel\CatalogueViewModel.cs" />

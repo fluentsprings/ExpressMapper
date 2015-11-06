@@ -112,7 +112,7 @@ namespace ExpressMapper
 
         public Expression GetMemberMappingExpression(Expression left, Expression right)
         {
-            var nullCheckNestedMemberVisitor = new NullCheckNestedMemberVisitor();
+            var nullCheckNestedMemberVisitor = new NullCheckNestedMemberVisitor(false);
             nullCheckNestedMemberVisitor.Visit(right);
 
             var destNullableType = Nullable.GetUnderlyingType(left.Type);

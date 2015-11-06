@@ -166,6 +166,14 @@ namespace ExpressMapper
                         Expression.Condition(
                             Expression.Equal(sourceExp, Expression.Constant(null, sourceExp.Type)),
                             Expression.Constant(null, destProp.PropertyType), clearanceExp);
+
+                    //var nullCheckNestedMemberVisitor = new NullCheckNestedMemberVisitor(true);
+                    //nullCheckNestedMemberVisitor.Visit(sourceExp);
+
+                    //expression = nullCheckNestedMemberVisitor.CheckNullExpression != null
+                    //    ? Expression.Condition(nullCheckNestedMemberVisitor.CheckNullExpression,
+                    //        Expression.Constant(null, destProp.PropertyType), expression)
+                    //    : expression;
                 }
                 else
                 {
