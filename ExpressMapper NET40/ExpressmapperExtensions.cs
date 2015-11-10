@@ -6,7 +6,12 @@ namespace ExpressMapper.Extensions
 {
     public static class ExpressmapperExtensions
     {
-        public static TN Map<T, TN>(this T source, TN destination = default(TN))
+        public static TN Map<T, TN>(this T source)
+        {
+            return Mapper.Map<T, TN>(source);
+        }
+
+        public static TN Map<T, TN>(this T source, TN destination)
         {
             return Mapper.Map(source, destination);
         }
