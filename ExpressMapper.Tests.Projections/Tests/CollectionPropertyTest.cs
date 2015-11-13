@@ -216,7 +216,7 @@ namespace ExpressMapper.Tests.Projections.Tests
             {
                 Id = catalId,
                 Name = catalName,
-                Categories = new List<CategoryViewModel>
+                Categories = new[]
                 {
                     cat, cat1
                 }
@@ -236,7 +236,7 @@ namespace ExpressMapper.Tests.Projections.Tests
             {
                 Id = catalId1,
                 Name = catalName1,
-                Categories = new List<CategoryViewModel>
+                Categories = new []
                 {
                     cat, cat1, cat2
                 }
@@ -347,14 +347,14 @@ namespace ExpressMapper.Tests.Projections.Tests
                         {
                             if (e.Products != null)
                             {
-                                e.Products = e.Products.OrderBy(p => p.Id);
+                                e.Products = e.Products.OrderBy(p => p.Id).ToList();
                             }
                         }
                             );
-                        v.Categories = v.Categories.OrderBy(f => f.Id);
+                        v.Categories = v.Categories.OrderBy(f => f.Id).ToArray();
                     }
                 });
-                r.Catalogues = r.Catalogues.OrderBy(s => s.Id);
+                r.Catalogues = r.Catalogues.OrderBy(s => s.Id).ToList();
             });
             return list.OrderBy(r => r.Id).ToList();
         }

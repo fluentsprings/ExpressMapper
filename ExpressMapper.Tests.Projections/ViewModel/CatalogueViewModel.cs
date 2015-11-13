@@ -12,7 +12,7 @@ namespace ExpressMapper.Tests.Projections.ViewModel
         }
         public Guid Id { get; set; }
         public string Name { get; set; }
-        public IEnumerable<CategoryViewModel> Categories { get; set; }
+        public IList<CategoryViewModel> Categories { get; set; }
 
         public bool Equals(CatalogueViewModel other)
         {

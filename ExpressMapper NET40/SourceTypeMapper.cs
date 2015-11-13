@@ -112,26 +112,25 @@ namespace ExpressMapper
                 MappingService.GetMemberQueryableExpression(sourceExp.Type,
                     destProp.PropertyType);
 
-
             var tCol =
                 sourceExp.Type.GetInterfaces()
-                    .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof (IEnumerable<>)) ??
+                    .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>)) ??
                 (sourceExp.Type.IsGenericType
                  && sourceExp.Type.GetInterfaces().Any(t => t == typeof(IEnumerable))
                     ? sourceExp.Type
                     : null);
 
             var tnCol = destProp.PropertyType.GetInterfaces()
-                .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof (IEnumerable<>)) ??
+                .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>)) ??
                         (destProp.PropertyType.IsGenericType &&
-                         destProp.PropertyType.GetInterfaces().Any(t => t == typeof (IEnumerable))
+                         destProp.PropertyType.GetInterfaces().Any(t => t == typeof(IEnumerable))
                             ? destProp.PropertyType
                             : null);
 
             if (sourceExp.Type != typeof(string) && tCol != null && tnCol != null)
             {
                 var sourceGenericType = sourceExp.Type.GetGenericArguments()[0];
-                var destGenericType = destProp.PropertyType.GetGenericArguments()[0];
+                var destGenericType = destProp.PropertyType.IsArray ? destProp.PropertyType.GetElementType() : destProp.PropertyType.GetGenericArguments()[0];
 
                 var genericMemberQueryableExpression =
                     MappingService.GetMemberQueryableExpression(sourceGenericType,
@@ -140,16 +139,24 @@ namespace ExpressMapper
 
                 MethodInfo selectMethod = null;
                 foreach (
-                    var p in from m in typeof (Enumerable).GetMethods().Where(m => m.Name == "Select")
-                        from p in m.GetParameters().Where(p => p.Name.Equals("selector"))
-                        where p.ParameterType.GetGenericArguments().Count() == 2
-                        select p)
-                    selectMethod = (MethodInfo) p.Member;
+                    var p in from m in typeof(Enumerable).GetMethods().Where(m => m.Name == "Select")
+                             from p in m.GetParameters().Where(p => p.Name.Equals("selector"))
+                             where p.ParameterType.GetGenericArguments().Count() == 2
+                             select p)
+                    selectMethod = (MethodInfo)p.Member;
 
-                var selectExpression = Expression.Call(
+                Expression selectExpression = Expression.Call(
                     null,
                     selectMethod.MakeGenericMethod(sourceGenericType, destGenericType),
-                    new[] {sourceExp, genericMemberQueryableExpression});
+                    new[] { sourceExp, genericMemberQueryableExpression });
+
+                var destListAndCollTest = typeof(ICollection<>).MakeGenericType(destGenericType).IsAssignableFrom(destProp.PropertyType);
+
+                if (destListAndCollTest)
+                {
+                    var toArrayMethod = typeof(Enumerable).GetMethod("ToList");
+                    selectExpression = Expression.Call(null, toArrayMethod.MakeGenericMethod(destGenericType), selectExpression);
+                }
 
                 _bindingExpressions.Add(destProp.Name,
                     Expression.Bind(destProp, selectExpression));
@@ -166,14 +173,6 @@ namespace ExpressMapper
                         Expression.Condition(
                             Expression.Equal(sourceExp, Expression.Constant(null, sourceExp.Type)),
                             Expression.Constant(null, destProp.PropertyType), clearanceExp);
-
-                    //var nullCheckNestedMemberVisitor = new NullCheckNestedMemberVisitor(true);
-                    //nullCheckNestedMemberVisitor.Visit(sourceExp);
-
-                    //expression = nullCheckNestedMemberVisitor.CheckNullExpression != null
-                    //    ? Expression.Condition(nullCheckNestedMemberVisitor.CheckNullExpression,
-                    //        Expression.Constant(null, destProp.PropertyType), expression)
-                    //    : expression;
                 }
                 else
                 {
