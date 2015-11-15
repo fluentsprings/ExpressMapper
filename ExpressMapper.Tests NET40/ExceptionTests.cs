@@ -1,4 +1,6 @@
-﻿using ExpressMapper.Tests.Model.Generator;
+﻿using System;
+using System.Collections.Generic;
+using ExpressMapper.Tests.Model.Generator;
 using ExpressMapper.Tests.Model.Models;
 using ExpressMapper.Tests.Model.ViewModels;
 using NUnit.Framework;
@@ -9,30 +11,29 @@ namespace ExpressMapper.Tests
     public class ExceptionTests : BaseTestClass
     {
         [Test]
-        public void NoMapping()
+        public void MappingRegisteredMoreThanOnceTest()
         {
-            var exceptionMessage = string.Format("There is no mapping has bee found. Source Type: {0}, Destination Type: {1}", typeof(Size).FullName, typeof(SizeViewModel).FullName);
-            Assert.Throws<MapNotImplementedException>(() =>
+            Mapper.Register<Size, SizeViewModel>();
+
+            var exceptionMessage = string.Format("Mapping from {0} to {1} is already registered",
+                typeof (Size).FullName, typeof (SizeViewModel).FullName);
+            Assert.Throws<InvalidOperationException>(() =>
             {
-                var testData = Functional.NoMapping();
-                Mapper.Map<Size, SizeViewModel>(testData.Key);
+                Mapper.Register<Size, SizeViewModel>();
 
             }, exceptionMessage);
         }
 
         [Test]
-        public void NoMappingForProperty()
+        public void RegisteringCollectionTypesTest()
         {
-            var exceptionMessage = string.Format("There is no mapping has bee found. Source Type: {0}, Destination Type: {1}", typeof(Country).FullName, typeof(Country).FullName);
-            Assert.Throws<MapNotImplementedException>(() =>
+            var exceptionMessage =
+                string.Format(
+                    "It is invalid to register mapping for collection types from {0} to {1}, please use just class registration mapping and your collections will be implicitly processed. In case you want to include some custom collection mapping please use: Mapper.RegisterCustom.",
+                    typeof(List<Size>).FullName, typeof(SizeViewModel[]).FullName);
+            Assert.Throws<InvalidOperationException>(() =>
             {
-                Mapper.Register<TestModel, TestViewModel>();
-                Mapper.Register<Size, SizeViewModel>();
-                Mapper.Compile();
-
-                var testData = Functional.NoMappingForProperty();
-                Mapper.Map<TestModel, TestViewModel>(testData.Key);
-
+                Mapper.Register<List<Size>, SizeViewModel[]>();
             }, exceptionMessage);
         }
     }
