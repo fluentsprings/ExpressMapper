@@ -51,6 +51,24 @@ namespace ExpressMapper.Tests
         }
 
         [Test]
+        public void CustomMemberAndFunctionFieldsTest()
+        {
+            Mapper.Register<Brand, BrandViewModel>();
+            Mapper.Register<Table, TableViewModel>()
+                .Member(t => t.Id, t => t.Id)
+                .Function(t => t.Name, t => t.Name);
+            Mapper.Register<Size, SizeViewModel>();
+            Mapper.Register<Country, CountryViewModel>();
+            Mapper.Compile();
+
+            var srcAndDest = Functional.FieldsTestMap();
+
+            var bvm = Mapper.Map<Table, TableViewModel>(srcAndDest.Key);
+
+            Assert.AreEqual(bvm, srcAndDest.Value);
+        }
+
+        [Test]
         public void MappingOrderLessTest()
         {
             Mapper.Register<Composition, CompositionViewModel>()

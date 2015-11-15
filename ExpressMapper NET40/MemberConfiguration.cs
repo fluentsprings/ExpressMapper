@@ -59,7 +59,11 @@ namespace ExpressMapper
 
             var propertyInfo = typeof(TN).GetProperty(memberExpression.Member.Name);
 
-            if (propertyInfo.CanWrite && propertyInfo.GetSetMethod(true).IsPublic)
+            if (propertyInfo != null && !propertyInfo.CanWrite || (propertyInfo != null && propertyInfo.CanWrite && !propertyInfo.GetSetMethod(true).IsPublic))
+            {
+                Ignore(dest);
+            }
+            else
             {
                 foreach (var typeMapper in _typeMappers)
                 {
@@ -79,7 +83,11 @@ namespace ExpressMapper
 
             var propertyInfo = typeof(TN).GetProperty(memberExpression.Member.Name);
 
-            if (propertyInfo.CanWrite && propertyInfo.GetSetMethod(true).IsPublic)
+            if (propertyInfo != null && !propertyInfo.CanWrite && !propertyInfo.GetSetMethod(true).IsPublic)
+            {
+                Ignore(dest);
+            }
+            else
             {
                 foreach (var typeMapper in _typeMappers)
                 {
