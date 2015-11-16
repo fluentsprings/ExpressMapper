@@ -205,5 +205,70 @@ namespace ExpressMapper.Tests
                 Assert.AreEqual(deepCopies[i], test.Key[i]);
             }
         }
+
+        [Test]
+        public void CollectionWithDestinationMap()
+        {
+            Mapper.Register<DbObjectA, ObjectA>();
+            Mapper.Register<DbObjectB, ObjectB>().
+                Member(x => x.Childs, x => x.DbObjectA);
+            Mapper.Compile();
+
+            var objectB1 = new DbObjectB()
+            {
+                Code = "ObjectB1",
+                DbObjectA = new DbObjectA[] { new DbObjectA() { Code = "ObjectA1" } }
+            };
+
+            var objectB2 = new DbObjectB()
+            {
+                Code = "ObjectB2",
+                DbObjectA = new DbObjectA[] { new DbObjectA() { Code = "ObjectA2" } }
+            };
+
+            DbObjectB[] objectBArr = new DbObjectB[] { objectB1, objectB2 };
+
+            List<ObjectB> result = new List<ObjectB>();
+
+            Mapper.Map<DbObjectB[], List<ObjectB>>(objectBArr, result);
+
+            Assert.AreEqual(2, result.Count);
+
+            Assert.IsNotNull(result[0]);
+            Assert.IsNotNull(result[0].Childs);
+            Assert.AreEqual(1, result[0].Childs.Count);
+            Assert.AreEqual("ObjectB1", result[0].Code);
+            Assert.AreEqual("ObjectA1", result[0].Childs[0].Code);
+
+            Assert.IsNotNull(result[1]);
+            Assert.IsNotNull(result[1].Childs);
+            Assert.AreEqual(1, result[1].Childs.Count);
+            Assert.AreEqual("ObjectB2", result[1].Code);
+            Assert.AreEqual("ObjectA2", result[1].Childs[0].Code);
+        }
+
+        public class ObjectA
+        {
+            public string Code { get; set; }
+        }
+
+        public class ObjectB
+        {
+            public string Code { get; set; }
+
+            public List<ObjectA> Childs { get; set; }
+        }
+
+        public class DbObjectA
+        {
+            public string Code { get; set; }
+        }
+
+        public class DbObjectB
+        {
+            public string Code { get; set; }
+
+            public DbObjectA[] DbObjectA { get; set; }
+        }
     }
 }
