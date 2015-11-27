@@ -677,13 +677,15 @@ namespace ExpressMapper.Tests.Model.Generator
             return new KeyValuePair<List<TestModel>, List<TestViewModel>>(models, viewModels);
         }
 
-        public static KeyValuePair<TestItem, TestItemViewModel> ExistingDestCollEquals()
+        public static Tuple<TestItem, TestItemViewModel, TestItemViewModel> ExistingDestCollEquals()
         {
             var testItem = new TestItem();
             var testItemVm = new TestItemViewModel();
+            var testItemVmCheck = new TestItemViewModel();
 
             var testItems = new List<TestCollection>();
             var testItemsVm = new List<TestCollectionViewModel>();
+            var testItemsVmCheck = new List<TestCollectionViewModel>();
 
             for (var i = 0; i < 5; i++)
             {
@@ -702,14 +704,22 @@ namespace ExpressMapper.Tests.Model.Generator
                     Id = id,
                     Name = format
                 };
-                
+
+                var testCollectionVmCheck = new TestCollectionViewModel
+                {
+                    Id = id,
+                    Name = name
+                };
+
                 testItems.Add(testCollection);
                 testItemsVm.Add(testCollectionVm);
+                testItemsVmCheck.Add(testCollectionVmCheck);
             }
             testItem.Queryable = testItems.AsQueryable();
             testItemVm.Array = testItemsVm.ToArray();
+            testItemVmCheck.Array = testItemsVmCheck.ToArray();
 
-            return new KeyValuePair<TestItem, TestItemViewModel>(testItem, testItemVm);
+            return new Tuple<TestItem, TestItemViewModel, TestItemViewModel>(testItem, testItemVm, testItemVmCheck);
         }
 
         public static KeyValuePair<TestItem, TestItemViewModel> OtherCollectionMapTest()
@@ -746,13 +756,15 @@ namespace ExpressMapper.Tests.Model.Generator
             return new KeyValuePair<TestItem, TestItemViewModel>(testItem, testItemVm);
         }
 
-        public static KeyValuePair<TestItem, TestItemViewModel> ExistingDestCollEqualsWithNullElement()
+        public static Tuple<TestItem, TestItemViewModel, TestItemViewModel> ExistingDestCollEqualsWithNullElement()
         {
             var testItem = new TestItem();
             var testItemVm = new TestItemViewModel();
+            var testItemVmCheck = new TestItemViewModel();
 
             var testItems = new List<TestCollection>();
             var testItemsVm = new List<TestCollectionViewModel>();
+            var testItemsVmCheck = new List<TestCollectionViewModel>();
 
             for (var i = 0; i < 5; i++)
             {
@@ -772,22 +784,32 @@ namespace ExpressMapper.Tests.Model.Generator
                     Name = format
                 };
 
+                var testCollectionVmCheck = new TestCollectionViewModel
+                {
+                    Id = id,
+                    Name = name
+                };
+
                 testItems.Add(testCollection);
+                testItemsVmCheck.Add(testCollectionVmCheck);
                 testItemsVm.Add(i == 3 ? null : testCollectionVm);
             }
             testItem.Queryable = testItems.AsQueryable();
             testItemVm.Array = testItemsVm.ToArray();
+            testItemVmCheck.Array = testItemsVmCheck.ToArray();
 
-            return new KeyValuePair<TestItem, TestItemViewModel>(testItem, testItemVm);
+            return new Tuple<TestItem, TestItemViewModel, TestItemViewModel>(testItem, testItemVm, testItemVmCheck);
         }
 
-        public static KeyValuePair<TestItem, TestItemViewModel> ExistingDestSrcCollGreater()
+        public static Tuple<TestItem, TestItemViewModel, TestItemViewModel> ExistingDestSrcCollGreater()
         {
             var testItem = new TestItem();
             var testItemVm = new TestItemViewModel();
+            var testItemVmCheck = new TestItemViewModel();
 
             var testItems = new List<TestCollection>();
             var testItemsVm = new List<TestCollectionViewModel>();
+            var testItemsVmCheck = new List<TestCollectionViewModel>();
 
             for (var i = 0; i < 10; i++)
             {
@@ -807,7 +829,15 @@ namespace ExpressMapper.Tests.Model.Generator
                     Name = format
                 };
 
+                var testCollectionVmCheck = new TestCollectionViewModel
+                {
+                    Id = id,
+                    Name = name
+                };
+
                 testItems.Add(testCollection);
+                testItemsVmCheck.Add(testCollectionVmCheck);
+
                 if (i < 6)
                 {
                     testItemsVm.Add(testCollectionVm);
@@ -815,17 +845,20 @@ namespace ExpressMapper.Tests.Model.Generator
             }
             testItem.Array = testItems.ToArray();
             testItemVm.Collection = testItemsVm;
+            testItemVmCheck.Collection = testItemsVmCheck;
 
-            return new KeyValuePair<TestItem, TestItemViewModel>(testItem, testItemVm);
+            return new Tuple<TestItem, TestItemViewModel, TestItemViewModel>(testItem, testItemVm, testItemVmCheck);
         }
 
-        public static KeyValuePair<TestItem, TestItemViewModel> ExistingDestCollGreater()
+        public static Tuple<TestItem, TestItemViewModel, TestItemViewModel> ExistingDestCollGreater()
         {
             var testItem = new TestItem();
             var testItemVm = new TestItemViewModel();
+            var testItemVmCheck = new TestItemViewModel();
 
             var testItems = new List<TestCollection>();
             var testItemsVm = new List<TestCollectionViewModel>();
+            var testItemsVmCheck = new List<TestCollectionViewModel>();
 
             for (var i = 0; i < 10; i++)
             {
@@ -845,25 +878,35 @@ namespace ExpressMapper.Tests.Model.Generator
                     Name = format
                 };
 
+                var testCollectionVmCheck = new TestCollectionViewModel
+                {
+                    Id = id,
+                    Name = name
+                };
+
                 if (i < 6)
                 {
                     testItems.Add(testCollection);
+                    testItemsVmCheck.Add(testCollectionVmCheck);
                 }
                 testItemsVm.Add(testCollectionVm);
             }
             testItem.Collection = testItems.ToArray();
             testItemVm.List = testItemsVm;
+            testItemVmCheck.List = testItemsVmCheck.ToList();
 
-            return new KeyValuePair<TestItem, TestItemViewModel>(testItem, testItemVm);
+            return new Tuple<TestItem, TestItemViewModel, TestItemViewModel>(testItem, testItemVm, testItemVmCheck);
         }
 
-        public static KeyValuePair<TestItem, TestItemViewModel> ExistingDestCollNotEqual()
+        public static Tuple<TestItem, TestItemViewModel, TestItemViewModel> ExistingDestCollNotEqual()
         {
             var testItem = new TestItem();
             var testItemVm = new TestItemViewModel();
+            var testItemVmCheck = new TestItemViewModel();
 
             var testItems = new List<TestCollection>();
             var testItemsVm = new List<TestCollectionViewModel>();
+            var testItemsVmCheck = new List<TestCollectionViewModel>();
 
             for (var i = 0; i < 10; i++)
             {
@@ -883,16 +926,24 @@ namespace ExpressMapper.Tests.Model.Generator
                     Name = format
                 };
 
+                var testCollectionVmCheck = new TestCollectionViewModel
+                {
+                    Id = id,
+                    Name = name
+                };
+
                 if (i < 6)
                 {
                     testItems.Add(testCollection);
+                    testItemsVmCheck.Add(testCollectionVmCheck);
                 }
                 testItemsVm.Add(testCollectionVm);
             }
             testItem.Collection = testItems;
             testItemVm.Array = testItemsVm.ToArray();
+            testItemVmCheck.Array = testItemsVmCheck.ToArray();
 
-            return new KeyValuePair<TestItem, TestItemViewModel>(testItem, testItemVm);
+            return new Tuple<TestItem, TestItemViewModel, TestItemViewModel>(testItem, testItemVm, testItemVmCheck);
         }
 
         public static KeyValuePair<TestModel, TestViewModel> AccessSourceNestedProperty()
@@ -1487,7 +1538,7 @@ namespace ExpressMapper.Tests.Model.Generator
             return keyValuePair;
         }
 
-        public static KeyValuePair<TestModel, TestViewModel> CustomNestedCollectionMap()
+        public static Tuple<TestModel, TestViewModel, TestViewModel> CustomNestedCollectionMap()
         {
             var newGuid = Guid.NewGuid();
             const string xxxl = "XXXL";
@@ -1553,12 +1604,38 @@ namespace ExpressMapper.Tests.Model.Generator
                 }
             };
 
+            var rstCheck = new TestViewModel
+            {
+                Id = testId,
+                Age = age,
+                Country = new CountryViewModel
+                {
+                    Id = countryId,
+                    Name = name,
+                    Code = code
+                },
+                Created = created,
+                Name = automembermap,
+                Weight = 23.6M,
+                Sizes = new List<SizeViewModel>
+                {
+                    new SizeViewModel
+                {
+                    Id = newGuid,
+                    Alias = xxxl,
+                    Name = xxxlSize,
+                    SortOrder = sortOrder
+                }
+                }
+            };
 
 
-            var keyValuePair = new KeyValuePair<TestModel, TestViewModel>
+
+            var keyValuePair = new Tuple<TestModel, TestViewModel, TestViewModel>
                 (
                 src,
-                rst
+                rst,
+                rstCheck
                 );
             return keyValuePair;
         }

@@ -110,7 +110,7 @@ namespace ExpressMapper
             return src != dst;
         }
 
-        public Expression GetMemberMappingExpression(Expression left, Expression right)
+        public Expression GetMemberMappingExpression(Expression left, Expression right, bool newDest)
         {
             var nullCheckNestedMemberVisitor = new NullCheckNestedMemberVisitor(false);
             nullCheckNestedMemberVisitor.Visit(right);
@@ -177,7 +177,7 @@ namespace ExpressMapper
 
                     return assignExp;
                 }
-                var mapComplexResult = GetDifferentTypeMemberMappingExpression(right, left);
+                var mapComplexResult = GetDifferentTypeMemberMappingExpression(right, left, newDest);
 
                 return nullCheckNestedMemberVisitor.CheckNullExpression != null
                     ? Expression.Condition(nullCheckNestedMemberVisitor.CheckNullExpression,
@@ -296,7 +296,7 @@ namespace ExpressMapper
             return blockResultExp;
         }
 
-        public Expression GetDifferentTypeMemberMappingExpression(Expression srcExpression, Expression destExpression)
+        public Expression GetDifferentTypeMemberMappingExpression(Expression srcExpression, Expression destExpression, bool newDest)
         {
             var sourceType = srcExpression.Type;
             var destType = destExpression.Type;
@@ -317,7 +317,7 @@ namespace ExpressMapper
 
             var blockExpression = (tCol != null && tnCol != null)
                 ? MapCollection(tCol, tnCol, srcExpression, destExpression)
-                : MapProperty(sourceType, destType, srcExpression, destExpression);
+                : MapProperty(sourceType, destType, srcExpression, destExpression, newDest);
 
 
             var refSrcType = sourceType.IsClass;
@@ -332,7 +332,7 @@ namespace ExpressMapper
             return resultExpression;
         }
 
-        public abstract BlockExpression MapProperty(Type srcType, Type destType, Expression srcExpression, Expression destExpression);
+        public abstract BlockExpression MapProperty(Type srcType, Type destType, Expression srcExpression, Expression destExpression, bool newDest);
 
         protected BlockExpression CompileCollectionInternal<T, TN>(ParameterExpression sourceParameterExp, ParameterExpression destParameterExp = null)
         {
@@ -392,7 +392,7 @@ namespace ExpressMapper
             BinaryExpression assignSourceItmFromProp,
             MethodCallExpression doMoveNext)
         {
-            var mapExprForType = GetMemberMappingExpression(destColItmVariable, sourceColItmVariable);
+            var mapExprForType = GetMemberMappingExpression(destColItmVariable, sourceColItmVariable, true);
 
             var addToNewColl = Expression.Call(destColl, "Add", null, destColItmVariable);
 

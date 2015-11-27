@@ -13,9 +13,9 @@ namespace ExpressMapper
         MulticastDelegate MapCollection(int cacheKey);
         void Reset();
         BlockExpression MapCollection(Type srcColtype, Type destColType, Expression srcExpression, Expression destExpression);
-        Expression GetDifferentTypeMemberMappingExpression(Expression srcExpression, Expression destExpression);
-        BlockExpression MapProperty(Type srcType, Type destType, Expression srcExpression, Expression destExpression);
-        Expression GetMemberMappingExpression(Expression left, Expression right);
+        Expression GetDifferentTypeMemberMappingExpression(Expression srcExpression, Expression destExpression, bool newDest);
+        BlockExpression MapProperty(Type srcType, Type destType, Expression srcExpression, Expression destExpression, bool newDest);
+        Expression GetMemberMappingExpression(Expression left, Expression right, bool newDest);
         Expression GetMemberQueryableExpression(Type srcType, Type dstType);
         void Compile();
     }

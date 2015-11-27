@@ -76,7 +76,7 @@ namespace ExpressMapper
             return true;
         }
 
-        public override BlockExpression MapProperty(Type srcType, Type destType, Expression srcExpression, Expression destExpression)
+        public override BlockExpression MapProperty(Type srcType, Type destType, Expression srcExpression, Expression destExpression, bool newDest)
         {
             var sourceVariable = Expression.Variable(srcType,
                 string.Format("{0}_{1}Src", srcType.Name, Guid.NewGuid().ToString().Replace("-", "_")));

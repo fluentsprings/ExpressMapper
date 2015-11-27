@@ -385,8 +385,8 @@ namespace ExpressMapper.Tests
             Mapper.RegisterCustom<Size, SizeViewModel, SizeMapper>();
             Mapper.Compile();
             var sizeResult = Functional.CustomNestedCollectionMap();
-            var result = sizeResult.Key.Map<TestModel, TestViewModel>();
-            Assert.AreEqual(result, sizeResult.Value);
+            var result = sizeResult.Item1.Map<TestModel, TestViewModel>();
+            Assert.AreEqual(result, sizeResult.Item3);
         }
 
         [Test]
@@ -397,15 +397,15 @@ namespace ExpressMapper.Tests
             Mapper.RegisterCustom<Size, Size, DeepCopySizeMapper>();
             Mapper.Compile();
             var sizeResult = Functional.CustomNestedCollectionMap();
-            var deepCopy = Mapper.Map<TestModel, TestModel>(sizeResult.Key);
+            var deepCopy = Mapper.Map<TestModel, TestModel>(sizeResult.Item1);
 
-            Assert.AreNotEqual(deepCopy.GetHashCode(), sizeResult.Key.GetHashCode());
-            Assert.AreNotEqual(deepCopy.Country.GetHashCode(), sizeResult.Key.Country.GetHashCode());
+            Assert.AreNotEqual(deepCopy.GetHashCode(), sizeResult.Item1.GetHashCode());
+            Assert.AreNotEqual(deepCopy.Country.GetHashCode(), sizeResult.Item1.Country.GetHashCode());
             for (var i = 0; i < deepCopy.Sizes.Count; i++)
             {
-                Assert.AreNotEqual(deepCopy.Sizes[i].GetHashCode(), sizeResult.Key.Sizes[i].GetHashCode());
+                Assert.AreNotEqual(deepCopy.Sizes[i].GetHashCode(), sizeResult.Item1.Sizes[i].GetHashCode());
             }
-            Assert.AreEqual(deepCopy, sizeResult.Key);
+            Assert.AreEqual(deepCopy, sizeResult.Item1);
         }
 
         [Test]
@@ -416,8 +416,8 @@ namespace ExpressMapper.Tests
             Mapper.RegisterCustom<List<Size>, List<SizeViewModel>, SizeListMapper>();
             Mapper.Compile();
             var sizeResult = Functional.CustomNestedCollectionMap();
-            var result = Mapper.Map<TestModel, TestViewModel>(sizeResult.Key);
-            Assert.AreEqual(result, sizeResult.Value);
+            var result = Mapper.Map<TestModel, TestViewModel>(sizeResult.Item1);
+            Assert.AreEqual(result, sizeResult.Item3);
         }
 
         [Test]
@@ -428,8 +428,8 @@ namespace ExpressMapper.Tests
             Mapper.RegisterCustom<Size, SizeViewModel, SizeMapper>();
             Mapper.Compile();
             var sizeResult = Functional.CustomNestedCollectionMap();
-            var result = Mapper.Map(sizeResult.Key, sizeResult.Value);
-            Assert.AreEqual(result, sizeResult.Value);
+            var result = Mapper.Map(sizeResult.Item1, sizeResult.Item2);
+            Assert.AreEqual(result, sizeResult.Item3);
         }
 
         [Test]
@@ -440,8 +440,8 @@ namespace ExpressMapper.Tests
             Mapper.RegisterCustom<List<Size>, List<SizeViewModel>, SizeListMapper>();
             Mapper.Compile();
             var sizeResult = Functional.CustomNestedCollectionMap();
-            var result = Mapper.Map(sizeResult.Key, sizeResult.Value);
-            Assert.AreEqual(result, sizeResult.Value);
+            var result = Mapper.Map(sizeResult.Item1, sizeResult.Item2);
+            Assert.AreEqual(result, sizeResult.Item3);
         }
 
         [Test]
@@ -754,20 +754,21 @@ namespace ExpressMapper.Tests
             Mapper.Compile();
             var testResult = Functional.ExistingDestCollEquals();
 
-            var testItemHash = testResult.Value.GetHashCode();
-            var arrayHash = testResult.Value.Array.GetHashCode();
-            var testArr = new List<int>(testResult.Value.Array.Length);
-            testArr.AddRange(testResult.Value.Array.Select(tc => tc.GetHashCode()));
+            var testItemHash = testResult.Item2.GetHashCode();
+            var arrayHash = testResult.Item2.Array.GetHashCode();
+            var testArr = new List<int>(testResult.Item2.Array.Length);
+            testArr.AddRange(testResult.Item2.Array.Select(tc => tc.GetHashCode()));
 
 
-            var result = Mapper.Map(testResult.Key, testResult.Value);
-            Assert.AreEqual(result, testResult.Value);
+            var result = Mapper.Map(testResult.Item1, testResult.Item2);
+            Assert.AreEqual(result, testResult.Item2);
             Assert.AreEqual(result.GetHashCode(), testItemHash);
             Assert.AreEqual(result.Array.GetHashCode(), arrayHash);
 
             for (var i = 0; i < result.Array.Length; i++)
             {
                 Assert.AreEqual(result.Array[i].GetHashCode(), testArr[i]);
+                Assert.AreEqual(result.Array[i], testResult.Item3.Array[i]);
             }
         }
 
@@ -782,13 +783,13 @@ namespace ExpressMapper.Tests
             Mapper.Compile();
             var testResult = Functional.ExistingDestCollEqualsWithNullElement();
 
-            var testItemHash = testResult.Value.GetHashCode();
-            var arrayHash = testResult.Value.Array.GetHashCode();
-            var testArr = new List<int?>(testResult.Value.Array.Length);
-            testArr.AddRange(testResult.Value.Array.Select(tc => tc == null ? (int?)null : tc.GetHashCode()));
+            var testItemHash = testResult.Item2.GetHashCode();
+            var arrayHash = testResult.Item2.Array.GetHashCode();
+            var testArr = new List<int?>(testResult.Item2.Array.Length);
+            testArr.AddRange(testResult.Item2.Array.Select(tc => tc == null ? (int?)null : tc.GetHashCode()));
 
-            var result = Mapper.Map(testResult.Key, testResult.Value);
-            Assert.AreEqual(result, testResult.Value);
+            var result = Mapper.Map(testResult.Item1, testResult.Item2);
+            Assert.AreEqual(result, testResult.Item2);
             Assert.AreEqual(result.GetHashCode(), testItemHash);
             Assert.AreEqual(result.Array.GetHashCode(), arrayHash);
 
@@ -802,6 +803,7 @@ namespace ExpressMapper.Tests
                 else
                 {
                     Assert.AreEqual(result.Array[i].GetHashCode(), testArr[i]);
+                    Assert.AreEqual(result.Array[i], testResult.Item3.Array[i]);
                 }
             }
         }
@@ -832,18 +834,22 @@ namespace ExpressMapper.Tests
             Mapper.Register<TestCollection, TestCollectionViewModel>();
             Mapper.Register<TestItem, TestItemViewModel>()
                 .Member(dest => dest.Collection, src => src.Array)
-                .Ignore(dest => dest.Array);
+                .Ignore(dest => dest.Array)
+                .Ignore(dest => dest.List)
+                .Ignore(dest => dest.Enumerable)
+                .Ignore(dest => dest.ObservableCollection)
+                .Ignore(dest => dest.Queryable);
 
             Mapper.Compile();
             var testResult = Functional.ExistingDestSrcCollGreater();
 
-            var testItemHash = testResult.Value.GetHashCode();
-            var collectionHash = testResult.Value.Collection.GetHashCode();
-            var testColl = new List<int>(testResult.Value.Collection.Count);
-            testColl.AddRange(testResult.Value.Collection.Select(tc => tc.GetHashCode()));
+            var testItemHash = testResult.Item2.GetHashCode();
+            var collectionHash = testResult.Item2.Collection.GetHashCode();
+            var testColl = new List<int>(testResult.Item2.Collection.Count);
+            testColl.AddRange(testResult.Item2.Collection.Select(tc => tc.GetHashCode()));
 
-            var result = Mapper.Map(testResult.Key, testResult.Value);
-            Assert.AreEqual(result, testResult.Value);
+            var result = Mapper.Map(testResult.Item1, testResult.Item2);
+            Assert.AreEqual(result, testResult.Item2);
             Assert.AreEqual(result.GetHashCode(), testItemHash);
             Assert.AreEqual(result.Collection.GetHashCode(), collectionHash);
 
@@ -851,8 +857,13 @@ namespace ExpressMapper.Tests
             {
                 Assert.AreEqual(result.Collection.ElementAt(i).GetHashCode(), testColl[i]);
             }
-        }
 
+            for (var i = 0; i < 10; i++)
+            {
+                Assert.AreEqual(result.Collection.ElementAt(i), testResult.Item3.Collection.ElementAt(i));
+            }
+        }
+        
         [Test]
         public void ExistingDestDestCollGreater()
         {
@@ -864,20 +875,48 @@ namespace ExpressMapper.Tests
             Mapper.Compile();
             var testResult = Functional.ExistingDestCollGreater();
 
-            var testItemHash = testResult.Value.GetHashCode();
-            var listHash = testResult.Value.List.GetHashCode();
-            var testList = new List<int>(testResult.Value.List.Count);
-            testList.AddRange(testResult.Value.List.Select(tc => tc.GetHashCode()));
+            var testItemHash = testResult.Item2.GetHashCode();
+            var listHash = testResult.Item2.List.GetHashCode();
+            var testList = new List<int>(testResult.Item2.List.Count);
+            testList.AddRange(testResult.Item2.List.Select(tc => tc.GetHashCode()));
 
 
-            var result = Mapper.Map(testResult.Key, testResult.Value);
-            Assert.AreEqual(result, testResult.Value);
+            var result = Mapper.Map(testResult.Item1, testResult.Item2);
+            Assert.AreEqual(result, testResult.Item2);
             Assert.AreEqual(result.GetHashCode(), testItemHash);
             Assert.AreEqual(result.List.GetHashCode(), listHash);
 
             for (var i = 0; i < 6; i++)
             {
                 Assert.AreEqual(result.List.ElementAt(i).GetHashCode(), testList[i + 4]);
+            }
+
+            for (var i = 0; i < 6; i++)
+            {
+                Assert.AreEqual(result.List[i], testResult.Item3.List[i]);
+            }
+        }
+
+        [Test]
+        public void NewDestinationTest()
+        {
+            Mapper.Register<TestCollection, TestCollectionViewModel>();
+            Mapper.Register<TestItem, TestItemViewModel>()
+                .Member(dest => dest.List, src => src.Collection)
+                .Ignore(dest => dest.Collection);
+
+            Mapper.Compile();
+            var testResult = Functional.ExistingDestCollGreater();
+
+            var testList = new List<int>(testResult.Item2.List.Count);
+            testList.AddRange(testResult.Item2.List.Select(tc => tc.GetHashCode()));
+
+
+            var result = Mapper.Map(testResult.Item1, new TestItemViewModel());
+
+            for (var i = 0; i < 6; i++)
+            {
+                Assert.AreEqual(result.List[i], testResult.Item3.List[i]);
             }
         }
 
@@ -892,20 +931,21 @@ namespace ExpressMapper.Tests
             Mapper.Compile();
             var testResult = Functional.ExistingDestCollNotEqual();
 
-            var testItemHash = testResult.Value.GetHashCode();
-            var listHash = testResult.Value.Array.GetHashCode();
-            var testList = new List<int>(testResult.Value.Array.Length);
-            testList.AddRange(testResult.Value.Array.Select(tc => tc.GetHashCode()));
+            var testItemHash = testResult.Item2.GetHashCode();
+            var listHash = testResult.Item2.Array.GetHashCode();
+            var testList = new List<int>(testResult.Item2.Array.Length);
+            testList.AddRange(testResult.Item2.Array.Select(tc => tc.GetHashCode()));
 
-            var result = Mapper.Map(testResult.Key, testResult.Value);
+            var result = Mapper.Map(testResult.Item1, testResult.Item2);
 
-            Assert.AreEqual(result, testResult.Value);
+            Assert.AreEqual(result, testResult.Item2);
             Assert.AreEqual(result.GetHashCode(), testItemHash);
             Assert.AreNotEqual(result.Array.GetHashCode(), listHash);
 
             for (var i = 0; i < 6; i++)
             {
                 Assert.AreEqual(result.Array[i].GetHashCode(), testList[i]);
+                Assert.AreEqual(result.Array[i], testResult.Item3.Array[i]);
             }
         }
 

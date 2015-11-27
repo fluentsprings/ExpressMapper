@@ -73,7 +73,7 @@ namespace ExpressMapper
             return block;
         }
 
-        public override BlockExpression MapProperty(Type srcType, Type destType, Expression srcExpression, Expression destExpression)
+        public override BlockExpression MapProperty(Type srcType, Type destType, Expression srcExpression, Expression destExpression, bool newDest)
         {
             var sourceVariable = Expression.Variable(srcType,
                 string.Format("{0}_{1}Src", srcType.Name, Guid.NewGuid().ToString().Replace("-", "_")));
@@ -90,7 +90,7 @@ namespace ExpressMapper
             var ifDestNull = destType.IsPrimitive || destType.IsEnum ? (Expression)StaticExpressions.FalseConstant : Expression.Equal(destExpression, StaticExpressions.NullConstant);
 
             var newDestInstanceExp = mapExprForType[0] as BinaryExpression;
-            if (newDestInstanceExp != null)
+            if (newDestInstanceExp != null && !newDest)
             {
                 mapExprForType.RemoveAt(0);
 
@@ -117,7 +117,11 @@ namespace ExpressMapper
 
             var assignExp = Expression.Assign(destExpression, destVariable);
 
-            var expressions = new List<Expression> {assignSourceFromProp, assignDestFromProp};
+            var expressions = new List<Expression> {assignSourceFromProp};
+            if (!newDest)
+            {
+                expressions.Add(assignDestFromProp);
+            }
             expressions.AddRange(resultMapExprForType);
             expressions.Add(assignExp);
 
@@ -257,7 +261,7 @@ namespace ExpressMapper
 
 
                 // If destination list is empty
-                var mapExprForType = GetMemberMappingExpression(destItmVarExp, srcItmVarExp);
+                var mapExprForType = GetMemberMappingExpression(destItmVarExp, srcItmVarExp, true);
 
                 var ifTrueBlock = IfElseExpr(srcItmVarExp, destItmVarExp, assignDestItmFromProp);
 
@@ -317,7 +321,7 @@ namespace ExpressMapper
             var destItmVarExp = Expression.Variable(destType, string.Format("{0}ItmDst", Guid.NewGuid().ToString("N")));
             var assignDestItmFromProp = Expression.Assign(destItmVarExp, currentDest);
 
-            var mapExprForType = GetMemberMappingExpression(destItmVarExp, srcItmVarExp);
+            var mapExprForType = GetMemberMappingExpression(destItmVarExp, srcItmVarExp, false);
 
             var ifTrueBlock = Expression.Block(new[] {srcItmVarExp, destItmVarExp},
                 new[] {assignSourceItmFromProp, assignDestItmFromProp, mapExprForType});
@@ -373,7 +377,7 @@ namespace ExpressMapper
             var ifTrueBlock = IfElseExpr(srcItmVarExp, destItmVarExp, assignDestItmFromProp);
 
             // If destination list is empty
-            var mapExprForType = GetMemberMappingExpression(destItmVarExp, srcItmVarExp);
+            var mapExprForType = GetMemberMappingExpression(destItmVarExp, srcItmVarExp, true);
 
             var destCollection = typeof (ICollection<>).MakeGenericType(destType);
 
@@ -404,7 +408,7 @@ namespace ExpressMapper
             Expression assignDestItmFromProp)
         {
             // TODO: Change name
-            var mapExprForType = GetMemberMappingExpression(destItmVarExp, srcItmVarExp);
+            var mapExprForType = GetMemberMappingExpression(destItmVarExp, srcItmVarExp, false);
 
             return Expression.Block(new ParameterExpression[] {}, new[] {assignDestItmFromProp, mapExprForType});
         }

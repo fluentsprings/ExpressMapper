@@ -161,7 +161,7 @@ namespace ExpressMapper
 
         protected void MapMember(MemberExpression left, Expression right)
         {
-            var mappingExpression = MappingService.GetMemberMappingExpression(left, right);
+            var mappingExpression = MappingService.GetMemberMappingExpression(left, right, false);
             CustomPropertyCache[left.Member.Name] = mappingExpression;
         }
 
@@ -261,7 +261,7 @@ namespace ExpressMapper
         {
             if (left.Member.DeclaringType != rightExpression.Type)
             {
-                var mapComplexResult = MappingService.GetDifferentTypeMemberMappingExpression(rightExpression, left);
+                var mapComplexResult = MappingService.GetDifferentTypeMemberMappingExpression(rightExpression, left, false);
                 CustomPropertyCache[left.Member.Name] = mapComplexResult;
             }
             else
