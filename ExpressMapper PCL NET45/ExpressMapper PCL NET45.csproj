@@ -49,6 +49,9 @@
     <Compile Include="..\ExpressMapper NET40\CollectionTypes.cs">
       <Link>CollectionTypes.cs</Link>
     </Compile>
+    <Compile Include="..\ExpressMapper NET40\CompilationTypes.cs">
+      <Link>CompilationTypes.cs</Link>
+    </Compile>
     <Compile Include="..\ExpressMapper NET40\Constants.cs">
       <Link>Constants.cs</Link>
     </Compile>

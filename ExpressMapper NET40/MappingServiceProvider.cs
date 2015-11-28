@@ -97,6 +97,38 @@ namespace ExpressMapper
             }
         }
 
+        public void Compile(CompilationTypes compilationType)
+        {
+            lock (_lock)
+            {
+                foreach (var mappingService in _mappingServices)
+                {
+                    switch (compilationType)
+                    {
+                        case CompilationTypes.All:
+                            mappingService.Compile();
+                            break;
+                        case CompilationTypes.OnlySource:
+                            {
+                                if (!mappingService.DestinationSupport)
+                                {
+                                    mappingService.Compile();
+                                }
+                                break;
+                            }
+                        case CompilationTypes.OnlyDestination:
+                            {
+                                if (mappingService.DestinationSupport)
+                                {
+                                    mappingService.Compile();
+                                }
+                                break;
+                            }
+                    }
+                }
+            }
+        }
+
         public void PrecompileCollection<T, TN>()
         {
             lock (_lock)
@@ -104,6 +136,38 @@ namespace ExpressMapper
                 foreach (var mappingService in _mappingServices)
                 {
                     mappingService.PrecompileCollection<T, TN>();
+                }
+            }
+        }
+
+        public void PrecompileCollection<T, TN>(CompilationTypes compilationType)
+        {
+            lock (_lock)
+            {
+                foreach (var mappingService in _mappingServices)
+                {
+                    switch (compilationType)
+                    {
+                        case CompilationTypes.All:
+                            mappingService.PrecompileCollection<T, TN>();
+                            break;
+                        case CompilationTypes.OnlySource:
+                            {
+                                if (!mappingService.DestinationSupport)
+                                {
+                                    mappingService.PrecompileCollection<T, TN>();
+                                }
+                                break;
+                            }
+                        case CompilationTypes.OnlyDestination:
+                            {
+                                if (mappingService.DestinationSupport)
+                                {
+                                    mappingService.PrecompileCollection<T, TN>();
+                                }
+                                break;
+                            }
+                    }
                 }
             }
         }
@@ -232,11 +296,17 @@ namespace ExpressMapper
                             srcType.FullName, destType.FullName));
                 }
                 Register<T, TN>();
-                return MapInternal<T, TN>(src, dest, true);
+                return MapInternal(src, dest, true);
             }
 
-
-            PrecompileCollection<T, TN>();
+            if (EqualityComparer<TN>.Default.Equals(dest, default(TN)))
+            {
+                PrecompileCollection<T, TN>(CompilationTypes.OnlySource);
+            }
+            else
+            {
+                PrecompileCollection<T, TN>();
+            }
 
             // todo: make same signature in both compiled funcs with destination
             var result = (TN)(((EqualityComparer<TN>.Default.Equals(dest, default(TN)))
@@ -332,7 +402,7 @@ namespace ExpressMapper
             var cacheKey = CalculateCacheKey(srcType, dstType);
             if (_nonGenericCollectionMappingCache.Contains(cacheKey)) return;
 
-            var methodInfo = GetType().GetMethod("PrecompileCollection");
+            var methodInfo = GetType().GetMethod("PrecompileCollection", new Type[] {});
             var makeGenericMethod = methodInfo.MakeGenericMethod(srcType, dstType);
             var methodCallExpression = Expression.Call(Expression.Constant(this), makeGenericMethod);
             var expression = Expression.Lambda<Action>(methodCallExpression);

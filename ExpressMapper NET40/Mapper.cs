@@ -18,6 +18,11 @@ namespace ExpressMapper
             Instance.Compile();
         }
 
+        public static void Compile(CompilationTypes compilationType)
+        {
+            Instance.Compile(compilationType);
+        }
+
         public static void PrecompileCollection<T,TN>()
         {
             Instance.PrecompileCollection<T, TN>();

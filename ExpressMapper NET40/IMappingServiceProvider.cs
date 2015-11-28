@@ -7,6 +7,7 @@ namespace ExpressMapper
     public interface IMappingServiceProvider
     {
         void Compile();
+        void Compile(CompilationTypes compilationType);
         void PrecompileCollection<T, TN>();
         TN Map<T, TN>(T src);
         TN Map<T, TN>(T src, TN dest);

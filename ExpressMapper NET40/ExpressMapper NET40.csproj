@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CollectionTypes.cs" />
+    <Compile Include="CompilationTypes.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="DefaultMappingContext.cs" />
     <Compile Include="DelegateCustomTypeMapper.cs" />
