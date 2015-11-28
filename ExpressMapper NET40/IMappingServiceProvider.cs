@@ -9,6 +9,7 @@ namespace ExpressMapper
         void Compile();
         void Compile(CompilationTypes compilationType);
         void PrecompileCollection<T, TN>();
+        void PrecompileCollection<T, TN>(CompilationTypes compilationType);
         TN Map<T, TN>(T src);
         TN Map<T, TN>(T src, TN dest);
         TN Map<T, TN>(T src, ICustomTypeMapper<T, TN> customMapper);

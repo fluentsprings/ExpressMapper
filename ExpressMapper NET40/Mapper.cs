@@ -28,6 +28,11 @@ namespace ExpressMapper
             Instance.PrecompileCollection<T, TN>();
         }
 
+        public static void PrecompileCollection<T, TN>(CompilationTypes compilationType)
+        {
+            Instance.PrecompileCollection<T, TN>(compilationType);
+        }
+
         public static TN Map<T, TN>(T src)
         {
             return Instance.Map<T, TN>(src);
