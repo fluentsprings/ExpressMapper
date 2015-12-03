@@ -58,6 +58,8 @@
     <Compile Include="Models\FashionProduct.cs" />
     <Compile Include="Models\ItemModel.cs" />
     <Compile Include="Models\Mail.cs" />
+    <Compile Include="Models\NonGenericCollectionImplementingIEnumerable.cs" />
+    <Compile Include="Models\NonGenericCollectionInhertedFromList.cs" />
     <Compile Include="Models\Organization.cs" />
     <Compile Include="Models\Person.cs" />
     <Compile Include="Models\Product.cs" />

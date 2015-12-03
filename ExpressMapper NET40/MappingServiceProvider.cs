@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -441,8 +441,8 @@ namespace ExpressMapper
 
             var destExp = Expression.Property(contextVarExp, "Destination");
             var destAssignedExp = Expression.Assign(destExp, dstTypedExp);
-            
-            
+
+
             //var destinationAssignedExp = Expression.Assign(destinationExpression, dstTypedExp);
 
             var mapCall = Expression.Call(genVariable, methodInfo, contextVarExp);
