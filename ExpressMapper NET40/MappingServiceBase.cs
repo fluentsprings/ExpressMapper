@@ -1,9 +1,11 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
+
 using ExpressMapper.Extensions;
 
 namespace ExpressMapper
@@ -54,7 +56,7 @@ namespace ExpressMapper
             {
                 return TypeMappers[cacheKey].GetMapExpressions();
             }
-            
+
             dynamic srcInst = Activator.CreateInstance(src);
             dynamic destInst = Activator.CreateInstance(dest);
             RegisterDynamic(srcInst, destInst);
@@ -301,28 +303,16 @@ namespace ExpressMapper
             var sourceType = srcExpression.Type;
             var destType = destExpression.Type;
 
-            var tCol =
-                sourceType.GetInterfaces()
-                    .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == GenericEnumerableType) ??
-                (sourceType.IsGenericType
-                    && sourceType.GetInterfaces().Any(t => t == typeof(IEnumerable)) ? sourceType
-                    : null);
-
-            var tnCol = destType.GetInterfaces()
-                .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == GenericEnumerableType) ??
-                        (destType.IsGenericType && destType.GetInterfaces().Any(t => t == typeof(IEnumerable)) ? destType
-                            : null);
-
-
+            var tCol = GetEnumerableInterface( sourceType );
+            var tnCol = GetEnumerableInterface( destType );
 
             var blockExpression = (tCol != null && tnCol != null)
                 ? MapCollection(tCol, tnCol, srcExpression, destExpression)
                 : MapProperty(sourceType, destType, srcExpression, destExpression, newDest);
 
-
             var refSrcType = sourceType.IsClass;
             var destPropType = destType;
-            
+
             if (!refSrcType) return blockExpression;
 
             var resultExpression =
@@ -380,9 +370,8 @@ namespace ExpressMapper
             return blockExpression;
         }
 
-        internal static Type GetCollectionElementType(Type type)
-        {
-            return type.IsArray ? type.GetElementType() : type.GetGenericArguments()[0];
+        internal static Type GetCollectionElementType( Type type ) {
+            return type.IsArray ? type.GetElementType() : GetEnumerableInterface( type ).GetGenericArguments()[0];
         }
 
         internal LoopExpression CollectionLoopExpression(
@@ -423,28 +412,56 @@ namespace ExpressMapper
             {
                 return Expression.Call(destColl, destList.GetMethod("ToArray"));
             }
-            if (!destPropType.IsGenericType) return destColl;
+
+            if (!destPropType.IsGenericType && GetEnumerableInterface(destPropType) == null)
+            {
+                return destColl;
+            }
 
             if (typeof(IQueryable).IsAssignableFrom(destPropType))
             {
                 return Expression.Call(typeof(Queryable), "AsQueryable", new[] { destType }, destColl);
             }
 
-            if (destPropType.IsInterface && destColl.Type.IsSubclassOf(destPropType))
-            {
+            if (destPropType.IsInterface && destPropType.IsAssignableFrom(destColl.Type)) {
+                // This will handle any destination interface implemented by List<T>
                 return destColl;
             }
 
-            if (destPropType.IsClass)
-            {
+            ConstructorInfo ctor = null;
 
+            if (destPropType.IsInterface)
+            {
+                // We are targeting an interface type, we need to find a compatible collection type
+                // We could look for a loaded type that implements the target interface and has an appropriate
+                // constructor, but that is a bit too much magic for now.
+                throw new NotImplementedException(
+                    "Destination interface type " + destPropType.FullName + " is not supported yet" );
+            }
+            else
+            {
+                ctor = destPropType.GetConstructors(BindingFlags.Public | BindingFlags.Instance).FirstOrDefault(
+                    ci => {
+                        var param = ci.GetParameters();
+                        return param.Length == 1 && param[0].ParameterType.IsAssignableFrom(destList);
+                    } );
+
+                if (ctor == null)
+                {
+                    throw new Exception(
+                        "Could not find a constructor on " + destPropType.Name + " that accepts " + destList);
+                }
             }
 
-            return destPropType.IsClass ? Expression.New(destPropType.GetConstructor(new Type[] { destList }), destColl) : destColl;
+            return Expression.New( ctor, destColl );
+        }
 
-            //var collectionType = typeof(Collection<>).MakeGenericType(destType);
-
-            //return destPropType == collectionType ? Expression.New(collectionType.GetConstructor(new Type[] { destList }), destColl) : destColl;
+        public static Type GetEnumerableInterface(Type type)
+        {
+            return
+                type.GetInterfaces()
+                    .FirstOrDefault( t => t.IsGenericType && t.GetGenericTypeDefinition() == GenericEnumerableType )
+                ?? ( type.IsGenericType && type.GetInterfaces().Any( t => t == typeof( IEnumerable ) ) ? type : null );
         }
     }
 }

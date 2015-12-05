@@ -31,6 +31,64 @@ namespace ExpressMapper.Tests
         }
 
         [Test]
+        public void AutoMemberMap_ToNonGenericListInherited() {
+          Mapper.Register<TestModel, TestViewModel>();
+          Mapper.Register<Size, SizeViewModel>();
+          Mapper.Register<Country, CountryViewModel>();
+          Mapper.Compile();
+
+          var testData = Functional.CollectionAutoMemberMap();
+
+          var result = Mapper.Map<List<TestModel>, NonGenericCollectionInhertedFromList>( testData.Key );
+
+          Assert.AreEqual( result.Count, testData.Value.Count );
+
+          for ( var i = 0; i < result.Count; i++ ) {
+            Assert.AreEqual( result[i], testData.Value[i] );
+          }
+        }
+
+        [Test]
+        public void AutoMemberMap_ToLinkedList() {
+          Mapper.Register<TestModel, TestViewModel>();
+          Mapper.Register<Size, SizeViewModel>();
+          Mapper.Register<Country, CountryViewModel>();
+          Mapper.Compile();
+
+          var testData = Functional.CollectionAutoMemberMap();
+
+          var result = Mapper.Map<List<TestModel>, LinkedList<TestViewModel>>( testData.Key );
+
+          Assert.AreEqual( result.Count, testData.Value.Count );
+
+          var resultList = result.ToList();
+
+          for ( var i = 0; i < resultList.Count; i++ ) {
+            Assert.AreEqual( resultList[i], testData.Value[i] );
+          }
+        }
+
+        [Test]
+        public void AutoMemberMap_ToNonGenericEnumerableInherited() {
+          Mapper.Register<TestModel, TestViewModel>();
+          Mapper.Register<Size, SizeViewModel>();
+          Mapper.Register<Country, CountryViewModel>();
+          Mapper.Compile();
+
+          var testData = Functional.CollectionAutoMemberMap();
+
+          var result = Mapper.Map<List<TestModel>, NonGenericCollectionImplementingIEnumerable>( testData.Key );
+
+          var resultList = result.ToList();
+
+          Assert.AreEqual( resultList.Count, testData.Value.Count );
+
+          for ( var i = 0; i < resultList.Count; i++ ) {
+            Assert.AreEqual( resultList[i], testData.Value[i] );
+          }
+        }
+
+        [Test]
         public void DirectDynamicCollectionMapTest()
         {
             var testData = Functional.CollectionAutoMemberMap();
