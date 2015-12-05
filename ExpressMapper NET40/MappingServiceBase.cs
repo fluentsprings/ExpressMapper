@@ -1,12 +1,9 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-
-using ExpressMapper.Extensions;
 
 namespace ExpressMapper
 {
@@ -435,8 +432,7 @@ namespace ExpressMapper
                 // We are targeting an interface type, we need to find a compatible collection type
                 // We could look for a loaded type that implements the target interface and has an appropriate
                 // constructor, but that is a bit too much magic for now.
-                throw new NotImplementedException(
-                    "Destination interface type " + destPropType.FullName + " is not supported yet" );
+                throw new NotImplementedException(string.Format("Destination interface type {0} is not supported yet", destPropType.FullName));
             }
             else
             {
@@ -448,8 +444,7 @@ namespace ExpressMapper
 
                 if (ctor == null)
                 {
-                    throw new Exception(
-                        "Could not find a constructor on " + destPropType.Name + " that accepts " + destList);
+                    throw new Exception(string.Format("Could not find a constructor on {0} that accepts {1}", destPropType.Name, destList));
                 }
             }
 
