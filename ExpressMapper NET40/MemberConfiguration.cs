@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace ExpressMapper
 {
@@ -57,7 +58,7 @@ namespace ExpressMapper
                 throw new Exception("MemberExpression should return one of the properties of destination class");
             }
 
-            var propertyInfo = typeof(TN).GetProperty(memberExpression.Member.Name);
+            var propertyInfo = memberExpression.Member as PropertyInfo;
 
             if (propertyInfo != null && !propertyInfo.CanWrite || (propertyInfo != null && propertyInfo.CanWrite && !propertyInfo.GetSetMethod(true).IsPublic))
             {
