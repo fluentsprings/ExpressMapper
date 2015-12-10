@@ -1172,6 +1172,42 @@ namespace ExpressMapper.Tests.Model.Generator
             return keyValuePair;
         }
 
+        public static KeyValuePair<SpecialGift, SpecialGiftViewModel> HiddenInheritedMemberMap()
+        {
+            var newGuid = Guid.NewGuid();
+            var otherGuid = Guid.NewGuid();
+            var keyValuePair = new KeyValuePair<SpecialGift, SpecialGiftViewModel>
+                (
+                new SpecialGift
+                {
+                    Id = newGuid,
+                    Name = "Vase",
+                    Recipient = new SpecialPerson
+                    {
+                        Name = "Mark",
+                        AffectionLevel = 10,
+                        Id = otherGuid,
+                        IsOrganization = false,
+                        IsPerson = true
+                    }
+                },
+                new SpecialGiftViewModel
+                {
+                    Id = newGuid,
+                    Name = "Vase",
+                    Recipient = new SpecialPersonViewModel
+                    {
+                        Name = "Mark",
+                        AffectionLevel = 10,
+                        Id = otherGuid,
+                        IsOrganization = false,
+                        IsPerson = true
+                    }
+                }
+                );
+            return keyValuePair;
+        }
+
         public static KeyValuePair<Size, SizeViewModel> InstantiateMap()
         {
             var newGuid = Guid.NewGuid();

@@ -231,6 +231,31 @@ namespace ExpressMapper.Tests
         }
 
         [Test]
+        public void HiddenInheritedMemberMap()
+        {
+            Mapper.Register<SpecialPerson, SpecialPersonViewModel>();
+
+            var mapConfig = Mapper.Register<SpecialGift, SpecialGiftViewModel>();
+            MapBaseMember(mapConfig);
+            mapConfig.Member(src => src.Recipient, dst => dst.Recipient);
+
+            Mapper.Compile();
+
+            var srcDst = Functional.HiddenInheritedMemberMap();
+
+            var result = Mapper.Map<SpecialGift, SpecialGiftViewModel>(srcDst.Key);
+
+            Assert.AreEqual(result, srcDst.Value);
+        }
+
+        private void MapBaseMember<T, TN>(IMemberConfiguration<T,TN> mapConfig) 
+            where T : Gift
+            where TN : GiftViewModel
+        {
+            mapConfig.Member(src => src.Recipient, dst => dst.Recipient);
+        }
+
+        [Test]
         public void ManualConstantMemberMap()
         {
             Mapper.Register<Size, SizeViewModel>()

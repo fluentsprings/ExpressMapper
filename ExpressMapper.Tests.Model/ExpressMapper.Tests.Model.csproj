@@ -56,6 +56,7 @@
     <Compile Include="Models\Employee.cs" />
     <Compile Include="Models\Engine.cs" />
     <Compile Include="Models\FashionProduct.cs" />
+    <Compile Include="Models\Gift.cs" />
     <Compile Include="Models\ItemModel.cs" />
     <Compile Include="Models\Mail.cs" />
     <Compile Include="Models\NonGenericCollectionImplementingIEnumerable.cs" />
@@ -65,6 +66,7 @@
     <Compile Include="Models\Product.cs" />
     <Compile Include="Models\ProductOption.cs" />
     <Compile Include="Models\Size.cs" />
+    <Compile Include="Models\SpecialPerson.cs" />
     <Compile Include="Models\Structs\Feature.cs" />
     <Compile Include="Models\Structs\Item.cs" />
     <Compile Include="Models\SubItem.cs" />
@@ -78,6 +80,7 @@
     <Compile Include="Models\TripCatalog.cs" />
     <Compile Include="Models\Unit.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Models\SpecialGift.cs" />
     <Compile Include="ViewModels\AddressViewModel.cs" />
     <Compile Include="ViewModels\BookingViewModel.cs" />
     <Compile Include="ViewModels\BrandViewModel.cs" />
@@ -90,6 +93,7 @@
     <Compile Include="ViewModels\EmployeeViewModel.cs" />
     <Compile Include="ViewModels\EngineViewModel.cs" />
     <Compile Include="ViewModels\FashionProductViewModel.cs" />
+    <Compile Include="ViewModels\GiftViewModel.cs" />
     <Compile Include="ViewModels\ItemModelViewModel.cs" />
     <Compile Include="ViewModels\MailViewModel.cs" />
     <Compile Include="ViewModels\OrganizationViewModel.cs" />
@@ -97,6 +101,8 @@
     <Compile Include="ViewModels\ProductOptionViewModel.cs" />
     <Compile Include="ViewModels\ProductViewModel.cs" />
     <Compile Include="ViewModels\SizeViewModel.cs" />
+    <Compile Include="ViewModels\SpecialGiftViewModel.cs" />
+    <Compile Include="ViewModels\SpecialPersonViewModel.cs" />
     <Compile Include="ViewModels\Structs\FeatureViewModel.cs" />
     <Compile Include="ViewModels\Structs\ItemViewModel.cs" />
     <Compile Include="ViewModels\SubItemViewModel.cs" />
