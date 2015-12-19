@@ -1,0 +1,12 @@
+﻿{
+  "version": "1.7.0.0-*",
+  "description": "ExpressMapper DNX451 Class Library",
+  "authors": [ "Jared Sowers" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+
+  "frameworks": {
+    "net451": { }
+  }
+}

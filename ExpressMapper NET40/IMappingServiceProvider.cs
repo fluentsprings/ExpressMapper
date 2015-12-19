@@ -20,8 +20,8 @@ namespace ExpressMapper
         void RegisterCustom<T, TN, TMapper>() where TMapper : ICustomTypeMapper<T, TN>;
         void RegisterCustom<T, TN>(Func<T, TN> mapFunc);
         void Reset();
-        int CalculateCacheKey(Type src, Type dest);
-        Dictionary<int, Func<ICustomTypeMapper>> CustomMappers { get; }
+        long CalculateCacheKey(Type src, Type dest);
+        Dictionary<long, Func<ICustomTypeMapper>> CustomMappers { get; }
         IQueryable<TN> Project<T, TN>(IQueryable<T> source);
     }
 }

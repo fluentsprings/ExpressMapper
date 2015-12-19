@@ -13,15 +13,18 @@ namespace ExpressMapper
 
         #endregion
 
-        public DestinationTypeMapper(IMappingService service) : base(service){}
+        public DestinationTypeMapper(IMappingService service, IMappingServiceProvider serviceProvider) : base(service, serviceProvider){}
 
-        protected override void InitializeRecursiveMappings()
+        protected override void InitializeRecursiveMappings(IMappingServiceProvider serviceProvider)
         {
             var mapMethod =
-                typeof (Mapper).GetMethods()
+                typeof(IMappingServiceProvider).GetMethods()
                     .First(mi => mi.Name == MapStr && mi.GetParameters().Length == 2)
-                    .MakeGenericMethod(typeof (T), typeof (TN));
-            RecursiveExpressionResult.Add(Expression.Assign(DestFakeParameter, Expression.Call(mapMethod, SourceParameter, DestFakeParameter)));
+                    .MakeGenericMethod(typeof(T), typeof(TN));
+
+            var methodCall = Expression.Call(Expression.Constant(serviceProvider), mapMethod, SourceParameter, DestFakeParameter);
+
+            RecursiveExpressionResult.Add(Expression.Assign(DestFakeParameter, methodCall));
         }
 
         protected override void CompileInternal()

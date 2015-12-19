@@ -22,14 +22,14 @@ namespace ExpressMapper
 
         #region Privates
 
-        private readonly IDictionary<int, MulticastDelegate> _collectionMappers =
-            new Dictionary<int, MulticastDelegate>();
+        private readonly IDictionary<long, MulticastDelegate> _collectionMappers =
+            new Dictionary<long, MulticastDelegate>();
 
         #endregion
 
         #region Implementation of IMappingService
 
-        public override IDictionary<int, MulticastDelegate> CollectionMappers
+        public override IDictionary<long, MulticastDelegate> CollectionMappers
         {
             get { return _collectionMappers; }
         }
@@ -51,7 +51,7 @@ namespace ExpressMapper
             get { return false; }
         }
 
-        public override MulticastDelegate MapCollection(int cacheKey)
+        public override MulticastDelegate MapCollection(long cacheKey)
         {
             return CollectionMappers.ContainsKey(cacheKey) ? CollectionMappers[cacheKey] : null;
         }

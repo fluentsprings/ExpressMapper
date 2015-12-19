@@ -23,7 +23,7 @@ namespace ExpressMapper
 
         #region Constructors
 
-        protected TypeMapperBase(IMappingService service)
+        protected TypeMapperBase(IMappingService service, IMappingServiceProvider serviceProvider)
         {
             ResultExpressionList = new List<Expression>();
             RecursiveExpressionResult = new List<Expression>();
@@ -31,7 +31,7 @@ namespace ExpressMapper
             CustomPropertyCache = new Dictionary<string, Expression>();
             IgnoreMemberList = new List<string>();
             MappingService = service;
-            InitializeRecursiveMappings();
+            InitializeRecursiveMappings(serviceProvider);
         }
 
         #endregion
@@ -52,7 +52,7 @@ namespace ExpressMapper
 
         #endregion
 
-        protected abstract void InitializeRecursiveMappings();
+        protected abstract void InitializeRecursiveMappings(IMappingServiceProvider serviceProvider);
 
         public void Compile()
         {

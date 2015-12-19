@@ -9,20 +9,20 @@ namespace ExpressMapper
 {
     internal abstract class MappingServiceBase
     {
-        protected readonly Dictionary<int, BlockExpression> CustomTypeMapperExpCache = new Dictionary<int, BlockExpression>();
-        public IDictionary<int, ITypeMapper> TypeMappers { get; set; }
+        protected readonly Dictionary<long, BlockExpression> CustomTypeMapperExpCache = new Dictionary<long, BlockExpression>();
+        public IDictionary<long, ITypeMapper> TypeMappers { get; set; }
         protected IMappingServiceProvider MappingServiceProvider { get; private set; }
         internal MappingServiceBase(IMappingServiceProvider mappingServiceProvider)
         {
             MappingServiceProvider = mappingServiceProvider;
-            TypeMappers = new Dictionary<int, ITypeMapper>();
+            TypeMappers = new Dictionary<long, ITypeMapper>();
         }
 
         protected static readonly Type GenericEnumerableType = typeof(IEnumerable<>);
-        public abstract IDictionary<int, MulticastDelegate> CollectionMappers { get; }
+        public abstract IDictionary<long, MulticastDelegate> CollectionMappers { get; }
         public abstract void PrecompileCollection<T, TN>();
         public abstract bool DestinationSupport { get; }
-        public abstract MulticastDelegate MapCollection(int cacheKey);
+        public abstract MulticastDelegate MapCollection(long cacheKey);
         public void Reset()
         {
             CollectionMappers.Clear();
@@ -31,7 +31,7 @@ namespace ExpressMapper
 
         public void Compile()
         {
-            var typeMappers = new Dictionary<int, ITypeMapper>(TypeMappers);
+            var typeMappers = new Dictionary<long, ITypeMapper>(TypeMappers);
             foreach (var typeMapper in typeMappers)
             {
                 typeMapper.Value.Compile();
@@ -65,12 +65,12 @@ namespace ExpressMapper
             throw new MapNotImplementedException(string.Format("There is no mapping has bee found. Source Type: {0}, Destination Type: {1}", src.FullName, dest.FullName));
         }
 
-        private static void RegisterDynamic<T, TN>(T src, TN dest)
+        private void RegisterDynamic<T, TN>(T src, TN dest)
         {
-            Mapper.Register<T, TN>();
+            MappingServiceProvider.Register<T, TN>();
         }
 
-        protected void CompileGenericCustomTypeMapper(Type srcType, Type dstType, ICustomTypeMapper typeMapper, int cacheKey)
+        protected void CompileGenericCustomTypeMapper(Type srcType, Type dstType, ICustomTypeMapper typeMapper, long cacheKey)
         {
             if (CustomTypeMapperExpCache.ContainsKey(cacheKey)) return;
 
