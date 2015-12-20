@@ -6,11 +6,11 @@ namespace ExpressMapper
 {
     public interface IMappingService
     {
-        IDictionary<int, ITypeMapper> TypeMappers { get; }
-        IDictionary<int, MulticastDelegate> CollectionMappers { get; }
+        IDictionary<long, ITypeMapper> TypeMappers { get; }
+        IDictionary<long, MulticastDelegate> CollectionMappers { get; }
         void PrecompileCollection<T, TN>();
         bool DestinationSupport { get; }
-        MulticastDelegate MapCollection(int cacheKey);
+        MulticastDelegate MapCollection(long cacheKey);
         void Reset();
         BlockExpression MapCollection(Type srcColtype, Type destColType, Expression srcExpression, Expression destExpression);
         Expression GetDifferentTypeMemberMappingExpression(Expression srcExpression, Expression destExpression, bool newDest);

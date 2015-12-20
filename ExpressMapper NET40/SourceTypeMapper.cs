@@ -12,16 +12,18 @@ namespace ExpressMapper
     {
         private readonly Dictionary<string, MemberBinding> _bindingExpressions = new Dictionary<string, MemberBinding>();
 
-        public SourceTypeMapper(IMappingService service) : base(service){}
+        public SourceTypeMapper(IMappingService service, IMappingServiceProvider serviceProvider) : base(service, serviceProvider) {}
 
-        protected override void InitializeRecursiveMappings()
+        protected override void InitializeRecursiveMappings(IMappingServiceProvider serviceProvider)
         {
             var mapMethod =
-                typeof (Mapper).GetMethods()
+                typeof(IMappingServiceProvider).GetMethods()
                     .First(mi => mi.Name == "Map" && mi.GetParameters().Length == 1)
-                    .MakeGenericMethod(typeof (T), typeof (TN));
-            
-            RecursiveExpressionResult.Add(Expression.Assign(DestFakeParameter, Expression.Call(mapMethod, SourceParameter)));
+                    .MakeGenericMethod(typeof(T), typeof(TN));
+
+            var methodCall = Expression.Call(Expression.Constant(serviceProvider), mapMethod, SourceParameter);
+
+            RecursiveExpressionResult.Add(Expression.Assign(DestFakeParameter, methodCall));
         }
 
         protected override void CompileInternal()

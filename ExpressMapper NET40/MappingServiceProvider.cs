@@ -8,11 +8,11 @@ namespace ExpressMapper
 {
     public sealed class MappingServiceProvider : IMappingServiceProvider
     {
-        private static readonly object _lock = new object();
+        private readonly object _lock = new object();
 
-        public Dictionary<int, Func<ICustomTypeMapper>> CustomMappers { get; set; }
-        private readonly Dictionary<int, Func<object, object, object>> _customTypeMapperCache = new Dictionary<int, Func<object, object, object>>();
-        private readonly List<int> _nonGenericCollectionMappingCache = new List<int>();
+        public Dictionary<long, Func<ICustomTypeMapper>> CustomMappers { get; set; }
+        private readonly Dictionary<long, Func<object, object, object>> _customTypeMapperCache = new Dictionary<long, Func<object, object, object>>();
+        private readonly List<long> _nonGenericCollectionMappingCache = new List<long>();
 
         private static readonly Type GenericEnumerableType = typeof(IEnumerable<>);
         private readonly IList<IMappingService> _mappingServices;
@@ -34,7 +34,7 @@ namespace ExpressMapper
                 new SourceMappingService(this),
                 new DestinationMappingService(this)
             };
-            CustomMappers = new Dictionary<int, Func<ICustomTypeMapper>>();
+            CustomMappers = new Dictionary<long, Func<ICustomTypeMapper>>();
         }
 
         public IQueryable<TN> Project<T, TN>(IQueryable<T> source)
@@ -76,8 +76,8 @@ namespace ExpressMapper
                         src.FullName, dest.FullName));
                 }
 
-                var sourceClassMapper = new SourceTypeMapper<T, TN>(SourceService);
-                var destinationClassMapper = new DestinationTypeMapper<T, TN>(DestinationService);
+                var sourceClassMapper = new SourceTypeMapper<T, TN>(SourceService, this);
+                var destinationClassMapper = new DestinationTypeMapper<T, TN>(DestinationService, this);
 
                 SourceService.TypeMappers[cacheKey] = sourceClassMapper;
                 DestinationService.TypeMappers[cacheKey] = destinationClassMapper;
@@ -410,7 +410,7 @@ namespace ExpressMapper
             action();
         }
 
-        private void CompileNonGenericCustomTypeMapper(Type srcType, Type dstType, ICustomTypeMapper typeMapper, int cacheKey)
+        private void CompileNonGenericCustomTypeMapper(Type srcType, Type dstType, ICustomTypeMapper typeMapper, long cacheKey)
         {
             var sourceExpression = Expression.Parameter(typeof(object), "src");
             var destinationExpression = Expression.Parameter(typeof(object), "dst");
@@ -461,10 +461,12 @@ namespace ExpressMapper
             return type.IsArray ? type.GetElementType() : type.GetGenericArguments()[0];
         }
 
-        public int CalculateCacheKey(Type source, Type dest)
+        public long CalculateCacheKey(Type source, Type dest)
         {
-            var destHashCode = dest.GetHashCode();
-            return source.GetHashCode() ^ ((destHashCode << 16) | (destHashCode >> 16));
+            var destHashCode = (uint)dest.GetHashCode();
+            var sourceHashCode = (uint)source.GetHashCode();
+
+            return (long)((((ulong)sourceHashCode) << 32) | ((ulong)destHashCode));
         }
 
         #endregion
