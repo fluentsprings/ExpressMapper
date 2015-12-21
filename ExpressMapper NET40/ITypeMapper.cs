@@ -24,7 +24,8 @@ namespace ExpressMapper
         void Ignore<TMember>(Expression<Func<TN, TMember>> left);
         void MapMember<TMember, TNMember>(Expression<Func<TN, TNMember>> left, Expression<Func<T, TMember>> right);
         void MapFunction<TMember, TNMember>(Expression<Func<TN, TNMember>> left, Func<T, TMember> right);
-        void Instantiate(Func<T,TN> constructor);
+        void InstantiateFunc(Func<T,TN> constructor);
+        void Instantiate(Expression<Func<T,TN>> constructor);
         void BeforeMap(Action<T,TN> beforeMap);
         void AfterMap(Action<T,TN> afterMap);
     }

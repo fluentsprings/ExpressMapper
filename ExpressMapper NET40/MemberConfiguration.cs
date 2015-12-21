@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -13,7 +12,16 @@ namespace ExpressMapper
             _typeMappers = typeMappers;
         }
 
-        public IMemberConfiguration<T, TN> Instantiate(Func<T, TN> constructor)
+        public IMemberConfiguration<T, TN> InstantiateFunc(Func<T, TN> constructor)
+        {
+            foreach (var typeMapper in _typeMappers)
+            {
+                typeMapper.InstantiateFunc(constructor);
+            }
+            return this;
+        }
+
+        public IMemberConfiguration<T, TN> Instantiate(Expression<Func<T, TN>> constructor)
         {
             foreach (var typeMapper in _typeMappers)
             {

@@ -8,9 +8,17 @@ namespace ExpressMapper
 {
     public abstract class TypeMapperBase<T, TN>
     {
+        #region Constants
+
+        private const string RightStr = "right";
+        private const string DstString = "dst";
+        private const string SrcString = "src";
+
+        #endregion
+
         private readonly object _lockObject = new object();
         private bool _compiling;
-        protected ParameterExpression DestFakeParameter = Expression.Parameter(typeof(TN), "dst");
+        protected ParameterExpression DestFakeParameter = Expression.Parameter(typeof(TN), DstString);
         protected IMappingService MappingService { get; set; }
         protected Dictionary<MemberInfo, MemberInfo> AutoMembers = new Dictionary<MemberInfo, MemberInfo>();
         protected List<KeyValuePair<MemberExpression, Expression>> CustomMembers = new List<KeyValuePair<MemberExpression, Expression>>();
@@ -39,7 +47,7 @@ namespace ExpressMapper
 
         #region Properties
 
-        protected ParameterExpression SourceParameter = Expression.Parameter(typeof(T), "src");
+        protected ParameterExpression SourceParameter = Expression.Parameter(typeof(T), SrcString);
         protected List<Expression> RecursiveExpressionResult { get; private set; }
         protected List<Expression> ResultExpressionList { get; private set; }
         protected Func<T, TN, TN> ResultMapFunction { get; set; }
@@ -49,6 +57,7 @@ namespace ExpressMapper
         protected Action<T, TN> BeforeMapHandler { get; set; }
         protected Action<T, TN> AfterMapHandler { get; set; }
         protected Func<T, TN> ConstructorFunc { get; set; }
+        protected Expression<Func<T, TN>> ConstructorExp { get; set; }
         protected Func<object, object, object> NonGenericMapFunc { get; set; }
 
         #endregion
@@ -108,12 +117,12 @@ namespace ExpressMapper
                 return NonGenericMapFunc;
             }
 
-            var parameterExpression = Expression.Parameter(typeof(object), "src");
+            var parameterExpression = Expression.Parameter(typeof(object), SrcString);
             var srcConverted = Expression.Convert(parameterExpression, typeof(T));
             var srcTypedExp = Expression.Variable(typeof(T), "srcTyped");
             var srcAssigned = Expression.Assign(srcTypedExp, srcConverted);
 
-            var destParameterExp = Expression.Parameter(typeof(object), "dst");
+            var destParameterExp = Expression.Parameter(typeof(object), DstString);
             var dstConverted = Expression.Convert(destParameterExp, typeof(TN));
             var dstTypedExp = Expression.Variable(typeof(TN), "dstTyped");
             var dstAssigned = Expression.Assign(dstTypedExp, dstConverted);
@@ -153,7 +162,7 @@ namespace ExpressMapper
 
             if (right == null)
             {
-                throw new ArgumentNullException("right");
+                throw new ArgumentNullException(RightStr);
             }
 
             CustomMembers.Add(new KeyValuePair<MemberExpression, Expression>(left.Body as MemberExpression, right.Body));
@@ -168,6 +177,14 @@ namespace ExpressMapper
 
         protected BinaryExpression GetDestionationVariable()
         {
+            if (ConstructorExp != null)
+            {
+                var substVisitorSrc = new SubstituteParameterVisitor(SourceParameter);
+                var constructorExp = substVisitorSrc.Visit(ConstructorExp.Body);
+                
+                return Expression.Assign(DestFakeParameter, constructorExp);
+            }
+
             if (ConstructorFunc != null)
             {
                 Expression<Func<T, TN>> customConstruct = t => ConstructorFunc(t);
@@ -211,9 +228,15 @@ namespace ExpressMapper
                 AutoMapProperty(prop, setprop);
             }
         }
-        public virtual void Instantiate(Func<T, TN> constructor)
+
+        public virtual void InstantiateFunc(Func<T, TN> constructor)
         {
             ConstructorFunc = constructor;
+        }
+
+        public virtual void Instantiate(Expression<Func<T, TN>> constructor)
+        {
+            ConstructorExp = constructor;
         }
 
         public virtual void BeforeMap(Action<T, TN> beforeMap)

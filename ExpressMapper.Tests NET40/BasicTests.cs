@@ -345,6 +345,23 @@ namespace ExpressMapper.Tests
         }
 
         [Test]
+        public void InstantiateFuncMap()
+        {
+            Mapper.Register<Size, SizeViewModel>()
+                .InstantiateFunc(src =>
+                {
+                    return new SizeViewModel(s => string.Format("{0} - Full name - {1}", src.Id, s));
+                });
+            Mapper.Compile();
+
+            var sizeResult = Functional.InstantiateMap();
+
+            var result = Mapper.Map<Size, SizeViewModel>(sizeResult.Key);
+
+            Assert.AreEqual(result, sizeResult.Value);
+        }
+
+        [Test]
         public void IgnoreMap()
         {
             Mapper.Register<Size, SizeViewModel>()
