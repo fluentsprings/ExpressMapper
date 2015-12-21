@@ -8,6 +8,7 @@ namespace ExpressMapper
 {
     public abstract class TypeMapperBase<T, TN>
     {
+        private readonly object _lockObject = new object();
         private bool _compiling;
         protected ParameterExpression DestFakeParameter = Expression.Parameter(typeof(TN), "dst");
         protected IMappingService MappingService { get; set; }
@@ -240,7 +241,10 @@ namespace ExpressMapper
         {
             if (ResultMapFunction == null)
             {
-                Compile();
+                lock (_lockObject)
+                {
+                    Compile();
+                }
             }
             return ResultMapFunction(src, dest);
         }
