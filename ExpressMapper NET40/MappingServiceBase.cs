@@ -9,6 +9,7 @@ namespace ExpressMapper
 {
     internal abstract class MappingServiceBase
     {
+        private readonly Type _enumImplicitConversionType = typeof (int);
         protected readonly Dictionary<long, BlockExpression> CustomTypeMapperExpCache = new Dictionary<long, BlockExpression>();
         public IDictionary<long, ITypeMapper> TypeMappers { get; set; }
         protected IMappingServiceProvider MappingServiceProvider { get; private set; }
@@ -163,6 +164,11 @@ namespace ExpressMapper
                 if (left.Type == right.Type && returnTypeDifferenceVisitor.DifferentReturnTypes)
                 {
                     return Expression.Assign(left, right);
+                }
+
+                if (destType.IsEnum && sourceType.IsEnum)
+                {
+                    return Expression.Assign(left, Expression.Convert(Expression.Convert(right, _enumImplicitConversionType), destType));
                 }
 
                 if (typeof(IConvertible).IsAssignableFrom(destType) &&

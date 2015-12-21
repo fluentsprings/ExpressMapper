@@ -40,7 +40,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Enums\AnotherStates.cs" />
     <Compile Include="Enums\GenderTypes.cs" />
+    <Compile Include="Enums\States.cs" />
     <Compile Include="Generator\Complex.cs" />
     <Compile Include="Generator\Functional.cs" />
     <Compile Include="Generator\Simple.cs" />
@@ -79,6 +81,7 @@
     <Compile Include="Models\Trip.cs" />
     <Compile Include="Models\TripCatalog.cs" />
     <Compile Include="Models\Unit.cs" />
+    <Compile Include="Models\UnitOfWork.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Models\SpecialGift.cs" />
     <Compile Include="ViewModels\AddressViewModel.cs" />
@@ -116,6 +119,7 @@
     <Compile Include="ViewModels\TripCatalogViewModel.cs" />
     <Compile Include="ViewModels\TripTypeViewModel.cs" />
     <Compile Include="ViewModels\TripViewModel.cs" />
+    <Compile Include="ViewModels\UnitOfWorkViewModel.cs" />
     <Compile Include="ViewModels\UnitViewModel.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -17,6 +17,23 @@ namespace ExpressMapper.Tests
     public class BasicTests : BaseTestClass
     {
         [Test]
+        public void EnumToAnotherEnumMapTest()
+        {
+            Mapper.Register<UnitOfWork, UnitOfWorkViewModel>();
+            Mapper.Compile();
+
+            var unitOfWork = new UnitOfWork
+            {
+                Id = Guid.NewGuid(),
+                State = States.InProgress
+            };
+
+            var unitOfWorkViewModel = unitOfWork.Map<UnitOfWork, UnitOfWorkViewModel>();
+            Assert.AreEqual((int)unitOfWork.State, (int)unitOfWorkViewModel.State);
+            Assert.AreEqual(unitOfWork.Id, unitOfWorkViewModel.Id);
+        }
+
+        [Test]
         public void ParallelPrecompileCollectionTest()
         {
             Mapper.Register<Composition, CompositionViewModel>()
