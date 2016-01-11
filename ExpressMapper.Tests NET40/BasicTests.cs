@@ -1142,6 +1142,88 @@ namespace ExpressMapper.Tests
         }
 
         [Test]
+        public void MemberCaseInSensitivityDefaultMapTest()
+        {
+            Mapper.Register<TypoCase, TypoCaseViewModel>();
+            Mapper.Compile();
+
+            var typoCase = new TypoCase
+            {
+                id = Guid.NewGuid(),
+                NaME = "Test name!",
+                TestId = 5
+            };
+
+            var typoCaseViewModel = Mapper.Map<TypoCase, TypoCaseViewModel>(typoCase);
+            Assert.AreEqual(typoCase.id, typoCaseViewModel.Id);
+            Assert.AreEqual(typoCase.NaME, typoCaseViewModel.Name);
+            Assert.AreEqual(typoCase.TestId, typoCaseViewModel.TestId);
+        }
+
+        [Test]
+        public void MemberCaseSensitivityGlobalMapTest()
+        {
+            Mapper.MemberCaseSensitiveMap(true);
+            Mapper.Register<TypoCase, TypoCaseViewModel>();
+            Mapper.Compile();
+
+            var typoCase = new TypoCase
+            {
+                id = Guid.NewGuid(),
+                NaME = "Test name!",
+                TestId = 5
+            };
+
+            var typoCaseViewModel = Mapper.Map<TypoCase, TypoCaseViewModel>(typoCase);
+            
+            Assert.AreEqual(typoCaseViewModel.Id, Guid.Empty);
+            Assert.AreEqual(typoCaseViewModel.Name, null);
+            Assert.AreEqual(typoCase.TestId, typoCaseViewModel.TestId);
+        }
+
+        [Test]
+        public void MemberCaseSensitivityLocalMapTest()
+        {
+            Mapper.Register<TypoCase, TypoCaseViewModel>()
+                .CaseSensetiveMemberMap(true);
+            Mapper.Compile();
+
+            var typoCase = new TypoCase
+            {
+                id = Guid.NewGuid(),
+                NaME = "Test name!",
+                TestId = 5
+            };
+
+            var typoCaseViewModel = Mapper.Map<TypoCase, TypoCaseViewModel>(typoCase);
+
+            Assert.AreEqual(typoCaseViewModel.Id, Guid.Empty);
+            Assert.AreEqual(typoCaseViewModel.Name, null);
+            Assert.AreEqual(typoCase.TestId, typoCaseViewModel.TestId);
+        }
+
+        [Test]
+        public void MemberCaseInSensitivityGlobalOverrideMapTest()
+        {
+            Mapper.MemberCaseSensitiveMap(true);
+            Mapper.Register<TypoCase, TypoCaseViewModel>()
+                .CaseSensetiveMemberMap(false);
+            Mapper.Compile();
+
+            var typoCase = new TypoCase
+            {
+                id = Guid.NewGuid(),
+                NaME = "Test name!",
+                TestId = 5
+            };
+
+            var typoCaseViewModel = Mapper.Map<TypoCase, TypoCaseViewModel>(typoCase);
+            Assert.AreEqual(typoCase.id, typoCaseViewModel.Id);
+            Assert.AreEqual(typoCase.NaME, typoCaseViewModel.Name);
+            Assert.AreEqual(typoCase.TestId, typoCaseViewModel.TestId);
+        }
+
+        [Test]
         public void InheritanceFuncMap()
         {
             Mapper.Register<Contact, ContactViewModel>();

@@ -80,6 +80,7 @@
     <Compile Include="Models\TestModel.cs" />
     <Compile Include="Models\Trip.cs" />
     <Compile Include="Models\TripCatalog.cs" />
+    <Compile Include="Models\TypoCase.cs" />
     <Compile Include="Models\Unit.cs" />
     <Compile Include="Models\UnitOfWork.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -119,6 +120,7 @@
     <Compile Include="ViewModels\TripCatalogViewModel.cs" />
     <Compile Include="ViewModels\TripTypeViewModel.cs" />
     <Compile Include="ViewModels\TripViewModel.cs" />
+    <Compile Include="ViewModels\TypoCaseViewModel.cs" />
     <Compile Include="ViewModels\UnitOfWorkViewModel.cs" />
     <Compile Include="ViewModels\UnitViewModel.cs" />
   </ItemGroup>

@@ -83,5 +83,10 @@ namespace ExpressMapper
         {
             Instance.Reset();
         }
+
+        public static void MemberCaseSensitiveMap(bool caseSensitive)
+        {
+            Instance.CaseSensetiveMemberMap = caseSensitive;
+        }
     }
 }

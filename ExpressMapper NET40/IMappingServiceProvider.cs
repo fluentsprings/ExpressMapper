@@ -23,5 +23,6 @@ namespace ExpressMapper
         long CalculateCacheKey(Type src, Type dest);
         Dictionary<long, Func<ICustomTypeMapper>> CustomMappers { get; }
         IQueryable<TN> Project<T, TN>(IQueryable<T> source);
+        bool CaseSensetiveMemberMap { get; set; }
     }
 }

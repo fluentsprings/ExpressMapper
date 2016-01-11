@@ -54,7 +54,19 @@ namespace ExpressMapper
             return source.Select(mapper.QueryableExpression);
         }
 
+        public bool CaseSensetiveMemberMap { get; set; }
+
         public IMemberConfiguration<T, TN> Register<T, TN>()
+        {
+            return RegisterInternal<T, TN>();
+        }
+
+        public IMemberConfiguration<T, TN> Register<T, TN>(bool memberCaseInsensitive)
+        {
+            return RegisterInternal<T, TN>(memberCaseInsensitive);
+        }
+
+        private IMemberConfiguration<T, TN> RegisterInternal<T, TN>(bool memberCaseInsensitive = true)
         {
             lock (_lock)
             {
@@ -69,11 +81,13 @@ namespace ExpressMapper
                         src.FullName, dest.FullName));
                 }
 
-                if (src.GetInterfaces().Any(t => t.Name.Contains(typeof(IEnumerable).Name)) &&
-                    dest.GetInterfaces().Any(t => t.Name.Contains(typeof(IEnumerable).Name)))
+                if (src.GetInterfaces().Any(t => t.Name.Contains(typeof (IEnumerable).Name)) &&
+                    dest.GetInterfaces().Any(t => t.Name.Contains(typeof (IEnumerable).Name)))
                 {
-                    throw new InvalidOperationException(string.Format("It is invalid to register mapping for collection types from {0} to {1}, please use just class registration mapping and your collections will be implicitly processed. In case you want to include some custom collection mapping please use: Mapper.RegisterCustom.",
-                        src.FullName, dest.FullName));
+                    throw new InvalidOperationException(
+                        string.Format(
+                            "It is invalid to register mapping for collection types from {0} to {1}, please use just class registration mapping and your collections will be implicitly processed. In case you want to include some custom collection mapping please use: Mapper.RegisterCustom.",
+                            src.FullName, dest.FullName));
                 }
 
                 var sourceClassMapper = new SourceTypeMapper<T, TN>(SourceService, this);
@@ -187,6 +201,7 @@ namespace ExpressMapper
                 {
                     mappingService.Reset();
                 }
+                CaseSensetiveMemberMap = false;
             }
         }
 
