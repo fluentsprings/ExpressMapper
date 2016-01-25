@@ -84,7 +84,17 @@ namespace ExpressMapper
             try
             {
                 _compiling = true;
-                CompileInternal();
+                try
+                {
+                    CompileInternal();
+                }
+                catch (Exception ex)
+                {
+                    throw new ExpressmapperException(
+                        string.Format(
+                            "Error error occured trying to compile mapping for: source {0}, destination {1}. See the inner exception for details.",
+                            typeof (T).FullName, typeof (TN).FullName), ex);
+                }
             }
             finally
             {

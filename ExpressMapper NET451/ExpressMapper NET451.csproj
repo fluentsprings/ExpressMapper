@@ -65,6 +65,9 @@
     <Compile Include="..\ExpressMapper NET40\DestinationTypeMapper.cs">
       <Link>DestinationTypeMapper.cs</Link>
     </Compile>
+    <Compile Include="..\ExpressMapper NET40\ExpressmapperException.cs">
+      <Link>ExpressmapperException.cs</Link>
+    </Compile>
     <Compile Include="..\ExpressMapper NET40\ExpressmapperExtensions.cs">
       <Link>ExpressmapperExtensions.cs</Link>
     </Compile>

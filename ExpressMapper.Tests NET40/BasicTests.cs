@@ -1276,5 +1276,34 @@ namespace ExpressMapper.Tests
 
             return destination;
         }
+
+        [Test]
+        public void ClearErrorDuringDynamicMappingTest()
+        {
+            var ticket = new Ticket
+            {
+                Id = Guid.NewGuid(),
+                Name = "Ticket",
+                Venue = new Venue
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Venue"
+                }
+            };
+
+
+            Assert.Throws<ExpressmapperException>(() =>
+            {
+                Mapper.Map<Ticket, TicketViewModel>(ticket);
+            });
+        }
+
+        [Test]
+        public void ClearErrorDuringCompileTimeTest()
+        {
+            Mapper.Register<Ticket, TicketViewModel>();
+
+            Assert.Throws<ExpressmapperException>(Mapper.Compile);
+        }
     }
 }

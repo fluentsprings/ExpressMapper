@@ -57,6 +57,7 @@
     <Compile Include="DefaultMappingContext.cs" />
     <Compile Include="DelegateCustomTypeMapper.cs" />
     <Compile Include="DestinationTypeMapper.cs" />
+    <Compile Include="ExpressmapperException.cs" />
     <Compile Include="ExpressmapperExtensions.cs" />
     <Compile Include="IMappingContext.cs" />
     <Compile Include="IMappingServiceProvider.cs" />
