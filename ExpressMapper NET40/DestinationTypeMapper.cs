@@ -15,6 +15,10 @@ namespace ExpressMapper
 
         public DestinationTypeMapper(IMappingService service, IMappingServiceProvider serviceProvider) : base(service, serviceProvider){}
 
+        public override CompilationTypes MapperType {
+            get { return CompilationTypes.OnlyDestination;}
+        }
+
         protected override void InitializeRecursiveMappings(IMappingServiceProvider serviceProvider)
         {
             var mapMethod =

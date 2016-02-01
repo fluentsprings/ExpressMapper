@@ -119,7 +119,7 @@ namespace ExpressMapper
             var typeMapper = TypeMappers[cacheKey];
             if (typeMapper.QueryableGeneralExpression == null)
             {
-                typeMapper.Compile();
+                typeMapper.Compile(CompilationTypes.OnlySource);
             }
             return typeMapper.QueryableGeneralExpression;
         }

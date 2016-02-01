@@ -25,6 +25,7 @@ namespace ExpressMapper
         protected List<KeyValuePair<MemberExpression, Expression>> CustomMembers = new List<KeyValuePair<MemberExpression, Expression>>();
         protected List<KeyValuePair<MemberExpression, Expression>> CustomFunctionMembers = new List<KeyValuePair<MemberExpression, Expression>>();
         public Expression<Func<T, TN>> QueryableExpression { get; protected set; }
+        public abstract CompilationTypes MapperType { get; }
 
         public Expression QueryableGeneralExpression
         {
@@ -64,6 +65,9 @@ namespace ExpressMapper
         protected bool CaseSensetiveMember { get; set; }
         protected bool CaseSensetiveOverride { get; set; }
 
+        protected CompilationTypes CompilationTypeMember { get; set; }
+        protected bool CompilationTypeOverride { get; set; }
+
         #endregion
 
         protected abstract void InitializeRecursiveMappings(IMappingServiceProvider serviceProvider);
@@ -74,8 +78,19 @@ namespace ExpressMapper
             CaseSensetiveOverride = true;
         }
 
-        public void Compile()
+        public void CompileTo(CompilationTypes compileType)
         {
+            CompilationTypeMember = compileType;
+            CompilationTypeOverride = true;
+        }
+
+        public void Compile(CompilationTypes compilationType, bool forceByDemand = false)
+        {
+            if (!forceByDemand && ((CompilationTypeOverride && (MapperType & CompilationTypeMember) != MapperType) || (!CompilationTypeOverride && (MapperType & compilationType) != MapperType)))
+            {
+                return;
+            }
+
             if (_compiling)
             {
                 return;
@@ -126,7 +141,7 @@ namespace ExpressMapper
                 return new Tuple<List<Expression>, ParameterExpression, ParameterExpression>(new List<Expression>(RecursiveExpressionResult), SourceParameter, DestFakeParameter);
             }
 
-            Compile();
+            Compile(MapperType);
             return new Tuple<List<Expression>, ParameterExpression, ParameterExpression>(new List<Expression>(ResultExpressionList), SourceParameter, DestFakeParameter); ;
         }
 
@@ -308,7 +323,8 @@ namespace ExpressMapper
             {
                 lock (_lockObject)
                 {
-                    Compile();
+                    // force compilation by client code demand
+                    Compile(MapperType, forceByDemand: true);
                 }
             }
             return ResultMapFunction(src, dest);

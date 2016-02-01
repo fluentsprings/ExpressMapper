@@ -141,5 +141,14 @@ namespace ExpressMapper
             }
             return this;
         }
+
+        public IMemberConfiguration<T, TN> CompileTo(CompilationTypes compilationType)
+        {
+            foreach (var typeMapper in _typeMappers)
+            {
+                typeMapper.CompileTo(compilationType);
+            }
+            return this;
+        }
     }
 }

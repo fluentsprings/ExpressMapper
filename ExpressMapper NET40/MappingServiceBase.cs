@@ -30,12 +30,12 @@ namespace ExpressMapper
             TypeMappers.Clear();
         }
 
-        public void Compile()
+        public void Compile(CompilationTypes compilationType)
         {
             var typeMappers = new Dictionary<long, ITypeMapper>(TypeMappers);
             foreach (var typeMapper in typeMappers)
             {
-                typeMapper.Value.Compile();
+                typeMapper.Value.Compile(compilationType);
             }
         }
 

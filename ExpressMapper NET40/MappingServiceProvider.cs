@@ -49,7 +49,7 @@ namespace ExpressMapper
             var mapper = typeMapper as ITypeMapper<T, TN>;
             if (mapper.QueryableExpression == null)
             {
-                mapper.Compile();
+                mapper.Compile(CompilationTypes.OnlySource);
             }
             return source.Select(mapper.QueryableExpression);
         }
@@ -106,7 +106,7 @@ namespace ExpressMapper
             {
                 foreach (var mappingService in _mappingServices)
                 {
-                    mappingService.Compile();
+                    mappingService.Compile(CompilationTypes.OnlySource | CompilationTypes.OnlyDestination);
                 }
             }
         }
@@ -117,28 +117,7 @@ namespace ExpressMapper
             {
                 foreach (var mappingService in _mappingServices)
                 {
-                    switch (compilationType)
-                    {
-                        case CompilationTypes.All:
-                            mappingService.Compile();
-                            break;
-                        case CompilationTypes.OnlySource:
-                            {
-                                if (!mappingService.DestinationSupport)
-                                {
-                                    mappingService.Compile();
-                                }
-                                break;
-                            }
-                        case CompilationTypes.OnlyDestination:
-                            {
-                                if (mappingService.DestinationSupport)
-                                {
-                                    mappingService.Compile();
-                                }
-                                break;
-                            }
-                    }
+                    mappingService.Compile(compilationType);
                 }
             }
         }
@@ -160,27 +139,19 @@ namespace ExpressMapper
             {
                 foreach (var mappingService in _mappingServices)
                 {
-                    switch (compilationType)
+                    if ((CompilationTypes.OnlySource & compilationType) == CompilationTypes.OnlySource)
                     {
-                        case CompilationTypes.All:
+                        if (!mappingService.DestinationSupport)
+                        {
                             mappingService.PrecompileCollection<T, TN>();
-                            break;
-                        case CompilationTypes.OnlySource:
-                            {
-                                if (!mappingService.DestinationSupport)
-                                {
-                                    mappingService.PrecompileCollection<T, TN>();
-                                }
-                                break;
-                            }
-                        case CompilationTypes.OnlyDestination:
-                            {
-                                if (mappingService.DestinationSupport)
-                                {
-                                    mappingService.PrecompileCollection<T, TN>();
-                                }
-                                break;
-                            }
+                        }
+                    }
+                    if ((CompilationTypes.OnlyDestination & compilationType) == CompilationTypes.OnlyDestination)
+                    {
+                        if (mappingService.DestinationSupport)
+                        {
+                            mappingService.PrecompileCollection<T, TN>();
+                        }
                     }
                 }
             }

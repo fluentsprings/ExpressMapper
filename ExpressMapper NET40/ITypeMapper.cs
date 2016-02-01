@@ -9,7 +9,7 @@ namespace ExpressMapper
         Expression QueryableGeneralExpression { get; }
         Func<object, object, object> GetNonGenericMapFunc();
         Tuple<List<Expression>, ParameterExpression, ParameterExpression> GetMapExpressions();
-        void Compile();
+        void Compile(CompilationTypes compilationtype, bool forceByDemand = false);
     }
 
     /// <summary>
@@ -23,11 +23,13 @@ namespace ExpressMapper
         TN MapTo(T src, TN dest);
         void Ignore<TMember>(Expression<Func<TN, TMember>> left);
         void CaseSensetiveMemberMap(bool caseSensitive);
+        void CompileTo(CompilationTypes compileType);
         void MapMember<TMember, TNMember>(Expression<Func<TN, TNMember>> left, Expression<Func<T, TMember>> right);
         void MapFunction<TMember, TNMember>(Expression<Func<TN, TNMember>> left, Func<T, TMember> right);
         void InstantiateFunc(Func<T,TN> constructor);
         void Instantiate(Expression<Func<T,TN>> constructor);
         void BeforeMap(Action<T,TN> beforeMap);
         void AfterMap(Action<T,TN> afterMap);
+        CompilationTypes MapperType { get; }
     }
 }
