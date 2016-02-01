@@ -5,7 +5,7 @@ namespace ExpressMapper
     [Flags]
     public enum CompilationTypes
     {
-        OnlySource = 2,
-        OnlyDestination = 4
+        Source = 2,
+        Destination = 4
     }
 }

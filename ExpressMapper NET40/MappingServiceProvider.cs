@@ -49,7 +49,7 @@ namespace ExpressMapper
             var mapper = typeMapper as ITypeMapper<T, TN>;
             if (mapper.QueryableExpression == null)
             {
-                mapper.Compile(CompilationTypes.OnlySource);
+                mapper.Compile(CompilationTypes.Source);
             }
             return source.Select(mapper.QueryableExpression);
         }
@@ -106,7 +106,7 @@ namespace ExpressMapper
             {
                 foreach (var mappingService in _mappingServices)
                 {
-                    mappingService.Compile(CompilationTypes.OnlySource | CompilationTypes.OnlyDestination);
+                    mappingService.Compile(CompilationTypes.Source | CompilationTypes.Destination);
                 }
             }
         }
@@ -139,14 +139,14 @@ namespace ExpressMapper
             {
                 foreach (var mappingService in _mappingServices)
                 {
-                    if ((CompilationTypes.OnlySource & compilationType) == CompilationTypes.OnlySource)
+                    if ((CompilationTypes.Source & compilationType) == CompilationTypes.Source)
                     {
                         if (!mappingService.DestinationSupport)
                         {
                             mappingService.PrecompileCollection<T, TN>();
                         }
                     }
-                    if ((CompilationTypes.OnlyDestination & compilationType) == CompilationTypes.OnlyDestination)
+                    if ((CompilationTypes.Destination & compilationType) == CompilationTypes.Destination)
                     {
                         if (mappingService.DestinationSupport)
                         {
@@ -287,7 +287,7 @@ namespace ExpressMapper
 
             if (EqualityComparer<TN>.Default.Equals(dest, default(TN)))
             {
-                PrecompileCollection<T, TN>(CompilationTypes.OnlySource);
+                PrecompileCollection<T, TN>(CompilationTypes.Source);
             }
             else
             {

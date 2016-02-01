@@ -18,7 +18,7 @@ namespace ExpressMapper
         IMemberConfiguration<T, TN> Function<TMember, TNMember>(Expression<Func<TN, TNMember>> dest, Func<T, TMember> src);
         IMemberConfiguration<T, TN> Ignore<TMember>(Expression<Func<TN, TMember>> dest);
         IMemberConfiguration<T, TN> Value<TNMember>(Expression<Func<TN, TNMember>> dest, TNMember value);
-        IMemberConfiguration<T, TN> CaseSensetiveMemberMap(bool caseSensitive);
+        IMemberConfiguration<T, TN> CaseSensitive(bool caseSensitive);
         IMemberConfiguration<T, TN> CompileTo(CompilationTypes compilationType);
     }
 }

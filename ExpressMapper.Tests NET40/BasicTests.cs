@@ -1185,7 +1185,7 @@ namespace ExpressMapper.Tests
         public void MemberCaseSensitivityLocalMapTest()
         {
             Mapper.Register<TypoCase, TypoCaseViewModel>()
-                .CaseSensetiveMemberMap(true);
+                .CaseSensitive(true);
             Mapper.Compile();
 
             var typoCase = new TypoCase
@@ -1207,7 +1207,7 @@ namespace ExpressMapper.Tests
         {
             Mapper.MemberCaseSensitiveMap(true);
             Mapper.Register<TypoCase, TypoCaseViewModel>()
-                .CaseSensetiveMemberMap(false);
+                .CaseSensitive(false);
             Mapper.Compile();
 
             var typoCase = new TypoCase

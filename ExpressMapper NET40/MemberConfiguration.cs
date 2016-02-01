@@ -133,7 +133,7 @@ namespace ExpressMapper
             return Member(dest, x => value);
         }
 
-        public IMemberConfiguration<T, TN> CaseSensetiveMemberMap(bool caseSensitive)
+        public IMemberConfiguration<T, TN> CaseSensitive(bool caseSensitive)
         {
             foreach (var typeMapper in _typeMappers)
             {
