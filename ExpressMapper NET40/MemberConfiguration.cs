@@ -82,7 +82,9 @@ namespace ExpressMapper
             return this;
         }
 
-        public IMemberConfiguration<T, TN> Member(MemberExpression destExpression, Expression sourceExpression)
+        //Note: If specific destination address mapping has already been set then it will NOT add the mapping given.
+        //This is used when flattening, which comes last in the stage, to ensure that the developer can override the flattening mappings
+        public IMemberConfiguration<T, TN> MemberComputed(MemberExpression destExpression, Expression sourceExpression)
         {
             var propertyInfo = destExpression.Member as PropertyInfo;
             if (propertyInfo != null && !propertyInfo.CanWrite || (propertyInfo != null && propertyInfo.CanWrite && !propertyInfo.GetSetMethod(true).IsPublic))
@@ -96,7 +98,7 @@ namespace ExpressMapper
             {
                 foreach (var typeMapper in _typeMappers)
                 {
-                    typeMapper.MapMemberCustom(destExpression, sourceExpression);
+                    typeMapper.MapMemberComputed(destExpression, sourceExpression);
                 }
             }
             return this;

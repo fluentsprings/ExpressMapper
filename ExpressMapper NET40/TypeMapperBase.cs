@@ -204,10 +204,11 @@ namespace ExpressMapper
             //MapMember(left.Body as MemberExpression, right.Body);
         }
 
-        public void MapMemberCustom(MemberExpression left, Expression right)
-        {
-            CustomMembers.Add(new KeyValuePair<MemberExpression, Expression>(left, right));
-            //MapMember(left.Body as MemberExpression, right.Body);
+        public void MapMemberComputed(MemberExpression left, Expression right)
+        {       
+            if (CustomMembers.All(x => x.Key.Member.Name != left.Member.Name))
+                //This stops explict .Member mapping from being overridden by computed 
+                CustomMembers.Add(new KeyValuePair<MemberExpression, Expression>(left, right));
         }
 
         protected void MapMember(MemberExpression left, Expression right)
