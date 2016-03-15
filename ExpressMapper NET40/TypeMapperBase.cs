@@ -204,6 +204,12 @@ namespace ExpressMapper
             //MapMember(left.Body as MemberExpression, right.Body);
         }
 
+        public void MapMemberCustom(MemberExpression left, Expression right)
+        {
+            CustomMembers.Add(new KeyValuePair<MemberExpression, Expression>(left, right));
+            //MapMember(left.Body as MemberExpression, right.Body);
+        }
+
         protected void MapMember(MemberExpression left, Expression right)
         {
             var mappingExpression = MappingService.GetMemberMappingExpression(left, right, false);
@@ -315,6 +321,11 @@ namespace ExpressMapper
         {
             var memberExpression = left.Body as MemberExpression;
             IgnoreMemberList.Add(memberExpression.Member.Name);
+        }
+
+        public void Ignore(PropertyInfo left)
+        {
+            IgnoreMemberList.Add(left.Name);
         }
 
         public TN MapTo(T src, TN dest)

@@ -82,6 +82,26 @@ namespace ExpressMapper
             return this;
         }
 
+        public IMemberConfiguration<T, TN> Member(MemberExpression destExpression, Expression sourceExpression)
+        {
+            var propertyInfo = destExpression.Member as PropertyInfo;
+            if (propertyInfo != null && !propertyInfo.CanWrite || (propertyInfo != null && propertyInfo.CanWrite && !propertyInfo.GetSetMethod(true).IsPublic))
+            {
+                foreach (var typeMapper in _typeMappers)
+                {
+                    typeMapper.Ignore(propertyInfo);
+                }
+            }
+            else
+            {
+                foreach (var typeMapper in _typeMappers)
+                {
+                    typeMapper.MapMemberCustom(destExpression, sourceExpression);
+                }
+            }
+            return this;
+        }
+
         public IMemberConfiguration<T, TN> Function<TMember, TNMember>(Expression<Func<TN, TNMember>> dest, Func<T, TMember> src)
         {
             var memberExpression = dest.Body as MemberExpression;
