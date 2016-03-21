@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -82,28 +85,6 @@ namespace ExpressMapper
             return this;
         }
 
-        //Note: If specific destination address mapping has already been set then it will NOT add the mapping given.
-        //This is used when flattening, which comes last in the stage, to ensure that the developer can override the flattening mappings
-        public IMemberConfiguration<T, TN> MemberComputed(MemberExpression destExpression, Expression sourceExpression)
-        {
-            var propertyInfo = destExpression.Member as PropertyInfo;
-            if (propertyInfo != null && !propertyInfo.CanWrite || (propertyInfo != null && propertyInfo.CanWrite && !propertyInfo.GetSetMethod(true).IsPublic))
-            {
-                foreach (var typeMapper in _typeMappers)
-                {
-                    typeMapper.Ignore(propertyInfo);
-                }
-            }
-            else
-            {
-                foreach (var typeMapper in _typeMappers)
-                {
-                    typeMapper.MapMemberComputed(destExpression, sourceExpression);
-                }
-            }
-            return this;
-        }
-
         public IMemberConfiguration<T, TN> Function<TMember, TNMember>(Expression<Func<TN, TNMember>> dest, Func<T, TMember> src)
         {
             var memberExpression = dest.Body as MemberExpression;
@@ -171,6 +152,28 @@ namespace ExpressMapper
                 typeMapper.CompileTo(compilationType);
             }
             return this;
+        }
+
+        /// <summary>
+        /// This will apply the flattening algorithm to the source. 
+        /// This allow properties in nested source classes to be assigned to a top level destination property.
+        /// Matching is done by concatenated names, and also a few Linq commands
+        /// e.g. dest.NestedClassMyProperty would contain the property src.NestedClass.MyProperty (as long as types match)
+        /// and  dest.MyCollectionCount would contain the count (int) of the Collection.
+        /// </summary>
+        public void FlattenSource()
+        {
+            var sourceMapperBase = 
+                _typeMappers.Single(x => x.MapperType == CompilationTypes.Source) as TypeMapperBase<T, TN>;
+
+            var f = new FlattenMapper<T, TN>(sourceMapperBase == null ? new List<string>() : sourceMapperBase.NamesOfMembersAndIgnoredProperties());
+            foreach (var flattenInfo in f.BuildMemberMapping())
+            {
+                foreach (var typeMapper in _typeMappers)
+                {
+                    typeMapper.MapMemberFlattened(flattenInfo.DestAsMemberExpression<TN>(), flattenInfo.SourceAsExpression<T>());
+                }
+            }
         }
     }
 }

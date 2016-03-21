@@ -58,8 +58,13 @@
     <Compile Include="Models\Employee.cs" />
     <Compile Include="Models\Engine.cs" />
     <Compile Include="Models\FashionProduct.cs" />
+    <Compile Include="Models\Father.cs" />
+    <Compile Include="Models\FatherSons.cs" />
     <Compile Include="Models\Gift.cs" />
+    <Compile Include="Models\Grandson.cs" />
     <Compile Include="Models\ItemModel.cs" />
+    <Compile Include="ViewModels\FlattenFatherSonsCountDto.cs" />
+    <Compile Include="ViewModels\FlattenLinqCollectionMethodsDto.cs" />
     <Compile Include="Models\Mail.cs" />
     <Compile Include="Models\NonGenericCollectionImplementingIEnumerable.cs" />
     <Compile Include="Models\NonGenericCollectionInhertedFromList.cs" />
@@ -68,6 +73,7 @@
     <Compile Include="Models\Product.cs" />
     <Compile Include="Models\ProductOption.cs" />
     <Compile Include="Models\Size.cs" />
+    <Compile Include="Models\Son.cs" />
     <Compile Include="Models\SpecialPerson.cs" />
     <Compile Include="Models\Structs\Feature.cs" />
     <Compile Include="Models\Structs\Item.cs" />
@@ -99,6 +105,7 @@
     <Compile Include="ViewModels\EmployeeViewModel.cs" />
     <Compile Include="ViewModels\EngineViewModel.cs" />
     <Compile Include="ViewModels\FashionProductViewModel.cs" />
+    <Compile Include="ViewModels\FlattenFatherSonGrandsonDto.cs" />
     <Compile Include="ViewModels\GiftViewModel.cs" />
     <Compile Include="ViewModels\ItemModelViewModel.cs" />
     <Compile Include="ViewModels\MailViewModel.cs" />

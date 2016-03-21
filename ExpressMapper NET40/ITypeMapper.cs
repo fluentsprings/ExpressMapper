@@ -27,7 +27,7 @@ namespace ExpressMapper
         void CaseSensetiveMemberMap(bool caseSensitive);
         void CompileTo(CompilationTypes compileType);
         void MapMember<TMember, TNMember>(Expression<Func<TN, TNMember>> left, Expression<Func<T, TMember>> right);
-        void MapMemberComputed(MemberExpression left, Expression right);
+        void MapMemberFlattened(MemberExpression left, Expression right);
         void MapFunction<TMember, TNMember>(Expression<Func<TN, TNMember>> left, Func<T, TMember> right);
         void InstantiateFunc(Func<T,TN> constructor);
         void Instantiate(Expression<Func<T,TN>> constructor);

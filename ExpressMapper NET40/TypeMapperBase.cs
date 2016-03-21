@@ -204,11 +204,9 @@ namespace ExpressMapper
             //MapMember(left.Body as MemberExpression, right.Body);
         }
 
-        public void MapMemberComputed(MemberExpression left, Expression right)
+        public void MapMemberFlattened(MemberExpression left, Expression right)
         {       
-            if (CustomMembers.All(x => x.Key.Member.Name != left.Member.Name))
-                //This stops explict .Member mapping from being overridden by computed 
-                CustomMembers.Add(new KeyValuePair<MemberExpression, Expression>(left, right));
+            CustomMembers.Add(new KeyValuePair<MemberExpression, Expression>(left, right));
         }
 
         protected void MapMember(MemberExpression left, Expression right)
@@ -353,6 +351,13 @@ namespace ExpressMapper
             CustomFunctionMembers.Add(new KeyValuePair<MemberExpression, Expression>(memberExpression, rightExpression));
             //MapFunction<TMember, TNMember>(left, rightExpression, memberExpression);
         }
+
+        internal List<string> NamesOfMembersAndIgnoredProperties()
+        {
+            var result = CustomMembers.Select(x => x.Key.Member.Name).ToList();
+            result.AddRange(IgnoreMemberList);
+            return result;
+        } 
 
         protected void MapFunction(MemberExpression left, Expression rightExpression)
         {
