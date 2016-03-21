@@ -7,47 +7,47 @@ namespace ExpressMapper
 {
     internal class FlattenMemberInfo
     {
-        public FlattenMemberInfo(PropertyInfo destMember, PropertyInfo[] sourcePathMembers, PropertyInfo lastMemberToAdd, 
-            FlattenLinqMethod linqMethodSuffix  = null)
-        {
-            DestMember = destMember;
-            LinqMethodSuffix = linqMethodSuffix;
-
-            var list = sourcePathMembers.ToList();
-            list.Add(lastMemberToAdd);
-            SourcePathMembers = list;
-        }
-
         /// <summary>
         /// The Destination property in the DTO
         /// </summary>
-        public PropertyInfo DestMember { get; private set; }
+        private readonly PropertyInfo _destMember;
 
         /// <summary>
         /// The list of properties in order to get to the source property we want
         /// </summary>
-        public ICollection<PropertyInfo> SourcePathMembers { get; private set; }
+        private readonly ICollection<PropertyInfo> _sourcePathMembers;
 
         /// <summary>
-        /// Optional Linq Method to apply to an enumerable source
+        /// Optional Linq Method to apply to an enumerable source (null if no Linq method on the end)
         /// </summary>
-        public FlattenLinqMethod LinqMethodSuffix { get; private set; }
+        private readonly FlattenLinqMethod _linqMethodSuffix;
+
+        public FlattenMemberInfo(PropertyInfo destMember, PropertyInfo[] sourcePathMembers, PropertyInfo lastMemberToAdd, 
+            FlattenLinqMethod linqMethodSuffix  = null)
+        {
+            _destMember = destMember;
+            _linqMethodSuffix = linqMethodSuffix;
+
+            var list = sourcePathMembers.ToList();
+            list.Add(lastMemberToAdd);
+            _sourcePathMembers = list;
+        }
 
         public override string ToString()
         {
-            var linqMethodStr = LinqMethodSuffix?.ToString() ?? "";
-            return $"dest => dest.{DestMember.Name}, src => src.{string.Join(".",SourcePathMembers.Select(x => x.Name))}{linqMethodStr}";
+            var linqMethodStr = _linqMethodSuffix?.ToString() ?? "";
+            return $"dest => dest.{_destMember.Name}, src => src.{string.Join(".",_sourcePathMembers.Select(x => x.Name))}{linqMethodStr}";
         }
 
         public MemberExpression  DestAsMemberExpression<TDest>()
         {
-            return Expression.Property(Expression.Parameter(typeof(TDest), "dest"), DestMember);
+            return Expression.Property(Expression.Parameter(typeof(TDest), "dest"), _destMember);
         }
 
         public Expression SourceAsExpression<TSource>()
         {
             var paramExpression = Expression.Parameter(typeof(TSource), "src");
-            return NestedExpressionProperty(paramExpression, SourcePathMembers.Reverse().ToArray());
+            return NestedExpressionProperty(paramExpression, _sourcePathMembers.Reverse().ToArray());
         }
 
         //-------------------------------------------------------
@@ -68,9 +68,9 @@ namespace ExpressMapper
             //we are at the end 
             var finalProperty = Expression.Property(expression, properties[0]);
 
-            return LinqMethodSuffix == null
+            return _linqMethodSuffix == null
                 ? (Expression)finalProperty
-                : LinqMethodSuffix.AsMethodCallExpression(finalProperty, properties[0], DestMember);
+                : _linqMethodSuffix.AsMethodCallExpression(finalProperty, properties[0], _destMember);
         }
 
     }
