@@ -154,6 +154,8 @@ namespace ExpressMapper
             return this;
         }
 
+        #region flatten code
+
         /// <summary>
         /// This will apply the flattening algorithm to the source. 
         /// This allow properties in nested source classes to be assigned to a top level destination property.
@@ -163,17 +165,24 @@ namespace ExpressMapper
         /// </summary>
         public void FlattenSource()
         {
-            var sourceMapperBase = 
+            var sourceMapperBase =
                 _typeMappers.Single(x => x.MapperType == CompilationTypes.Source) as TypeMapperBase<T, TN>;
 
-            var f = new FlattenMapper<T, TN>(sourceMapperBase == null ? new List<string>() : sourceMapperBase.NamesOfMembersAndIgnoredProperties());
+            if (sourceMapperBase == null)
+                throw new Exception("Failed to find the source mapping.");
+
+            var f = new FlattenMapper<T, TN>(sourceMapperBase.NamesOfMembersAndIgnoredProperties());
             foreach (var flattenInfo in f.BuildMemberMapping())
             {
                 foreach (var typeMapper in _typeMappers)
                 {
-                    typeMapper.MapMemberFlattened(flattenInfo.DestAsMemberExpression<TN>(), flattenInfo.SourceAsExpression<T>());
+                    typeMapper.MapMemberFlattened(flattenInfo.DestAsMemberExpression<TN>(),
+                        flattenInfo.SourceAsExpression<T>());
                 }
             }
         }
+
+        #endregion
+
     }
 }

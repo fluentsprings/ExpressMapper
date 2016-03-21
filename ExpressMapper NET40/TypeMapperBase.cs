@@ -204,10 +204,22 @@ namespace ExpressMapper
             //MapMember(left.Body as MemberExpression, right.Body);
         }
 
+        #region flatten code
+
         public void MapMemberFlattened(MemberExpression left, Expression right)
-        {       
+        {
             CustomMembers.Add(new KeyValuePair<MemberExpression, Expression>(left, right));
         }
+
+        internal List<string> NamesOfMembersAndIgnoredProperties()
+        {
+            var result = CustomMembers.Select(x => x.Key.Member.Name).ToList();
+            result.AddRange(IgnoreMemberList);
+            return result;
+        }
+
+        #endregion
+
 
         protected void MapMember(MemberExpression left, Expression right)
         {
@@ -351,13 +363,6 @@ namespace ExpressMapper
             CustomFunctionMembers.Add(new KeyValuePair<MemberExpression, Expression>(memberExpression, rightExpression));
             //MapFunction<TMember, TNMember>(left, rightExpression, memberExpression);
         }
-
-        internal List<string> NamesOfMembersAndIgnoredProperties()
-        {
-            var result = CustomMembers.Select(x => x.Key.Member.Name).ToList();
-            result.AddRange(IgnoreMemberList);
-            return result;
-        } 
 
         protected void MapFunction(MemberExpression left, Expression rightExpression)
         {
