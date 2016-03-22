@@ -74,16 +74,13 @@ namespace ExpressMapper.Tests.Projections.Tests
             //SETUP
 
             //ATTEMPT
-            var results = Context.Set<Father>().Where(x => x.Son.Grandson == null).Project<Father, FlattenFatherSonGrandsonDto>().ToList();
+            var results = Context.Set<FatherSons>().Project<FatherSons, FlattenFatherSonsCountDto>().ToList();
 
             //VERIFY  
             Assert.AreEqual(1, results.Count);
             Assert.AreEqual("Father", results.First().MyString);    //This is mapped by the normal AutoMapper 
-            Assert.AreEqual(2, results.First().MyInt);              //This is mapped by the normal AutoMapper 
-            Assert.AreEqual("Son", results.First().SonMyString);
-            Assert.AreEqual(102, results.First().SonMyInt);
-            Assert.AreEqual(null, results.First().SonGrandsonMyString);
-            Assert.AreEqual(null, results.First().SonGrandsonMyInt);
+            Assert.AreEqual(1, results.First().MyInt);              //This is mapped by the normal AutoMapper 
+            Assert.AreEqual(5, results.First().SonsCount);
         }
 
     }
