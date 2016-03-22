@@ -2,6 +2,7 @@
 using ExpressMapper.Extensions;
 using ExpressMapper.Tests.Model.ViewModels;
 using ExpressMapper.Tests.Projections.Entities;
+using ExpressMapper.Tests.Projections.Utils;
 using ExpressMapper.Tests.Projections.ViewModel;
 using NUnit.Framework;
 
@@ -37,29 +38,28 @@ namespace ExpressMapper.Tests.Projections.Tests
         [Test]
         public void FlattenFatherSonGrandsonDtoOk()
         {
-            //SETUP
+            using (new LogDatabaseAccesses(Context))
+            {                
+                var results = Context.Set<Father>().Where(x => x.Son.Grandson != null).Project<Father, FlattenFatherSonGrandsonDto>().ToList();
 
-            //ATTEMPT
-            var results = Context.Set<Father>().Where(x => x.Son.Grandson != null).Project<Father, FlattenFatherSonGrandsonDto>().ToList();
-
-            //VERIFY  
-            Assert.AreEqual(1, results.Count);
-            Assert.AreEqual("Father", results.First().MyString);    //This is mapped by the normal ExpressMapper 
-            Assert.AreEqual(1, results.First().MyInt);              //This is mapped by the normal ExpressMapper 
-            Assert.AreEqual("Son", results.First().SonMyString);
-            Assert.AreEqual(101, results.First().SonMyInt);
-            Assert.AreEqual("Grandson", results.First().SonGrandsonMyString);
-            Assert.AreEqual(10001, results.First().SonGrandsonMyInt);
+                //VERIFY  
+                Assert.AreEqual(1, results.Count);
+                Assert.AreEqual("Father", results.First().MyString);    //This is mapped by the normal ExpressMapper 
+                Assert.AreEqual(1, results.First().MyInt);              //This is mapped by the normal ExpressMapper 
+                Assert.AreEqual("Son", results.First().SonMyString);
+                Assert.AreEqual(101, results.First().SonMyInt);
+                Assert.AreEqual("Grandson", results.First().SonGrandsonMyString);
+                Assert.AreEqual(10001, results.First().SonGrandsonMyInt);
+            }
         }
 
 
         [Test]
         public void FlattenFatherSonGrandsonDtoNoGrandsonOk()
         {
-            //SETUP
-
-            //ATTEMPT
-            var results = Context.Set<Father>().Where(x => x.Son.Grandson == null).Project<Father, FlattenFatherSonGrandsonDto>().ToList();
+            using (new LogDatabaseAccesses(Context))
+            { 
+                var results = Context.Set<Father>().Where(x => x.Son.Grandson == null).Project<Father, FlattenFatherSonGrandsonDto>().ToList();
 
             //VERIFY  
             Assert.AreEqual(1, results.Count);
@@ -69,15 +69,15 @@ namespace ExpressMapper.Tests.Projections.Tests
             Assert.AreEqual(102, results.First().SonMyInt);
             Assert.AreEqual(null, results.First().SonGrandsonMyString);
             Assert.AreEqual(null, results.First().SonGrandsonMyInt);
+}
         }
 
         [Test]
         public void FlattenFatherSonSimpleDtoOk()
         {
-            //SETUP
-
-            //ATTEMPT
-            var results = Context.Set<Father>().Where(x => x.Son.Grandson != null).Project<Father, FlattenFatherSonSimpleDto>().ToList();
+            using (new LogDatabaseAccesses(Context))
+            {
+                var results = Context.Set<Father>().Where(x => x.Son.Grandson != null).Project<Father, FlattenFatherSonSimpleDto>().ToList();
 
             //VERIFY   
             Assert.AreEqual(1, results.Count);
@@ -85,21 +85,22 @@ namespace ExpressMapper.Tests.Projections.Tests
             Assert.AreEqual(1, results.First().MyInt);              //This is mapped by the normal ExpressMapper 
             Assert.AreEqual("Son", results.First().Son.MyString);
             Assert.AreEqual(101, results.First().Son.MyInt);
+}
         }
 
         [Test]
         public void FlattenFatherSonsCountDtoOk()
         {
-            //SETUP
+            using (new LogDatabaseAccesses(Context))
+            {
+                var results = Context.Set<FatherSons>().Project<FatherSons, FlattenFatherSonsCountDto>().ToList();
 
-            //ATTEMPT
-            var results = Context.Set<FatherSons>().Project<FatherSons, FlattenFatherSonsCountDto>().ToList();
-
-            //VERIFY  
-            Assert.AreEqual(1, results.Count);
-            Assert.AreEqual("Father", results.First().MyString);    //This is mapped by the normal ExpressMapper 
-            Assert.AreEqual(1, results.First().MyInt);              //This is mapped by the normal ExpressMapper 
-            Assert.AreEqual(5, results.First().SonsCount);
+                //VERIFY  
+                Assert.AreEqual(1, results.Count);
+                Assert.AreEqual("Father", results.First().MyString); //This is mapped by the normal ExpressMapper 
+                Assert.AreEqual(1, results.First().MyInt); //This is mapped by the normal ExpressMapper 
+                Assert.AreEqual(5, results.First().SonsCount);
+            }
         }
 
     }

@@ -97,6 +97,7 @@
     <Compile Include="Tests\FlattenEntityTests.cs" />
     <Compile Include="Tests\NestedAssociationNullChecktest.cs" />
     <Compile Include="Tests\RecursionExpressionHandlingTest.cs" />
+    <Compile Include="Utils\LogDatabaseAccesses.cs" />
     <Compile Include="ViewModel\CatalogueGroupViewModel.cs" />
     <Compile Include="ViewModel\CatalogueViewModel.cs" />
     <Compile Include="ViewModel\CategoryViewModel.cs" />
