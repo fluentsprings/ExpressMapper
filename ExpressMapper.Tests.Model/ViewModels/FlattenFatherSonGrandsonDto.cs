@@ -10,7 +10,7 @@ namespace ExpressMapper.Tests.Model.ViewModels
         public int SonMyInt { get; set; }
         public string SonMyString { get; set; }
 
-        public int SonGrandsonMyInt { get; set; }
+        public int? SonGrandsonMyInt { get; set; }
         public string SonGrandsonMyString { get; set; }
 
 

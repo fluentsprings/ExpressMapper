@@ -51,7 +51,7 @@ namespace ExpressMapper.Tests
             Assert.AreEqual(null, dto.SonMyString);
             Assert.AreEqual(0, dto.SonMyInt);
             Assert.AreEqual(null, dto.SonGrandsonMyString);
-            Assert.AreEqual(0, dto.SonGrandsonMyInt);
+            Assert.AreEqual(null, dto.SonGrandsonMyInt);
         }
 
         [Test]

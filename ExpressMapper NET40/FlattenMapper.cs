@@ -50,10 +50,13 @@ namespace ExpressMapper
                 var matchStart = prefix + matchedStartSrcProp.Name;
                 if (destProp.Name == matchStart)
                 {
-                    //direct match
+                    //direct match of name
 
-                    if (destProp.PropertyType == matchedStartSrcProp.PropertyType)
+                    var underlyingType = Nullable.GetUnderlyingType(destProp.PropertyType);
+                    if (destProp.PropertyType == matchedStartSrcProp.PropertyType ||
+                        underlyingType == matchedStartSrcProp.PropertyType)
                     {
+                        //matched directly
                         _foundFlattens.Add( new FlattenMemberInfo(destProp, sourcePropPath, matchedStartSrcProp));
                         _filteredDestProps.Remove(destProp);        //matched, so take it out
                     }
