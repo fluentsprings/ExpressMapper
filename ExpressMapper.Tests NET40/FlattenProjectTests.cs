@@ -138,13 +138,11 @@ namespace ExpressMapper.Tests
         {
             //SETUP
             Mapper.Reset();
-            Mapper.Register<FlattenCircularReference, FlattenCircularReferenceDto>() //.FlattenSource();
-                .Member(dest => dest.SonMyString, src => src.Son.MyString)
-                .Member(dest => dest.CircularRefMyString, src => src.CircularRef.MyString);
+            Mapper.Register<FlattenCircularReference, FlattenCircularReferenceDto>().FlattenSource();
             Mapper.Compile(CompilationTypes.Source);
 
             //ATTEMPT
-            var single = new FlattenCircularReference();
+            var single = FlattenCircularReference.CreateOne();
             var queryData = new List<FlattenCircularReference> { single }.AsQueryable();
             var dto = queryData.Project<FlattenCircularReference, FlattenCircularReferenceDto>().Single();
 
