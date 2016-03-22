@@ -15,11 +15,7 @@ namespace ExpressMapper.Tests
         public void FlattenFatherSonGrandsonDtoOk()
         {
             //SETUP
-            Mapper.Register<Father, FlattenFatherSonGrandsonDto>()//.FlattenSource();
-                    .Member(dest => dest.SonMyInt, src => src.Son.MyInt)
-                    .Member(dest => dest.SonGrandsonMyInt, src => src.Son.Grandson.MyInt)
-                    .Member(dest => dest.SonMyString, src => src.Son.MyString)
-                    .Member(dest => dest.SonGrandsonMyString, src => src.Son.Grandson.MyString);
+            Mapper.Register<Father, FlattenFatherSonGrandsonDto>().FlattenSource();
             Mapper.Compile(CompilationTypes.Source);
 
             //ATTEMPT
@@ -38,18 +34,15 @@ namespace ExpressMapper.Tests
 
 
         [Test]
-        public void FlattenFatherSonGrandsonDtoNoSon()
+        public void FlattenFatherSonGrandsonDtoNoGrandson()
         {
             //SETUP
             Mapper.Register<Father, FlattenFatherSonGrandsonDto>().FlattenSource();
             Mapper.Compile(CompilationTypes.Source);
 
             //ATTEMPT
-            var single = new Father
-            {
-                MyString = "Father",
-                MyInt = 1
-            };
+            var single = Father.CreateOne();
+            single.Son.Grandson = null;
             var queryData = new List<Father> { single }.AsQueryable();
             var dto = queryData.Project<Father, FlattenFatherSonGrandsonDto>().Single();
 
