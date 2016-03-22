@@ -60,9 +60,12 @@
     <Compile Include="Models\FashionProduct.cs" />
     <Compile Include="Models\Father.cs" />
     <Compile Include="Models\FatherSons.cs" />
+    <Compile Include="Models\FlattenCircularReference.cs" />
     <Compile Include="Models\Gift.cs" />
     <Compile Include="Models\Grandson.cs" />
     <Compile Include="Models\ItemModel.cs" />
+    <Compile Include="ViewModels\FlattenCircularReferenceDto.cs" />
+    <Compile Include="ViewModels\FlattenFatherSonsCountBadDto.cs" />
     <Compile Include="ViewModels\FlattenFatherSonsCountDto.cs" />
     <Compile Include="ViewModels\FlattenLinqCollectionMethodsDto.cs" />
     <Compile Include="Models\Mail.cs" />

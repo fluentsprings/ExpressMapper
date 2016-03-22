@@ -65,12 +65,12 @@ namespace ExpressMapper
             var ienumerableType = propertyToActOn.PropertyType.GetGenericArguments().Single();
 
             var foundMethodInfo = typeof (Enumerable).GetMethods()
-                .Single(m => m.Name == _methodName && m.GetParameters().Length == 1
+                .SingleOrDefault(m => m.Name == _methodName && m.GetParameters().Length == 1
                         && (!_checkReturnType || m.ReturnType == destProperty.PropertyType));
 
             if (foundMethodInfo == null)
                 throw new InvalidOperationException(
-                    $"We could not find the Method {_methodName} which matched the {destProperty.Name} which has the type {destProperty.PropertyType}.");
+                    $"We could not find the Method {_methodName}() which matched the property {destProperty.Name} of type {destProperty.PropertyType}.");
 
             var method = foundMethodInfo.IsGenericMethod
                 ? foundMethodInfo.MakeGenericMethod(ienumerableType)
