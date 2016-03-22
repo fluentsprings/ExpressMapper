@@ -62,12 +62,24 @@
     <Compile Include="Configuration\Catalogue.cs" />
     <Compile Include="Configuration\CatalogueGroup.cs" />
     <Compile Include="Configuration\Category.cs" />
+    <Compile Include="Configuration\FatherSonsConfiguration.cs" />
+    <Compile Include="Configuration\GrandsonConfiguration.cs" />
+    <Compile Include="Configuration\SonConfiguration.cs" />
+    <Compile Include="Configuration\FatherConfiguration.cs" />
     <Compile Include="Entities\Catalogue.cs" />
     <Compile Include="Entities\CatalogueGroup.cs" />
     <Compile Include="Entities\Category.cs" />
+    <Compile Include="Entities\Father.cs" />
+    <Compile Include="Entities\FatherSons.cs" />
+    <Compile Include="Entities\Grandson.cs" />
+    <Compile Include="Entities\Son.cs" />
     <Compile Include="Migrations\201511050542223_Initial.cs" />
     <Compile Include="Migrations\201511050542223_Initial.Designer.cs">
       <DependentUpon>201511050542223_Initial.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201603220950395_AddFlattening.cs" />
+    <Compile Include="Migrations\201603220950395_AddFlattening.Designer.cs">
+      <DependentUpon>201603220950395_AddFlattening.cs</DependentUpon>
     </Compile>
     <Compile Include="Tests\BaseTest.cs" />
     <Compile Include="Tests\CollectionPropertyTest.cs" />
@@ -82,11 +94,14 @@
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tests\CustomMemberMappingTest.cs" />
+    <Compile Include="Tests\FlattenEntityTests.cs" />
     <Compile Include="Tests\NestedAssociationNullChecktest.cs" />
     <Compile Include="Tests\RecursionExpressionHandlingTest.cs" />
     <Compile Include="ViewModel\CatalogueGroupViewModel.cs" />
     <Compile Include="ViewModel\CatalogueViewModel.cs" />
     <Compile Include="ViewModel\CategoryViewModel.cs" />
+    <Compile Include="ViewModel\FlattenFatherSonGrandsonDto.cs" />
+    <Compile Include="ViewModel\FlattenFatherSonsCountDto.cs" />
     <Compile Include="ViewModel\FullCatalogueGroupViewModel.cs" />
     <Compile Include="ViewModel\FullCatalogueViewModel.cs" />
     <Compile Include="ViewModel\ProductVariantViewModel.cs" />
@@ -110,6 +125,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201511050542223_Initial.resx">
       <DependentUpon>201511050542223_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201603220950395_AddFlattening.resx">
+      <DependentUpon>201603220950395_AddFlattening.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
