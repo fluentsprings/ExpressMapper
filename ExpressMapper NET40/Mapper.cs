@@ -68,6 +68,11 @@ namespace ExpressMapper
             return Instance.Register<T, TN>();
         }
 
+        public static bool MapExists(Type sourceType, Type destinationType)
+        {
+            return Instance.MapExists(sourceType, destinationType);
+        }
+
         public static void RegisterCustom<T, TN, TMapper>()
             where TMapper : ICustomTypeMapper<T, TN>
         {

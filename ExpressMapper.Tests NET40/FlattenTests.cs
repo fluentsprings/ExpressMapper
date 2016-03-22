@@ -20,12 +20,31 @@ namespace ExpressMapper.Tests
             Mapper.Map(Father.CreateOne(), dto);
 
             //VERIFY   
-            Assert.AreEqual("Father", dto.MyString);    //This is mapped by the normal AutoMapper 
-            Assert.AreEqual(1, dto.MyInt);              //This is mapped by the normal AutoMapper 
+            Assert.AreEqual("Father", dto.MyString);    //This is mapped by the normal ExpressMapper 
+            Assert.AreEqual(1, dto.MyInt);              //This is mapped by the normal ExpressMapper 
             Assert.AreEqual("Son", dto.SonMyString);
             Assert.AreEqual(2, dto.SonMyInt);
             Assert.AreEqual("Grandson", dto.SonGrandsonMyString);
             Assert.AreEqual(3, dto.SonGrandsonMyInt);
+        }
+
+        [Test]
+        public void FlattenFatherSonGrandsonDtoWithSimpleClassOk()
+        {
+            //SETUP
+            Mapper.Register<Father, FlattenFatherSonSimpleDto>().FlattenSource();
+            Mapper.Register<Son, FlattenSimpleClass>();
+            Mapper.Compile(CompilationTypes.Source);
+
+            //ATTEMPT
+            var dto = new FlattenFatherSonSimpleDto();
+            Mapper.Map(Father.CreateOne(), dto);
+
+            //VERIFY   
+            Assert.AreEqual("Father", dto.MyString);    //This is mapped by the normal ExpressMapper 
+            Assert.AreEqual(1, dto.MyInt);              //This is mapped by the normal ExpressMapper 
+            Assert.AreEqual("Son", dto.Son.MyString);
+            Assert.AreEqual(2, dto.Son.MyInt);
         }
 
 
@@ -46,8 +65,8 @@ namespace ExpressMapper.Tests
             Mapper.Map(src, dto);
 
             //VERIFY   
-            Assert.AreEqual("Father", dto.MyString);    //This is mapped by the normal AutoMapper 
-            Assert.AreEqual(1, dto.MyInt);              //This is mapped by the normal AutoMapper 
+            Assert.AreEqual("Father", dto.MyString);    //This is mapped by the normal ExpressMapper 
+            Assert.AreEqual(1, dto.MyInt);              //This is mapped by the normal ExpressMapper 
             Assert.AreEqual(null, dto.SonMyString);
             Assert.AreEqual(0, dto.SonMyInt);
             Assert.AreEqual(null, dto.SonGrandsonMyString);

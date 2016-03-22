@@ -2,6 +2,7 @@
 using ExpressMapper.Extensions;
 using ExpressMapper.Tests.Model.ViewModels;
 using ExpressMapper.Tests.Projections.Entities;
+using ExpressMapper.Tests.Projections.ViewModel;
 using NUnit.Framework;
 
 namespace ExpressMapper.Tests.Projections.Tests
@@ -22,6 +23,8 @@ namespace ExpressMapper.Tests.Projections.Tests
 
             Mapper.Register<Father, FlattenFatherSonGrandsonDto>().FlattenSource();
             Mapper.Register<FatherSons, FlattenFatherSonsCountDto>().FlattenSource();
+            Mapper.Register<Father, FlattenFatherSonSimpleDto>().FlattenSource();
+            Mapper.Register<Son, FlattenSimpleClass>();
             Mapper.Compile(CompilationTypes.Source);
         }
 
@@ -41,8 +44,8 @@ namespace ExpressMapper.Tests.Projections.Tests
 
             //VERIFY  
             Assert.AreEqual(1, results.Count);
-            Assert.AreEqual("Father", results.First().MyString);    //This is mapped by the normal AutoMapper 
-            Assert.AreEqual(1, results.First().MyInt);              //This is mapped by the normal AutoMapper 
+            Assert.AreEqual("Father", results.First().MyString);    //This is mapped by the normal ExpressMapper 
+            Assert.AreEqual(1, results.First().MyInt);              //This is mapped by the normal ExpressMapper 
             Assert.AreEqual("Son", results.First().SonMyString);
             Assert.AreEqual(101, results.First().SonMyInt);
             Assert.AreEqual("Grandson", results.First().SonGrandsonMyString);
@@ -60,12 +63,28 @@ namespace ExpressMapper.Tests.Projections.Tests
 
             //VERIFY  
             Assert.AreEqual(1, results.Count);
-            Assert.AreEqual("Father", results.First().MyString);    //This is mapped by the normal AutoMapper 
-            Assert.AreEqual(2, results.First().MyInt);              //This is mapped by the normal AutoMapper 
+            Assert.AreEqual("Father", results.First().MyString);    //This is mapped by the normal ExpressMapper 
+            Assert.AreEqual(2, results.First().MyInt);              //This is mapped by the normal ExpressMapper 
             Assert.AreEqual("Son", results.First().SonMyString);
             Assert.AreEqual(102, results.First().SonMyInt);
             Assert.AreEqual(null, results.First().SonGrandsonMyString);
             Assert.AreEqual(null, results.First().SonGrandsonMyInt);
+        }
+
+        [Test]
+        public void FlattenFatherSonSimpleDtoOk()
+        {
+            //SETUP
+
+            //ATTEMPT
+            var results = Context.Set<Father>().Where(x => x.Son.Grandson != null).Project<Father, FlattenFatherSonSimpleDto>().ToList();
+
+            //VERIFY   
+            Assert.AreEqual(1, results.Count);
+            Assert.AreEqual("Father", results.First().MyString);    //This is mapped by the normal ExpressMapper 
+            Assert.AreEqual(1, results.First().MyInt);              //This is mapped by the normal ExpressMapper 
+            Assert.AreEqual("Son", results.First().Son.MyString);
+            Assert.AreEqual(101, results.First().Son.MyInt);
         }
 
         [Test]
@@ -78,8 +97,8 @@ namespace ExpressMapper.Tests.Projections.Tests
 
             //VERIFY  
             Assert.AreEqual(1, results.Count);
-            Assert.AreEqual("Father", results.First().MyString);    //This is mapped by the normal AutoMapper 
-            Assert.AreEqual(1, results.First().MyInt);              //This is mapped by the normal AutoMapper 
+            Assert.AreEqual("Father", results.First().MyString);    //This is mapped by the normal ExpressMapper 
+            Assert.AreEqual(1, results.First().MyInt);              //This is mapped by the normal ExpressMapper 
             Assert.AreEqual(5, results.First().SonsCount);
         }
 
