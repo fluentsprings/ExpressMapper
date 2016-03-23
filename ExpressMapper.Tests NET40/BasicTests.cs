@@ -1305,5 +1305,14 @@ namespace ExpressMapper.Tests
 
             Assert.Throws<ExpressmapperException>(Mapper.Compile);
         }
+
+        [Test]
+        public void MapExistsTest()
+        {
+            Mapper.Register<Father, FlattenFatherSonGrandsonDto>();
+
+            Assert.True(Mapper.MapExists(typeof(Father), typeof(FlattenFatherSonGrandsonDto)));
+            Assert.False(Mapper.MapExists(typeof(FlattenFatherSonGrandsonDto), typeof(Father)));
+        }
     }
 }

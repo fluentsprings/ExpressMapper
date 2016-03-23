@@ -12,20 +12,5 @@ namespace ExpressMapper.Tests.Model.ViewModels
 
         public int? SonGrandsonMyInt { get; set; }
         public string SonGrandsonMyString { get; set; }
-
-
-        public static FlattenFatherSonGrandsonDto CreateOne(Random rand = null)
-        {
-            rand = rand ?? new Random();
-            return new FlattenFatherSonGrandsonDto
-            {
-                MyInt = rand.Next(),
-                MyString = "Father",
-                SonMyInt = 2,
-                SonMyString = "Son",
-                SonGrandsonMyInt = 3,
-                SonGrandsonMyString = "Grandson"
-            };
-        }
     }
 }

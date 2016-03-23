@@ -12,6 +12,7 @@ namespace ExpressMapper.Tests
         public void FlattenFatherSonGrandsonDtoOk()
         {
             //SETUP
+            Mapper.Reset();
             Mapper.Register<Father, FlattenFatherSonGrandsonDto>().FlattenSource();
             Mapper.Compile(CompilationTypes.Source);
 
@@ -29,29 +30,94 @@ namespace ExpressMapper.Tests
         }
 
         [Test]
-        public void FlattenFatherSonGrandsonDtoWithSimpleClassOk()
+        public void FatherLowerCaseFlattenFatherSonGrandsonDtoOk()
         {
             //SETUP
-            Mapper.Register<Father, FlattenFatherSonSimpleDto>().FlattenSource();
-            Mapper.Register<Son, FlattenSimpleClass>();
+            Mapper.Reset();
+            Mapper.Register<FatherLowerCase, FlattenFatherSonGrandsonDto>().FlattenSource();
             Mapper.Compile(CompilationTypes.Source);
 
             //ATTEMPT
-            var dto = new FlattenFatherSonSimpleDto();
+            var dto = new FlattenFatherSonGrandsonDto();
+            Mapper.Map(FatherLowerCase.CreateOne(), dto);
+
+            //VERIFY   
+            Assert.AreEqual("Father", dto.MyString);    //This is mapped by the normal ExpressMapper 
+            Assert.AreEqual(1, dto.MyInt);              //This is mapped by the normal ExpressMapper 
+            Assert.AreEqual("Son", dto.SonMyString);
+            Assert.AreEqual(2, dto.SonMyInt);
+            Assert.AreEqual("Grandson", dto.SonGrandsonMyString);
+            Assert.AreEqual(3, dto.SonGrandsonMyInt);
+        }
+
+        [Test]
+        public void FlattenFatherSonGrandsonLowerCaseDtoOk()
+        {
+            //SETUP
+            Mapper.Reset();
+            Mapper.Register<Father, FlattenFatherSonGrandsonLowerCaseDto>().FlattenSource();
+            Mapper.Compile(CompilationTypes.Source);
+
+            //ATTEMPT
+            var dto = new FlattenFatherSonGrandsonLowerCaseDto();
+            Mapper.Map(Father.CreateOne(), dto);
+
+            //VERIFY   
+            Assert.AreEqual("Father", dto.mystring);    //This is mapped by the normal ExpressMapper 
+            Assert.AreEqual(1, dto.myInt);              //This is mapped by the normal ExpressMapper 
+            Assert.AreEqual("Son", dto.sonMyString);
+            Assert.AreEqual(2, dto.Sonmyint);
+            Assert.AreEqual("Grandson", dto.SongrandsonmYstring);
+            Assert.AreEqual(3, dto.sonGrandsonMyInt);
+        }
+
+        [Test]
+        public void FlattenFatherSonGrandsonDtoCaseSensativeOk()
+        {
+            //SETUP
+            Mapper.Reset();
+            Mapper.Register<Father, FlattenFatherSonGrandsonDto>().CaseSensitive(true).FlattenSource();
+            Mapper.Compile(CompilationTypes.Source);
+
+            //ATTEMPT
+            var dto = new FlattenFatherSonGrandsonDto();
             Mapper.Map(Father.CreateOne(), dto);
 
             //VERIFY   
             Assert.AreEqual("Father", dto.MyString);    //This is mapped by the normal ExpressMapper 
             Assert.AreEqual(1, dto.MyInt);              //This is mapped by the normal ExpressMapper 
-            Assert.AreEqual("Son", dto.Son.MyString);
-            Assert.AreEqual(2, dto.Son.MyInt);
+            Assert.AreEqual("Son", dto.SonMyString);
+            Assert.AreEqual(2, dto.SonMyInt);
+            Assert.AreEqual("Grandson", dto.SonGrandsonMyString);
+            Assert.AreEqual(3, dto.SonGrandsonMyInt);
         }
 
+        [Test]
+        public void FlattenFatherSonGrandsonLowerCaseDtoCaseSensativeOk()
+        {
+            //SETUP
+            Mapper.Reset();
+            Mapper.Register<Father, FlattenFatherSonGrandsonLowerCaseDto>().CaseSensitive(true).FlattenSource();
+            Mapper.Compile(CompilationTypes.Source);
+
+            //ATTEMPT
+            var dto = new FlattenFatherSonGrandsonLowerCaseDto();
+            Mapper.Map(Father.CreateOne(), dto);
+
+            //VERIFY   
+            Assert.AreEqual(null, dto.mystring);        //This is mapped by the normal ExpressMapper 
+            Assert.AreEqual(0, dto.myInt);              //This is mapped by the normal ExpressMapper 
+            Assert.AreEqual(null, dto.sonMyString);
+            Assert.AreEqual(0, dto.Sonmyint);
+            Assert.AreEqual(null, dto.SongrandsonmYstring);
+            Assert.AreEqual(null, dto.sonGrandsonMyInt);
+        }
 
         [Test]
         public void FlattenFatherSonGrandsonDtoNoSon()
         {
             //SETUP
+            Mapper.Reset();
             Mapper.Register<Father, FlattenFatherSonGrandsonDto>().FlattenSource();
             Mapper.Compile(CompilationTypes.Source);
 

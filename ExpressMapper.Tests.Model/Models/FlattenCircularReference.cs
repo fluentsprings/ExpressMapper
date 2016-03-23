@@ -12,17 +12,19 @@
 
         public static FlattenCircularReference CreateOne()
         {
-            return new FlattenCircularReference
+            var outer = new FlattenCircularReference
             {
                 MyInt = 1,
                 MyString = "Outer",
-                CircularRef = new FlattenCircularReference
-                {
-                    MyInt = 2,
-                    MyString = "Inner"
-                },
                 Son = Son.CreateOne()
             };
+            outer.CircularRef = new FlattenCircularReference
+            {
+                MyInt = 2,
+                MyString = "Inner",
+                CircularRef = outer
+            };
+            return outer;
         }
     }
 }

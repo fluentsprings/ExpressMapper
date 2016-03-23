@@ -58,6 +58,7 @@
     <Compile Include="Models\Employee.cs" />
     <Compile Include="Models\Engine.cs" />
     <Compile Include="Models\FashionProduct.cs" />
+    <Compile Include="Models\FatherLowerCase.cs" />
     <Compile Include="Models\Father.cs" />
     <Compile Include="Models\FatherSons.cs" />
     <Compile Include="Models\FlattenCircularReference.cs" />
@@ -65,7 +66,7 @@
     <Compile Include="Models\Grandson.cs" />
     <Compile Include="Models\ItemModel.cs" />
     <Compile Include="ViewModels\FlattenCircularReferenceDto.cs" />
-    <Compile Include="ViewModels\FlattenFatherSonSimpleDto.cs" />
+    <Compile Include="ViewModels\FlattenFatherSonGrandsonLowerCaseDto.cs" />
     <Compile Include="ViewModels\FlattenFatherSonsCountBadDto.cs" />
     <Compile Include="ViewModels\FlattenFatherSonsCountDto.cs" />
     <Compile Include="ViewModels\FlattenLinqCollectionMethodsDto.cs" />
@@ -110,7 +111,6 @@
     <Compile Include="ViewModels\EngineViewModel.cs" />
     <Compile Include="ViewModels\FashionProductViewModel.cs" />
     <Compile Include="ViewModels\FlattenFatherSonGrandsonDto.cs" />
-    <Compile Include="ViewModels\FlattenSimpleClass.cs" />
     <Compile Include="ViewModels\GiftViewModel.cs" />
     <Compile Include="ViewModels\ItemModelViewModel.cs" />
     <Compile Include="ViewModels\MailViewModel.cs" />

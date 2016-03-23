@@ -171,7 +171,7 @@ namespace ExpressMapper
             if (sourceMapperBase == null)
                 throw new Exception("Failed to find the source mapping.");
 
-            var f = new FlattenMapper<T, TN>(sourceMapperBase.NamesOfMembersAndIgnoredProperties());
+            var f = new FlattenMapper<T, TN>(sourceMapperBase.NamesOfMembersAndIgnoredProperties(), sourceMapperBase.GetStringCase());
             foreach (var flattenInfo in f.BuildMemberMapping())
             {
                 foreach (var typeMapper in _typeMappers)

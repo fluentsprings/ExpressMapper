@@ -49,10 +49,13 @@ namespace ExpressMapper
         /// This can be called on enumerable properly to see if the ending is a valid Linq method
         /// </summary>
         /// <param name="endOfName"></param>
+        /// <param name="stringComparison"></param>
         /// <returns></returns>
-        public static FlattenLinqMethod EnumerableEndMatchsWithLinqMethod(string endOfName)
+        public static FlattenLinqMethod EnumerableEndMatchsWithLinqMethod(string endOfName, StringComparison stringComparison)
         {
-            return EnumerableMethodLookup.ContainsKey(endOfName) ? EnumerableMethodLookup[endOfName] : null;
+            var foundKey = EnumerableMethodLookup.Keys.SingleOrDefault(x => string.Equals(x, endOfName, stringComparison));
+
+            return foundKey != null ? EnumerableMethodLookup[foundKey] : null;
         }
 
         public override string ToString()

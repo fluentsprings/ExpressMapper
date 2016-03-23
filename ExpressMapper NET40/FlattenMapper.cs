@@ -7,6 +7,7 @@ namespace ExpressMapper
 {
     internal class FlattenMapper<TSource, TDest>
     {
+        private readonly StringComparison _stringComparison;
 
         private readonly PropertyInfo[] _allDestProps;
         private readonly PropertyInfo[] _allSourceProps;
@@ -15,12 +16,22 @@ namespace ExpressMapper
 
         private List<FlattenMemberInfo> _foundFlattens;
 
-        public FlattenMapper(ICollection<string> namesOfPropertiesToIgnore)
+        public FlattenMapper(ICollection<string> namesOfPropertiesToIgnore, StringComparison stringComparison)
         {
-            _allDestProps = GetPropertiesRightAccess<TDest>().Where(x => !namesOfPropertiesToIgnore.Contains(x.Name)).ToArray();
+            _stringComparison = stringComparison;
             _allSourceProps = GetPropertiesRightAccess<TSource>();
+            _allDestProps = GetPropertiesRightAccess<TDest>();
+
             //ExpressMapper with match the top level properties, so we ignore those
             _filteredDestProps = FilterOutExactMatches(_allDestProps, _allSourceProps);
+
+            if (!namesOfPropertiesToIgnore.Any()) return;
+
+            //we also need to remove the destinations that have a .Member or .Ignore applied to them
+            if (stringComparison == StringComparison.OrdinalIgnoreCase)
+                namesOfPropertiesToIgnore = namesOfPropertiesToIgnore.Select(x => x.ToLowerInvariant()).ToList();
+            _filteredDestProps = _filteredDestProps.Where(x => !namesOfPropertiesToIgnore.Contains(
+                _stringComparison == StringComparison.OrdinalIgnoreCase ? x.Name.ToLowerInvariant() : x.Name)).ToList();
         }
 
         public List<FlattenMemberInfo> BuildMemberMapping()
@@ -45,19 +56,18 @@ namespace ExpressMapper
             string prefix, PropertyInfo [] sourcePropPath)
         {
 
-            foreach (var matchedStartSrcProp in sourceProps.Where(x => destProp.Name.StartsWith(prefix+x.Name)))
+            foreach (var matchedStartSrcProp in sourceProps.Where(x => destProp.Name.StartsWith(prefix+x.Name, _stringComparison)))
             {
                 var matchStart = prefix + matchedStartSrcProp.Name;
-                if (destProp.Name == matchStart)
+                if (string.Equals(destProp.Name, matchStart, _stringComparison))
                 {
                     //direct match of name
 
                     var underlyingType = Nullable.GetUnderlyingType(destProp.PropertyType);
                     if (destProp.PropertyType == matchedStartSrcProp.PropertyType ||
-                        underlyingType == matchedStartSrcProp.PropertyType ||
-                        Mapper.MapExists(matchedStartSrcProp.PropertyType, destProp.PropertyType))
+                        underlyingType == matchedStartSrcProp.PropertyType)
                     {
-                        //matched a) same type, b) dest is a nullable version of source or c) there is an Express mapping between source and dest
+                        //matched a) same type, or b) dest is a nullable version of source 
                         _foundFlattens.Add( new FlattenMemberInfo(destProp, sourcePropPath, matchedStartSrcProp));
                         _filteredDestProps.Remove(destProp);        //matched, so take it out
                     }
@@ -80,7 +90,7 @@ namespace ExpressMapper
                 {
                     //its an enumerable class so see if the end relates to a LINQ method
                     var endOfName = destProp.Name.Substring(matchStart.Length);
-                    var enumeableMethod = FlattenLinqMethod.EnumerableEndMatchsWithLinqMethod(endOfName);
+                    var enumeableMethod = FlattenLinqMethod.EnumerableEndMatchsWithLinqMethod(endOfName, _stringComparison);
                     if (enumeableMethod != null)
                     {
                         _foundFlattens.Add(new FlattenMemberInfo(destProp, sourcePropPath, matchedStartSrcProp, enumeableMethod));
@@ -100,10 +110,12 @@ namespace ExpressMapper
             return classType.GetProperties(BindingFlags.Instance | BindingFlags.Public);
         }
 
-        private static List<PropertyInfo> FilterOutExactMatches(PropertyInfo[] propsToFilter, PropertyInfo[] filterAgainst)
+        private List<PropertyInfo> FilterOutExactMatches(PropertyInfo[] propsToFilter, PropertyInfo[] filterAgainst)
         {
-            var filterNames = filterAgainst.Select(x => x.Name).ToArray();
-            return propsToFilter.Where(x => !filterNames.Contains(x.Name)).ToList();
+            var filterNames = filterAgainst
+                .Select(x => _stringComparison == StringComparison.OrdinalIgnoreCase ? x.Name.ToLowerInvariant() : x.Name).ToArray();
+            return propsToFilter.Where(x => !filterNames
+                .Contains(_stringComparison == StringComparison.OrdinalIgnoreCase ? x.Name.ToLowerInvariant() : x.Name)).ToList();
 
         }
     }

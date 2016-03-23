@@ -284,7 +284,7 @@ namespace ExpressMapper
             }
         }
 
-        private StringComparison GetStringCase()
+        internal StringComparison GetStringCase()
         {
             StringComparison stringComparison;
 
