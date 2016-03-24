@@ -17,7 +17,7 @@ namespace ExpressMapper
             //"~First", "~Last", "~LastOrDefault", "~Single", "~SingleOrDefault"    - not supported by Entity Framework
         };
 
-        private static readonly Dictionary<string, FlattenLinqMethod> EnumerableMethodLookup;
+        private static readonly List<FlattenLinqMethod> EnumerableMethodLookup;
 
         static FlattenLinqMethod()
         {
@@ -25,8 +25,7 @@ namespace ExpressMapper
                 (from givenName in ListOfSupportedLinqMethods
                 let checkReturnType = givenName[0] != '~'
                 let name = checkReturnType ? givenName : givenName.Substring(1)
-                select new { Key = name, Value = new FlattenLinqMethod(name, checkReturnType) })
-                .ToDictionary(key => key.Key, val => val.Value);
+                select new FlattenLinqMethod(name, checkReturnType) ).ToList();
         }
 
         /// <summary>
@@ -53,9 +52,7 @@ namespace ExpressMapper
         /// <returns></returns>
         public static FlattenLinqMethod EnumerableEndMatchsWithLinqMethod(string endOfName, StringComparison stringComparison)
         {
-            var foundKey = EnumerableMethodLookup.Keys.SingleOrDefault(x => string.Equals(x, endOfName, stringComparison));
-
-            return foundKey != null ? EnumerableMethodLookup[foundKey] : null;
+            return EnumerableMethodLookup.SingleOrDefault(x => string.Equals(x._methodName, endOfName, stringComparison));
         }
 
         public override string ToString()
