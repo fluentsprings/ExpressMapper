@@ -65,7 +65,8 @@ namespace ExpressMapper
 
                     var underlyingType = Nullable.GetUnderlyingType(destProp.PropertyType);
                     if (destProp.PropertyType == matchedStartSrcProp.PropertyType ||
-                        underlyingType == matchedStartSrcProp.PropertyType)
+                        underlyingType == matchedStartSrcProp.PropertyType ||
+                        Mapper.MapExists(matchedStartSrcProp.PropertyType, destProp.PropertyType))
                     {
                         //matched a) same type, or b) dest is a nullable version of source 
                         _foundFlattens.Add( new FlattenMemberInfo(destProp, sourcePropPath, matchedStartSrcProp));

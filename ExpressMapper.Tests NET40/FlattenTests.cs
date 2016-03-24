@@ -51,6 +51,31 @@ namespace ExpressMapper.Tests
         }
 
         [Test]
+        public void FlattenFatherSonDtoForGrandsonDtoOk()
+        {
+            //SETUP
+            Mapper.Reset();
+            Mapper.Register<Grandson, FlattenSimpleClass>();
+            Mapper.Register<Father, FlattenFatherSonDtoForGrandsonDto>() //.FlattenSource();
+                .Member(dest => dest.SonMyInt, src => src.Son.MyInt)
+                .Member(dest => dest.SonMyString, src => src.Son.MyString)
+                .Member(dest => dest.SonGrandson, src => src.Son.Grandson);
+            Mapper.Compile(CompilationTypes.Source);
+
+            //ATTEMPT
+            var dto = new FlattenFatherSonDtoForGrandsonDto();
+            Mapper.Map(Father.CreateOne(), dto);
+
+            //VERIFY   
+            Assert.AreEqual("Father", dto.MyString);    //This is mapped by the normal ExpressMapper 
+            Assert.AreEqual(1, dto.MyInt);              //This is mapped by the normal ExpressMapper 
+            Assert.AreEqual("Son", dto.SonMyString);
+            Assert.AreEqual(2, dto.SonMyInt);
+            Assert.AreEqual("Grandson", dto.SonGrandson.MyString);
+            Assert.AreEqual(3, dto.SonGrandson.MyInt);
+        }
+
+        [Test]
         public void FlattenFatherSonGrandsonLowerCaseDtoOk()
         {
             //SETUP
