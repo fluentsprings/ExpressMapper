@@ -65,8 +65,8 @@ namespace ExpressMapper
 
                     var underlyingType = Nullable.GetUnderlyingType(destProp.PropertyType);
                     if (destProp.PropertyType == matchedStartSrcProp.PropertyType ||
-                        underlyingType == matchedStartSrcProp.PropertyType)//
-                        //|| Mapper.MapExists(matchedStartSrcProp.PropertyType, destProp.PropertyType))
+                        underlyingType == matchedStartSrcProp.PropertyType ||
+                        Mapper.MapExists(matchedStartSrcProp.PropertyType, destProp.PropertyType))
                     {
                         //matched a) same type, or b) dest is a nullable version of source 
                         _foundFlattens.Add( new FlattenMemberInfo(destProp, sourcePropPath, matchedStartSrcProp));
@@ -87,7 +87,7 @@ namespace ExpressMapper
                     clonedList.Add(matchedStartSrcProp);
                     ScanSourceClassRecursively(classProps, destProp, matchStart, clonedList.ToArray());
                 }
-                else if (matchedStartSrcProp.PropertyType.GetInterface("IEnumerable") != null)
+                else if (matchedStartSrcProp.PropertyType.GetInterfaces().Any(i => i.Name == "IEnumerable"))
                 {
                     //its an enumerable class so see if the end relates to a LINQ method
                     var endOfName = destProp.Name.Substring(matchStart.Length);

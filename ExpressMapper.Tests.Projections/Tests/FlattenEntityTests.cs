@@ -3,7 +3,6 @@ using ExpressMapper.Extensions;
 using ExpressMapper.Tests.Model.ViewModels;
 using ExpressMapper.Tests.Projections.Entities;
 using ExpressMapper.Tests.Projections.Utils;
-using ExpressMapper.Tests.Projections.ViewModel;
 using NUnit.Framework;
 
 namespace ExpressMapper.Tests.Projections.Tests
@@ -22,8 +21,8 @@ namespace ExpressMapper.Tests.Projections.Tests
 
             Context.SaveChanges();
 
-            Mapper.Register<Father, FlattenFatherSonGrandsonDto>().FlattenSource();
-            Mapper.Register<FatherSons, FlattenFatherSonsCountDto>().FlattenSource();
+            Mapper.Register<Father, FlattenFatherSonGrandsonDto>().Flatten();
+            Mapper.Register<FatherSons, FlattenFatherSonsCountDto>().Flatten();
             Mapper.Compile(CompilationTypes.Source);
         }
 

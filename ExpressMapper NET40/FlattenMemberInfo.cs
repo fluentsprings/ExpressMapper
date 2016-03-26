@@ -72,6 +72,5 @@ namespace ExpressMapper
                 ? (Expression)finalProperty
                 : _linqMethodSuffix.AsMethodCallExpression(finalProperty, properties[0], _destMember);
         }
-
     }
 }

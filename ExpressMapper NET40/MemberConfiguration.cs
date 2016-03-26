@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -163,23 +161,20 @@ namespace ExpressMapper
         /// e.g. dest.NestedClassMyProperty would contain the property src.NestedClass.MyProperty (as long as types match)
         /// and  dest.MyCollectionCount would contain the count (int) of the Collection.
         /// </summary>
-        public void FlattenSource()
+        public IMemberConfiguration<T, TN> Flatten()
         {
             var sourceMapperBase =
                 _typeMappers.Single(x => x.MapperType == CompilationTypes.Source) as TypeMapperBase<T, TN>;
 
             if (sourceMapperBase == null)
                 throw new Exception("Failed to find the source mapping.");
-
-            var f = new FlattenMapper<T, TN>(sourceMapperBase.NamesOfMembersAndIgnoredProperties(), sourceMapperBase.GetStringCase());
-            foreach (var flattenInfo in f.BuildMemberMapping())
+            
+            foreach (var typeMapper in _typeMappers)
             {
-                foreach (var typeMapper in _typeMappers)
-                {
-                    typeMapper.MapMemberFlattened(flattenInfo.DestAsMemberExpression<TN>(),
-                        flattenInfo.SourceAsExpression<T>());
-                }
+                typeMapper.Flatten();
             }
+
+            return this;
         }
 
         #endregion

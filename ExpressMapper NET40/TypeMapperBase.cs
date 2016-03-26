@@ -23,9 +23,11 @@ namespace ExpressMapper
         protected IMappingServiceProvider MappingServiceProvider { get; set; }
         protected Dictionary<MemberInfo, MemberInfo> AutoMembers = new Dictionary<MemberInfo, MemberInfo>();
         protected List<KeyValuePair<MemberExpression, Expression>> CustomMembers = new List<KeyValuePair<MemberExpression, Expression>>();
+        protected List<KeyValuePair<MemberExpression, Expression>> FlattenMembers = new List<KeyValuePair<MemberExpression, Expression>>();
         protected List<KeyValuePair<MemberExpression, Expression>> CustomFunctionMembers = new List<KeyValuePair<MemberExpression, Expression>>();
         public Expression<Func<T, TN>> QueryableExpression { get; protected set; }
         public abstract CompilationTypes MapperType { get; }
+        protected bool Flattened { get; set; }
 
         public Expression QueryableGeneralExpression
         {
@@ -71,6 +73,11 @@ namespace ExpressMapper
         #endregion
 
         protected abstract void InitializeRecursiveMappings(IMappingServiceProvider serviceProvider);
+
+        public void Flatten()
+        {
+            Flattened = true;
+        }
 
         public void CaseSensetiveMemberMap(bool caseSensitive)
         {
@@ -208,12 +215,15 @@ namespace ExpressMapper
 
         public void MapMemberFlattened(MemberExpression left, Expression right)
         {
-            CustomMembers.Add(new KeyValuePair<MemberExpression, Expression>(left, right));
+            FlattenMembers.Add(new KeyValuePair<MemberExpression, Expression>(left, right));
         }
 
-        internal List<string> NamesOfMembersAndIgnoredProperties()
+        protected List<string> NamesOfMembersAndIgnoredProperties()
         {
-            var result = CustomMembers.Select(x => x.Key.Member.Name).ToList();
+            var result =
+                CustomMembers.Select(x => x.Key.Member.Name)
+                    .Union(CustomFunctionMembers.Select(x => x.Key.Member.Name))
+                    .ToList();
             result.AddRange(IgnoreMemberList);
             return result;
         }
@@ -393,6 +403,24 @@ namespace ExpressMapper
             foreach (var keyValue in CustomFunctionMembers)
             {
                 MapMember(keyValue.Key, keyValue.Value);
+            }
+        }
+
+        protected void ProcessFlattenedMembers()
+        {
+            if (Flattened)
+            {
+                var flattenMapper = new FlattenMapper<T, TN>(NamesOfMembersAndIgnoredProperties(), GetStringCase());
+                foreach (var flattenInfo in flattenMapper.BuildMemberMapping())
+                {
+                    MapMemberFlattened(flattenInfo.DestAsMemberExpression<TN>(), flattenInfo.SourceAsExpression<T>());
+                }
+
+                FlattenMembers = TranslateExpression(FlattenMembers);
+                foreach (var keyValue in FlattenMembers)
+                {
+                    MapMember(keyValue.Key, keyValue.Value);
+                }
             }
         }
 
