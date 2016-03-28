@@ -20,5 +20,6 @@ namespace ExpressMapper
         IMemberConfiguration<T, TN> Value<TNMember>(Expression<Func<TN, TNMember>> dest, TNMember value);
         IMemberConfiguration<T, TN> CaseSensitive(bool caseSensitive);
         IMemberConfiguration<T, TN> CompileTo(CompilationTypes compilationType);
+        IMemberConfiguration<T, TN> Flatten();
     }
 }

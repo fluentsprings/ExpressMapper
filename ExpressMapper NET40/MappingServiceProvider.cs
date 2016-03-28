@@ -66,6 +66,22 @@ namespace ExpressMapper
             return RegisterInternal<T, TN>(memberCaseInsensitive);
         }
 
+        #region flatten code
+
+        /// <summary>
+        /// This returns true if ExpressMapper already contains a map between the source and destination types
+        /// </summary>
+        /// <returns></returns>
+        public bool MapExists(Type sourceType, Type destinationType)
+        {
+            var cacheKey = CalculateCacheKey(sourceType, destinationType);
+
+            return SourceService.TypeMappers.ContainsKey(cacheKey) &&
+                   DestinationService.TypeMappers.ContainsKey(cacheKey);
+        }
+
+        #endregion
+
         private IMemberConfiguration<T, TN> RegisterInternal<T, TN>(bool memberCaseInsensitive = true)
         {
             lock (_lock)

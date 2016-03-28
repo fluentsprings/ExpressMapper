@@ -70,6 +70,15 @@
     <Compile Include="..\ExpressMapper NET40\ExpressmapperExtensions.cs">
       <Link>ExpressmapperExtensions.cs</Link>
     </Compile>
+    <Compile Include="..\ExpressMapper NET40\FlattenLinqMethod.cs">
+      <Link>FlattenLinqMethod.cs</Link>
+    </Compile>
+    <Compile Include="..\ExpressMapper NET40\FlattenMapper.cs">
+      <Link>FlattenMapper.cs</Link>
+    </Compile>
+    <Compile Include="..\ExpressMapper NET40\FlattenMemberInfo.cs">
+      <Link>FlattenMemberInfo.cs</Link>
+    </Compile>
     <Compile Include="..\ExpressMapper NET40\ICustomTypeMapper.cs">
       <Link>ICustomTypeMapper.cs</Link>
     </Compile>

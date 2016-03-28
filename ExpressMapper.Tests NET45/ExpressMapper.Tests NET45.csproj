@@ -60,6 +60,12 @@
     <Compile Include="..\ExpressMapper.Tests NET40\ExceptionTests.cs">
       <Link>ExceptionTests.cs</Link>
     </Compile>
+    <Compile Include="..\ExpressMapper.Tests NET40\FlattenProjectTests.cs">
+      <Link>FlattenProjectTests.cs</Link>
+    </Compile>
+    <Compile Include="..\ExpressMapper.Tests NET40\FlattenTests.cs">
+      <Link>FlattenTests.cs</Link>
+    </Compile>
     <Compile Include="..\ExpressMapper.Tests NET40\SizeListMapper.cs">
       <Link>SizeListMapper.cs</Link>
     </Compile>

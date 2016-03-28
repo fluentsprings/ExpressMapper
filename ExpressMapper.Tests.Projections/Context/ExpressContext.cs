@@ -14,6 +14,11 @@ namespace ExpressMapper.Tests.Projections.Context
             modelBuilder.Configurations.Add(new CategoryConfiguration());
             modelBuilder.Configurations.Add(new CatalogueConfiguration());
             modelBuilder.Configurations.Add(new CatalogueGroupConfiguration());
+            //flattening tests entities
+            modelBuilder.Configurations.Add(new FatherConfiguration());
+            modelBuilder.Configurations.Add(new SonConfiguration());
+            modelBuilder.Configurations.Add(new GrandsonConfiguration());
+            modelBuilder.Configurations.Add(new FatherSonsConfiguration());
         }
     }
 }

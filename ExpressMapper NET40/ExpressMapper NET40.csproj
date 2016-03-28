@@ -59,10 +59,13 @@
     <Compile Include="DestinationTypeMapper.cs" />
     <Compile Include="ExpressmapperException.cs" />
     <Compile Include="ExpressmapperExtensions.cs" />
+    <Compile Include="FlattenMemberInfo.cs" />
+    <Compile Include="FlattenMapper.cs" />
     <Compile Include="IMappingContext.cs" />
     <Compile Include="IMappingServiceProvider.cs" />
     <Compile Include="Ioc\DependencyResolver.cs" />
     <Compile Include="Ioc\IContainer.cs" />
+    <Compile Include="FlattenLinqMethod.cs" />
     <Compile Include="MapNotImplemented.cs" />
     <Compile Include="MappingServiceProvider.cs">
       <SubType>Code</SubType>

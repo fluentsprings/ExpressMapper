@@ -38,6 +38,7 @@ namespace ExpressMapper
 
             ProcessCustomMembers();
             ProcessCustomFunctionMembers();
+            ProcessFlattenedMembers();
             ProcessAutoProperties();
 
             CreateQueryableProjection();
@@ -90,6 +91,11 @@ namespace ExpressMapper
                 foreach (var customMember in CustomMembers)
                 {
                     ProcessProjectingMember(customMember.Value, customMember.Key.Member as PropertyInfo);
+                }
+
+                foreach (var flattenedMember in FlattenMembers)
+                {
+                    ProcessProjectingMember(flattenedMember.Value, flattenedMember.Key.Member as PropertyInfo);
                 }
 
                 foreach (var autoMember in AutoMembers)

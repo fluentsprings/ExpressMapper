@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -150,5 +151,33 @@ namespace ExpressMapper
             }
             return this;
         }
+
+        #region flatten code
+
+        /// <summary>
+        /// This will apply the flattening algorithm to the source. 
+        /// This allow properties in nested source classes to be assigned to a top level destination property.
+        /// Matching is done by concatenated names, and also a few Linq commands
+        /// e.g. dest.NestedClassMyProperty would contain the property src.NestedClass.MyProperty (as long as types match)
+        /// and  dest.MyCollectionCount would contain the count (int) of the Collection.
+        /// </summary>
+        public IMemberConfiguration<T, TN> Flatten()
+        {
+            var sourceMapperBase =
+                _typeMappers.Single(x => x.MapperType == CompilationTypes.Source) as TypeMapperBase<T, TN>;
+
+            if (sourceMapperBase == null)
+                throw new Exception("Failed to find the source mapping.");
+            
+            foreach (var typeMapper in _typeMappers)
+            {
+                typeMapper.Flatten();
+            }
+
+            return this;
+        }
+
+        #endregion
+
     }
 }
