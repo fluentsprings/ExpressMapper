@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using ExpressMapper.Extensions;
 using ExpressMapper.Tests.Model.Models;
@@ -16,8 +15,7 @@ namespace ExpressMapper.Tests
         public void FlattenFatherSonsCountDtoOk()
         {
             //SETUP
-            Mapper.Reset();
-            Mapper.Register<FatherSons, FlattenFatherSonsCountDto>().FlattenSource();
+            Mapper.Register<FatherSons, FlattenFatherSonsCountDto>().Flatten();
             Mapper.Compile(CompilationTypes.Source);
 
             //ATTEMPT
@@ -34,8 +32,7 @@ namespace ExpressMapper.Tests
         public void FlattenLinqCollectionMethodsDtoOk()
         {
             //SETUP
-            Mapper.Reset();
-            Mapper.Register<FatherSons, FlattenLinqCollectionMethodsDto>().FlattenSource();
+            Mapper.Register<FatherSons, FlattenLinqCollectionMethodsDto>().Flatten();
             Mapper.Compile(CompilationTypes.Source);
 
             //ATTEMPT
@@ -55,7 +52,7 @@ namespace ExpressMapper.Tests
         {
             //SETUP
             Mapper.Reset();
-            Mapper.Register<FlattenCircularReference, FlattenCircularReferenceDto>().FlattenSource();
+            Mapper.Register<FlattenCircularReference, FlattenCircularReferenceDto>().Flatten();
             Mapper.Compile(CompilationTypes.Source);
 
             //ATTEMPT

@@ -184,11 +184,11 @@ namespace ExpressMapper
                 }
                 var mapComplexResult = GetDifferentTypeMemberMappingExpression(right, left, newDest);
 
-                return nullCheckNestedMemberVisitor.CheckNullExpression != null
-                    ? Expression.Condition(nullCheckNestedMemberVisitor.CheckNullExpression,
-                        Expression.Assign(left, Expression.Default(left.Type)),
-                        mapComplexResult)
-                    : mapComplexResult;
+//                return nullCheckNestedMemberVisitor.CheckNullExpression != null
+//                    ? Expression.Condition(nullCheckNestedMemberVisitor.CheckNullExpression,
+//                        Expression.Assign(left, Expression.Default(left.Type)),
+//                        mapComplexResult)
+                  return mapComplexResult;
             }
             var binaryExpression = CreateAssignExpression(left,
                 right,

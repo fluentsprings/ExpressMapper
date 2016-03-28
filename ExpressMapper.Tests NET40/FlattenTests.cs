@@ -12,13 +12,39 @@ namespace ExpressMapper.Tests
         public void FlattenFatherSonGrandsonDtoOk()
         {
             //SETUP
-            Mapper.Reset();
-            Mapper.Register<Father, FlattenFatherSonGrandsonDto>().FlattenSource();
+            Mapper.Register<Father, FlattenFatherSonGrandsonDto>()
+                .Flatten();
             Mapper.Compile(CompilationTypes.Source);
 
             //ATTEMPT
-            var dto = new FlattenFatherSonGrandsonDto();
-            Mapper.Map(Father.CreateOne(), dto);
+            var father = Father.CreateOne();
+            var dto = Mapper.Map<Father, FlattenFatherSonGrandsonDto>(father);
+
+            //VERIFY   
+            Assert.AreEqual("Father", dto.MyString);    //This is mapped by the normal ExpressMapper 
+            Assert.AreEqual(1, dto.MyInt);              //This is mapped by the normal ExpressMapper 
+            Assert.AreEqual("Son", dto.SonMyString);
+            Assert.AreEqual(2, dto.SonMyInt);
+            Assert.AreEqual("Grandson", dto.SonGrandsonMyString);
+            Assert.AreEqual(3, dto.SonGrandsonMyInt);
+        }
+
+        [Test]
+        public void FlattenFatherSonGrandsonDtoWithDestinationOk()
+        {
+            //SETUP
+            Mapper.Register<Father, FlattenFatherSonGrandsonDto>()
+                .Flatten();
+            Mapper.Compile(CompilationTypes.Destination);
+
+            //ATTEMPT
+            var dto = new FlattenFatherSonGrandsonDto
+            {
+                MyInt = 29387465,
+                MyString = "whjqegfqwjehfg"
+            };
+            var father = Father.CreateOne();
+            Mapper.Map(father, dto);
 
             //VERIFY   
             Assert.AreEqual("Father", dto.MyString);    //This is mapped by the normal ExpressMapper 
@@ -33,8 +59,8 @@ namespace ExpressMapper.Tests
         public void FatherLowerCaseFlattenFatherSonGrandsonDtoOk()
         {
             //SETUP
-            Mapper.Reset();
-            Mapper.Register<FatherLowerCase, FlattenFatherSonGrandsonDto>().FlattenSource();
+            Mapper.Register<FatherLowerCase, FlattenFatherSonGrandsonDto>()
+                .Flatten();
             Mapper.Compile(CompilationTypes.Source);
 
             //ATTEMPT
@@ -50,22 +76,18 @@ namespace ExpressMapper.Tests
             Assert.AreEqual(3, dto.SonGrandsonMyInt);
         }
 
-        [Ignore("This does not work - awaiting decision on ExpressMapping inside Cutomer members")]
         [Test]
         public void FlattenFatherSonDtoForGrandsonDtoOk()
         {
             //SETUP
-            Mapper.Reset();
             Mapper.Register<Grandson, FlattenSimpleClass>();
-            Mapper.Register<Father, FlattenFatherSonDtoForGrandsonDto>() //.FlattenSource();
-                .Member(dest => dest.SonMyInt, src => src.Son.MyInt)
-                .Member(dest => dest.SonMyString, src => src.Son.MyString)
-                .Member(dest => dest.SonGrandson, src => src.Son.Grandson);
+            Mapper.Register<Father, FlattenFatherSonDtoForGrandsonDto>()
+                .Flatten();
             Mapper.Compile(CompilationTypes.Source);
 
             //ATTEMPT
-            var dto = new FlattenFatherSonDtoForGrandsonDto();
-            Mapper.Map(Father.CreateOne(), dto);
+            var father = Father.CreateOne();
+            var dto = Mapper.Map<Father, FlattenFatherSonDtoForGrandsonDto>(father);
 
             //VERIFY   
             Assert.AreEqual("Father", dto.MyString);    //This is mapped by the normal ExpressMapper 
@@ -80,13 +102,13 @@ namespace ExpressMapper.Tests
         public void FlattenFatherSonGrandsonLowerCaseDtoOk()
         {
             //SETUP
-            Mapper.Reset();
-            Mapper.Register<Father, FlattenFatherSonGrandsonLowerCaseDto>().FlattenSource();
+            Mapper.Register<Father, FlattenFatherSonGrandsonLowerCaseDto>()
+                .Flatten();
             Mapper.Compile(CompilationTypes.Source);
 
             //ATTEMPT
-            var dto = new FlattenFatherSonGrandsonLowerCaseDto();
-            Mapper.Map(Father.CreateOne(), dto);
+            var father = Father.CreateOne();
+            var dto = Mapper.Map<Father, FlattenFatherSonGrandsonLowerCaseDto>(father);
 
             //VERIFY   
             Assert.AreEqual("Father", dto.mystring);    //This is mapped by the normal ExpressMapper 
@@ -101,13 +123,13 @@ namespace ExpressMapper.Tests
         public void FlattenFatherSonGrandsonDtoCaseSensativeOk()
         {
             //SETUP
-            Mapper.Reset();
-            Mapper.Register<Father, FlattenFatherSonGrandsonDto>().CaseSensitive(true).FlattenSource();
+            Mapper.Register<Father, FlattenFatherSonGrandsonDto>().CaseSensitive(true)
+                .Flatten();
             Mapper.Compile(CompilationTypes.Source);
 
             //ATTEMPT
-            var dto = new FlattenFatherSonGrandsonDto();
-            Mapper.Map(Father.CreateOne(), dto);
+            var father = Father.CreateOne();
+            var dto = Mapper.Map<Father, FlattenFatherSonGrandsonDto>(father);
 
             //VERIFY   
             Assert.AreEqual("Father", dto.MyString);    //This is mapped by the normal ExpressMapper 
@@ -122,13 +144,13 @@ namespace ExpressMapper.Tests
         public void FlattenFatherSonGrandsonLowerCaseDtoCaseSensativeOk()
         {
             //SETUP
-            Mapper.Reset();
-            Mapper.Register<Father, FlattenFatherSonGrandsonLowerCaseDto>().CaseSensitive(true).FlattenSource();
+            Mapper.Register<Father, FlattenFatherSonGrandsonLowerCaseDto>()
+                .CaseSensitive(true)
+                .Flatten();
             Mapper.Compile(CompilationTypes.Source);
 
             //ATTEMPT
-            var dto = new FlattenFatherSonGrandsonLowerCaseDto();
-            Mapper.Map(Father.CreateOne(), dto);
+            var dto = Mapper.Map<Father, FlattenFatherSonGrandsonLowerCaseDto>(Father.CreateOne());
 
             //VERIFY   
             Assert.AreEqual(null, dto.mystring);        //This is mapped by the normal ExpressMapper 
@@ -143,18 +165,18 @@ namespace ExpressMapper.Tests
         public void FlattenFatherSonGrandsonDtoNoSon()
         {
             //SETUP
-            Mapper.Reset();
-            Mapper.Register<Father, FlattenFatherSonGrandsonDto>().FlattenSource();
+            Mapper.Register<Father, FlattenFatherSonGrandsonDto>()
+                .Flatten();
             Mapper.Compile(CompilationTypes.Source);
 
             //ATTEMPT
-            var dto = new FlattenFatherSonGrandsonDto();
             var src = new Father
             {
                 MyString = "Father",
                 MyInt = 1
             };
-            Mapper.Map(src, dto);
+
+            var dto = Mapper.Map<Father, FlattenFatherSonGrandsonDto>(src);
 
             //VERIFY   
             Assert.AreEqual("Father", dto.MyString);    //This is mapped by the normal ExpressMapper 
@@ -169,14 +191,14 @@ namespace ExpressMapper.Tests
         public void FlattenFatherSonGrandsonDtoOverrideSonGrandsonMyStringOk()
         {
             //SETUP
-            Mapper.Reset();
             Mapper.Register<Father, FlattenFatherSonGrandsonDto>()
-                .Member(dest => dest.SonGrandsonMyString, src => src.MyString).FlattenSource();
+                .Member(dest => dest.SonGrandsonMyString, src => src.MyString)
+                .Flatten();
             Mapper.Compile(CompilationTypes.Source);
 
             //ATTEMPT
-            var dto = new FlattenFatherSonGrandsonDto();
-            Mapper.Map(Father.CreateOne(), dto);
+            var father = Father.CreateOne();
+            var dto = Mapper.Map<Father, FlattenFatherSonGrandsonDto>(father);
 
             //VERIFY   
             Assert.AreEqual("Father", dto.MyString);
@@ -188,14 +210,13 @@ namespace ExpressMapper.Tests
         public void FlattenFatherSonGrandsonDtoIgnoreSonMyStringOk()
         {
             //SETUP
-            Mapper.Reset();
             Mapper.Register<Father, FlattenFatherSonGrandsonDto>()
-                .Ignore(dest => dest.SonMyString).FlattenSource();
+                .Ignore(dest => dest.SonMyString)
+                .Flatten();
             Mapper.Compile(CompilationTypes.Source);
 
             //ATTEMPT
-            var dto = new FlattenFatherSonGrandsonDto();
-            Mapper.Map(Father.CreateOne(), dto);
+            var dto = Mapper.Map<Father, FlattenFatherSonGrandsonDto>(Father.CreateOne());
 
             //VERIFY   
             Assert.AreEqual("Father", dto.MyString);
@@ -207,13 +228,13 @@ namespace ExpressMapper.Tests
         public void FlattenFatherSonsCountDtoOk()
         {
             //SETUP
-            Mapper.Reset();
-            Mapper.Register<FatherSons, FlattenFatherSonsCountDto>().FlattenSource();
+            Mapper.Register<FatherSons, FlattenFatherSonsCountDto>()
+                .Flatten();
             Mapper.Compile(CompilationTypes.Source);
 
             //ATTEMPT
-            var dto = new FlattenFatherSonsCountDto();
-            Mapper.Map(FatherSons.CreateOne(), dto);
+            var fatherSons = FatherSons.CreateOne();
+            var dto = Mapper.Map<FatherSons, FlattenFatherSonsCountDto>(fatherSons);
 
             //VERIFY  
             Assert.AreEqual("Father", dto.MyString);
@@ -224,13 +245,12 @@ namespace ExpressMapper.Tests
         public void FlattenLinqCollectionMethodsDtoOk()
         {
             //SETUP
-            Mapper.Reset();
-            Mapper.Register<FatherSons, FlattenLinqCollectionMethodsDto>().FlattenSource();
+            Mapper.Register<FatherSons, FlattenLinqCollectionMethodsDto>()
+                .Flatten();
             Mapper.Compile(CompilationTypes.Source);
 
             //ATTEMPT
-            var dto = new FlattenLinqCollectionMethodsDto();
-            Mapper.Map(FatherSons.CreateOne(), dto);
+            var dto = Mapper.Map<FatherSons, FlattenLinqCollectionMethodsDto>(FatherSons.CreateOne());
 
             //VERIFY  
             Assert.AreEqual(true, dto.SonsAny);
@@ -243,33 +263,17 @@ namespace ExpressMapper.Tests
         public void FlattenCircularReferenceDtoOk()
         {
             //SETUP
-            Mapper.Reset();
-            Mapper.Register<FlattenCircularReference, FlattenCircularReferenceDto>().FlattenSource();
+            Mapper.Register<FlattenCircularReference, FlattenCircularReferenceDto>()
+                .Flatten();
             Mapper.Compile(CompilationTypes.Source);
 
             //ATTEMPT
-            var dto = new FlattenCircularReferenceDto();
-            Mapper.Map(FlattenCircularReference.CreateOne(), dto);
+            var dto = Mapper.Map<FlattenCircularReference, FlattenCircularReferenceDto>(FlattenCircularReference.CreateOne());
 
             //VERIFY  
             Assert.AreEqual("Outer", dto.MyString);
             Assert.AreEqual("Son", dto.SonMyString);
             Assert.AreEqual("Inner", dto.CircularRefMyString);
-        }
-
-        //----------------------------------
-        //Failure tests
-
-        [Test]
-        public void FlattenFatherSonsCountBadDtoOk()
-        {
-            //SETUP
-
-            //ATTEMPT
-            var ex = Assert.Throws<InvalidOperationException>( () => Mapper.Register<FatherSons, FlattenFatherSonsCountBadDto>().FlattenSource());
-
-            //VERIFY  
-            Assert.AreEqual("We could not find the Method Count() which matched the property SonsCount of type System.String.", ex.Message);
         }
     }
 }

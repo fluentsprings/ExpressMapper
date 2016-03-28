@@ -38,6 +38,7 @@ namespace ExpressMapper
 
             ProcessCustomMembers();
             ProcessCustomFunctionMembers();
+            ProcessFlattenedMembers();
             ProcessAutoProperties();
 
             var expressions = new List<Expression>();

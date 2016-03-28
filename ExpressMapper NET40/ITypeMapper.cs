@@ -33,6 +33,7 @@ namespace ExpressMapper
         void Instantiate(Expression<Func<T,TN>> constructor);
         void BeforeMap(Action<T,TN> beforeMap);
         void AfterMap(Action<T,TN> afterMap);
+        void Flatten();
         CompilationTypes MapperType { get; }
     }
 }

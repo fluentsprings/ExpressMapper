@@ -101,6 +101,7 @@ namespace ExpressMapper.Tests.Projections.Tests
         }
 
         #endregion
+
         protected override void Setup()
         {
             InitializeData();
