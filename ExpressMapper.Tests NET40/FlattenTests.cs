@@ -79,9 +79,9 @@ namespace ExpressMapper.Tests
         public void FlattenFatherSonDtoForGrandsonDtoOk()
         {
             //SETUP
-            Mapper.Register<Grandson, FlattenSimpleClass>();
             Mapper.Register<Father, FlattenFatherSonDtoForGrandsonDto>()
                 .Flatten();
+            Mapper.Register<Grandson, FlattenSimpleClass>();
             Mapper.Compile(CompilationTypes.Source);
 
             //ATTEMPT
