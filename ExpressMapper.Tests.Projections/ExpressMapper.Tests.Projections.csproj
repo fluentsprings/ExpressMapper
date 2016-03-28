@@ -101,8 +101,10 @@
     <Compile Include="ViewModel\CatalogueGroupViewModel.cs" />
     <Compile Include="ViewModel\CatalogueViewModel.cs" />
     <Compile Include="ViewModel\CategoryViewModel.cs" />
+    <Compile Include="ViewModel\FlattenFatherSonDtoForGrandsonDto.cs" />
     <Compile Include="ViewModel\FlattenFatherSonGrandsonDto.cs" />
     <Compile Include="ViewModel\FlattenFatherSonsCountDto.cs" />
+    <Compile Include="ViewModel\FlattenSimpleClass.cs" />
     <Compile Include="ViewModel\FullCatalogueGroupViewModel.cs" />
     <Compile Include="ViewModel\FullCatalogueViewModel.cs" />
     <Compile Include="ViewModel\ProductVariantViewModel.cs" />

@@ -1,5 +1,4 @@
-﻿using System;
-using ExpressMapper.Tests.Model.Models;
+﻿using ExpressMapper.Tests.Model.Models;
 using ExpressMapper.Tests.Model.ViewModels;
 using NUnit.Framework;
 
@@ -96,6 +95,27 @@ namespace ExpressMapper.Tests
             Assert.AreEqual(2, dto.SonMyInt);
             Assert.AreEqual("Grandson", dto.SonGrandson.MyString);
             Assert.AreEqual(3, dto.SonGrandson.MyInt);
+        }
+
+        [Test]
+        public void FlattenFatherSonDtoForGrandsonDtoForgetFlattenSimpleClassOk()
+        {
+            //SETUP
+            //Mapper.Register<Grandson, FlattenSimpleClass>();      //If you don't supply the mapping it does not happen
+            Mapper.Register<Father, FlattenFatherSonDtoForGrandsonDto>()
+                .Flatten();
+            Mapper.Compile(CompilationTypes.Source);
+
+            //ATTEMPT
+            var father = Father.CreateOne();
+            var dto = Mapper.Map<Father, FlattenFatherSonDtoForGrandsonDto>(father);
+
+            //VERIFY   
+            Assert.AreEqual("Father", dto.MyString);    //This is mapped by the normal ExpressMapper 
+            Assert.AreEqual(1, dto.MyInt);              //This is mapped by the normal ExpressMapper 
+            Assert.AreEqual("Son", dto.SonMyString);
+            Assert.AreEqual(2, dto.SonMyInt);
+            Assert.AreEqual(null, dto.SonGrandson);
         }
 
         [Test]
@@ -275,5 +295,25 @@ namespace ExpressMapper.Tests
             Assert.AreEqual("Son", dto.SonMyString);
             Assert.AreEqual("Inner", dto.CircularRefMyString);
         }
+
+        //----------------------------------
+        //Failure tests
+
+        [Test]
+        public void FlattenFatherSonsCountBadDtoOk()
+        {
+            //SETUP
+            Mapper.Reset();
+            Mapper.Register<FatherSons, FlattenFatherSonsCountBadDto>().Flatten();
+
+            //ATTEMPT
+            var ex = Assert.Throws<ExpressmapperException>(() => Mapper.Compile(CompilationTypes.Source));
+
+            //VERIFY  
+            Assert.AreEqual("Error error occured trying to compile mapping for: source ExpressMapper.Tests.Model.Models.FatherSons, destination ExpressMapper.Tests.Model.ViewModels.FlattenFatherSonsCountBadDto. See the inner exception for details.", ex.Message);
+            Assert.AreEqual("We could not find the Method Count() which matched the property SonsCount of type System.String.", ex.InnerException.Message);
+        }
+
+
     }
 }

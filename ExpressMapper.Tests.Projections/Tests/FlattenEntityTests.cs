@@ -3,6 +3,7 @@ using ExpressMapper.Extensions;
 using ExpressMapper.Tests.Model.ViewModels;
 using ExpressMapper.Tests.Projections.Entities;
 using ExpressMapper.Tests.Projections.Utils;
+using ExpressMapper.Tests.Projections.ViewModel;
 using NUnit.Framework;
 
 namespace ExpressMapper.Tests.Projections.Tests
@@ -23,6 +24,9 @@ namespace ExpressMapper.Tests.Projections.Tests
 
             Mapper.Register<Father, FlattenFatherSonGrandsonDto>().Flatten();
             Mapper.Register<FatherSons, FlattenFatherSonsCountDto>().Flatten();
+            Mapper.Register<Grandson, FlattenSimpleClass>();
+            Mapper.Register<Father, FlattenFatherSonDtoForGrandsonDto>()
+                .Flatten();
             Mapper.Compile(CompilationTypes.Source);
         }
 
@@ -66,6 +70,41 @@ namespace ExpressMapper.Tests.Projections.Tests
             Assert.AreEqual(102, results.First().SonMyInt);
             Assert.AreEqual(null, results.First().SonGrandsonMyString);
             Assert.AreEqual(null, results.First().SonGrandsonMyInt);
+            }
+        }
+
+        [Test]
+        public void FlattenFatherSonDtoForGrandsonDtoOk()
+        {
+            using (new LogDatabaseAccesses(Context))
+            {
+                var results = Context.Set<Father>().Where(x => x.Son.Grandson != null).Project<Father, FlattenFatherSonDtoForGrandsonDto>().ToList();
+
+                //VERIFY  
+                Assert.AreEqual(1, results.Count);
+                Assert.AreEqual("Father", results.First().MyString);    //This is mapped by the normal ExpressMapper 
+                Assert.AreEqual(1, results.First().MyInt);              //This is mapped by the normal ExpressMapper 
+                Assert.AreEqual("Son", results.First().SonMyString);
+                Assert.AreEqual(101, results.First().SonMyInt);
+                Assert.AreEqual("Grandson", results.First().SonGrandson.MyString);
+                Assert.AreEqual(10001, results.First().SonGrandson.MyInt);
+            }
+        }
+
+        [Test]
+        public void FlattenFatherSonDtoForGrandsonDtoNoGrandsonOk()
+        {
+            using (new LogDatabaseAccesses(Context))
+            {
+                var results = Context.Set<Father>().Where(x => x.Son.Grandson == null).Project<Father, FlattenFatherSonDtoForGrandsonDto>().ToList();
+
+                //VERIFY  
+                Assert.AreEqual(1, results.Count);
+                Assert.AreEqual("Father", results.First().MyString);    //This is mapped by the normal ExpressMapper 
+                Assert.AreEqual(2, results.First().MyInt);              //This is mapped by the normal ExpressMapper 
+                Assert.AreEqual("Son", results.First().SonMyString);
+                Assert.AreEqual(102, results.First().SonMyInt);
+                Assert.AreEqual(null, results.First().SonGrandson);
             }
         }
 

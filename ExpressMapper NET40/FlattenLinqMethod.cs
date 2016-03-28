@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 
 namespace ExpressMapper
 {
@@ -69,7 +68,7 @@ namespace ExpressMapper
                         && (!_checkReturnType || m.ReturnType == destProperty.PropertyType));
 
             if (foundMethodInfo == null)
-                throw new InvalidOperationException(
+                throw new ExpressmapperException(
                     $"We could not find the Method {_methodName}() which matched the property {destProperty.Name} of type {destProperty.PropertyType}.");
 
             var method = foundMethodInfo.IsGenericMethod
