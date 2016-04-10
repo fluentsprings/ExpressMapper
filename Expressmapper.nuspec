@@ -2,8 +2,8 @@
 <package >
   <metadata>
     <id>Expressmapper</id>
-    <version>1.1.1</version>
-    <authors>Yuriy Anisimov, Dmitry Bogatykh</authors>
+    <version>1.8.1</version>
+    <authors>Yuriy Anisimov</authors>
     <owners>Yuriy Anisimov</owners>
     <licenseUrl>https://github.com/expressmapper/ExpressMapper/blob/master/LICENSE</licenseUrl>
     <projectUrl>http://expressmapper.org</projectUrl>
@@ -11,17 +11,12 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>ExpressMapper it is a lightweight, fast and easy to use .Net mapper to map one type of object(s) to another. ExpressMapper relies completely on the expression trees. </description>
     <releaseNotes>
-- new:     PCL support
-- new:     Precompilation of collection direct types
-- new:     Case-insensitive support
-- new:     Field mapping support
-- fix:     The order of mapping registration is important
-- fix:     Mapping to object of the same type doesn't work
-- fix:     Recursion during compilation phase
-- fix:     Thread safe registration
-- non-func:Refactoring
+
+1. Flattening support - author:JonPSmith
+
+Special thanks for PR contribution to: JonPSmith
     </releaseNotes>
     <copyright>Copyright 2015 ExpressMapper</copyright>
-    <tags>Mapper .Net-Mapper Mapping</tags>
+    <tags>Mapper .net-mapper mapping object-to-object conventional-mapping fluent-api-mapping</tags>
   </metadata>
 </package>
