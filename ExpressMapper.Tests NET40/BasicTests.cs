@@ -52,6 +52,20 @@ namespace ExpressMapper.Tests
         }
 
         [Test]
+        public void DefaultPrimitiveTypePropertyToStringTest()
+        {
+            Mapper.Register<TestDefaultDecimal, TestDefaultDecimalToStringViewModel>()
+                .Member(dest => dest.TestString, src => src.TestDecimal);
+            Mapper.RegisterCustom<decimal, string>(src => src.ToString("#0.00"));
+            Mapper.Compile();
+            var test = new TestDefaultDecimal() { TestDecimal = default(decimal) };
+            test.TestDecimal = default(decimal);
+            var result = Mapper.Map<TestDefaultDecimal, TestDefaultDecimalToStringViewModel>(test);
+            //This is where the mapping fails
+            Assert.AreEqual(result.TestString, "0.00");
+        }
+
+        [Test]
         public void FieldsTest()
         {
             Mapper.Register<Brand, BrandViewModel>();

@@ -148,10 +148,10 @@ namespace ExpressMapper
                     var resultBlockExp = Expression.Block(new[] { srcExp, destExp }, assignSrcExp, assignDestExp, blockExpression, assignResultExp);
 
                     var checkNullExp =
-                        Expression.IfThenElse(Expression.Equal(right, Expression.Default(right.Type)),
+                         Expression.IfThenElse(Expression.Equal(right, Expression.Default(right.Type)),
                             Expression.Assign(left, Expression.Default(left.Type)), resultBlockExp);
 
-                    var releaseExp = Expression.Block(new ParameterExpression[] { }, checkNullExp);
+                    var releaseExp = Expression.Block(new ParameterExpression[] { }, (right.Type.IsPrimitive || right.Type.IsValueType ? resultBlockExp : (Expression)checkNullExp));
 
                     return releaseExp;
                 }
