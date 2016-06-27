@@ -294,7 +294,7 @@ namespace ExpressMapper
                 if (dynamicTrial)
                 {
                     throw new MapNotImplementedException(
-                        string.Format("There is no mapping has bee found. Source Type: {0}, Destination Type: {1}",
+                        string.Format("There is no mapping has been found. Source Type: {0}, Destination Type: {1}",
                             srcType.FullName, destType.FullName));
                 }
                 Register<T, TN>();
@@ -393,7 +393,7 @@ namespace ExpressMapper
                 return result;
             }
             throw new MapNotImplementedException(
-                string.Format("There is no mapping has bee found. Source Type: {0}, Destination Type: {1}", srcType.FullName,
+                string.Format("There is no mapping has been found. Source Type: {0}, Destination Type: {1}", srcType.FullName,
                     dstType.FullName));
         }
 

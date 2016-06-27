@@ -63,7 +63,7 @@ namespace ExpressMapper
                 return TypeMappers[cacheKey].GetMapExpressions();
             }
 
-            throw new MapNotImplementedException(string.Format("There is no mapping has bee found. Source Type: {0}, Destination Type: {1}", src.FullName, dest.FullName));
+            throw new MapNotImplementedException(string.Format("There is no mapping has been found. Source Type: {0}, Destination Type: {1}", src.FullName, dest.FullName));
         }
 
         private void RegisterDynamic<T, TN>(T src, TN dest)
