@@ -65,6 +65,7 @@
     <Compile Include="Models\Gift.cs" />
     <Compile Include="Models\Grandson.cs" />
     <Compile Include="Models\ItemModel.cs" />
+    <Compile Include="Models\Source.cs" />
     <Compile Include="Models\TestDefaultDecimal.cs" />
     <Compile Include="ViewModels\FlattenCircularReferenceDto.cs" />
     <Compile Include="ViewModels\FlattenFatherSonDtoForGrandsonDto.cs" />
@@ -130,6 +131,7 @@
     <Compile Include="ViewModels\SubUnitViewModel.cs" />
     <Compile Include="ViewModels\SupplierViewModel.cs" />
     <Compile Include="ViewModels\TableViewModel.cs" />
+    <Compile Include="ViewModels\TargetViewModel.cs" />
     <Compile Include="ViewModels\TestCollectionViewModel.cs" />
     <Compile Include="ViewModels\TestDefaultDecimalToStringViewModel.cs" />
     <Compile Include="ViewModels\TestItemViewModel.cs" />

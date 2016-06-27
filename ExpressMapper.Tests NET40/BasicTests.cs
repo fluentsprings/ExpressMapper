@@ -66,6 +66,18 @@ namespace ExpressMapper.Tests
         }
 
         [Test]
+        public void MemberMappingsHasHigherPriorityThanCaseSensetiveTest()
+        {
+            Mapper.Register<Source, TargetViewModel>()
+                .Member(t => t.Enabled, s => s.enabled == "Y");
+            Mapper.Compile();
+
+           var source = new Source { enabled = "N" };
+           var result = Mapper.Map<Source, TargetViewModel>(source);
+           Assert.AreEqual(result.Enabled, false);
+        }
+
+        [Test]
         public void FieldsTest()
         {
             Mapper.Register<Brand, BrandViewModel>();

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -274,10 +276,12 @@ namespace ExpressMapper
 
             var stringComparison = GetStringCase();
 
+            var comparer = StringComparer.Create(CultureInfo.CurrentCulture,
+                stringComparison == StringComparison.OrdinalIgnoreCase);
 
             foreach (var prop in sourceMembers)
             {
-                if (IgnoreMemberList.Contains(prop.Name) || CustomPropertyCache.ContainsKey(prop.Name))
+                if (IgnoreMemberList.Contains(prop.Name, comparer) || CustomPropertyCache.Keys.Contains(prop.Name, comparer))
                 {
                     continue;
                 }
