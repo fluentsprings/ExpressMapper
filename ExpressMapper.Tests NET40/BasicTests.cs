@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Moq;
 
 namespace ExpressMapper.Tests
 {
@@ -1338,6 +1339,25 @@ namespace ExpressMapper.Tests
 
             Assert.True(Mapper.MapExists(typeof(Father), typeof(FlattenFatherSonGrandsonDto)));
             Assert.False(Mapper.MapExists(typeof(FlattenFatherSonGrandsonDto), typeof(Father)));
+        }
+
+        [Test]
+        public void DoNotUpdateUnchangedPropertyValuesTest()
+        {
+            var srcBrand = new Brand
+            {
+                Id = Guid.NewGuid(),
+                Name = "brand"
+            };
+
+            var existingBrandMock = new Mock<Brand>().SetupAllProperties();
+            existingBrandMock.Object.Name = "brand";
+
+            var destBrand = Mapper.Map(srcBrand, existingBrandMock.Object);
+            existingBrandMock.VerifySet(x => x.Name = It.IsAny<string>(), Times.Once());
+
+            Assert.AreEqual(destBrand.Id, srcBrand.Id);
+            Assert.AreEqual(destBrand.Name, srcBrand.Name);
         }
     }
 }
