@@ -8,8 +8,10 @@ using ExpressMapper.Tests.Model.ViewModels.Structs;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Moq;
 
 namespace ExpressMapper.Tests
 {
@@ -56,7 +58,7 @@ namespace ExpressMapper.Tests
         {
             Mapper.Register<TestDefaultDecimal, TestDefaultDecimalToStringViewModel>()
                 .Member(dest => dest.TestString, src => src.TestDecimal);
-            Mapper.RegisterCustom<decimal, string>(src => src.ToString("#0.00"));
+            Mapper.RegisterCustom<decimal, string>(src => src.ToString("#0.00", CultureInfo.InvariantCulture));
             Mapper.Compile();
             var test = new TestDefaultDecimal() { TestDecimal = default(decimal) };
             test.TestDecimal = default(decimal);
@@ -413,14 +415,13 @@ namespace ExpressMapper.Tests
         }
 
         [Test]
-        [ExpectedException(typeof(InvalidOperationException), ExpectedMessage = "BeforeMap already registered for ExpressMapper.Tests.Model.Models.Size")]
         public void BeforeMapDuplicateTest()
         {
-            Mapper.Register<Size, SizeViewModel>()
+            var exception = Assert.Throws<InvalidOperationException>(() => Mapper.Register<Size, SizeViewModel>()
                 .Before((src, dest) => dest.Name = src.Name)
                 .Before((src, dest) => dest.Name = src.Name)
-                .Ignore(dest => dest.Name);
-            Mapper.Compile();
+                .Ignore(dest => dest.Name));
+            Assert.That(exception.Message, Is.EqualTo("BeforeMap already registered for ExpressMapper.Tests.Model.Models.Size"));
 
             var sizeResult = Functional.BeforeMap();
             var result = Mapper.Map<Size, SizeViewModel>(sizeResult.Key);
@@ -439,13 +440,12 @@ namespace ExpressMapper.Tests
         }
 
         [Test]
-        [ExpectedException(typeof(InvalidOperationException), ExpectedMessage = "AfterMap already registered for ExpressMapper.Tests.Model.Models.Size")]
         public void AfterMapDuplicateTest()
         {
-            Mapper.Register<Size, SizeViewModel>()
+            var exception = Assert.Throws<InvalidOperationException>(() => Mapper.Register<Size, SizeViewModel>()
                 .After((src, dest) => dest.Name = "OVERRIDE BY AFTER MAP")
-                .After((src, dest) => dest.Name = "Duplicate map");
-            Mapper.Compile();
+                .After((src, dest) => dest.Name = "Duplicate map"));
+            Assert.That(exception.Message, Is.EqualTo("AfterMap already registered for ExpressMapper.Tests.Model.Models.Size"));
             var sizeResult = Functional.AfterMap();
             var result = Mapper.Map<Size, SizeViewModel>(sizeResult.Key);
             Assert.AreEqual(result, sizeResult.Value);
@@ -1339,6 +1339,25 @@ namespace ExpressMapper.Tests
 
             Assert.True(Mapper.MapExists(typeof(Father), typeof(FlattenFatherSonGrandsonDto)));
             Assert.False(Mapper.MapExists(typeof(FlattenFatherSonGrandsonDto), typeof(Father)));
+        }
+
+        [Test]
+        public void DoNotUpdateUnchangedPropertyValuesTest()
+        {
+            var srcBrand = new Brand
+            {
+                Id = Guid.NewGuid(),
+                Name = "brand"
+            };
+
+            var existingBrandMock = new Mock<Brand>().SetupAllProperties();
+            existingBrandMock.Object.Name = "brand";
+
+            var destBrand = Mapper.Map(srcBrand, existingBrandMock.Object);
+            existingBrandMock.VerifySet(x => x.Name = It.IsAny<string>(), Times.Once());
+
+            Assert.AreEqual(destBrand.Id, srcBrand.Id);
+            Assert.AreEqual(destBrand.Name, srcBrand.Name);
         }
     }
 }

@@ -218,7 +218,7 @@ namespace ExpressMapper
                 right = Expression.Convert(getMethod, setType);
             }
 
-            return Expression.Assign(left, right);
+            return Expression.Condition(Expression.NotEqual(left, right), Expression.Assign(left, right), Expression.Default(setType));
         }
 
         private static Expression CreateConvertibleAssignExpression(Expression setMethod, Expression getMethod, Type setType, Type getType, Type setNullableType)
