@@ -9,7 +9,7 @@ namespace ExpressMapper
 {
     internal abstract class MappingServiceBase
     {
-        private readonly Type _enumImplicitConversionType = typeof (int);
+        private readonly Type _enumImplicitConversionType = typeof(int);
         protected readonly Dictionary<long, BlockExpression> CustomTypeMapperExpCache = new Dictionary<long, BlockExpression>();
         public IDictionary<long, ITypeMapper> TypeMappers { get; set; }
         protected IMappingServiceProvider MappingServiceProvider { get; private set; }
@@ -84,7 +84,7 @@ namespace ExpressMapper
                 customGenericType);
             var genVariable = Expression.Variable(customGenericType);
             var assignExp = Expression.Assign(genVariable, castToCustomGeneric);
-            var methodInfo = customGenericType.GetMethod("Map");
+            var methodInfo = customGenericType.GetInfo().GetMethod("Map");
             var genericMappingContext = typeof(DefaultMappingContext<,>).MakeGenericType(srcType, dstType);
             var newMappingContextExp = Expression.New(genericMappingContext);
             var contextVarExp = Expression.Variable(genericMappingContext, string.Format("context{0}", Guid.NewGuid()));
@@ -151,7 +151,7 @@ namespace ExpressMapper
                          Expression.IfThenElse(Expression.Equal(right, Expression.Default(right.Type)),
                             Expression.Assign(left, Expression.Default(left.Type)), resultBlockExp);
 
-                    var releaseExp = Expression.Block(new ParameterExpression[] { }, (right.Type.IsPrimitive || right.Type.IsValueType ? resultBlockExp : (Expression)checkNullExp));
+                    var releaseExp = Expression.Block(new ParameterExpression[] { }, (right.Type.GetInfo().IsPrimitive || right.Type.GetInfo().IsValueType ? resultBlockExp : (Expression)checkNullExp));
 
                     return releaseExp;
                 }
@@ -166,13 +166,13 @@ namespace ExpressMapper
                     return Expression.Assign(left, right);
                 }
 
-                if (destType.IsEnum && sourceType.IsEnum)
+                if (destType.GetInfo().IsEnum && sourceType.GetInfo().IsEnum)
                 {
                     return Expression.Assign(left, Expression.Convert(Expression.Convert(right, _enumImplicitConversionType), destType));
                 }
 
-                if (typeof(IConvertible).IsAssignableFrom(destType) &&
-                    typeof(IConvertible).IsAssignableFrom(sourceType))
+                if (typeof(IConvertible).GetInfo().IsAssignableFrom(destType) &&
+                    typeof(IConvertible).GetInfo().IsAssignableFrom(sourceType))
                 {
                     var assignExp = CreateConvertibleAssignExpression(left,
                         right,
@@ -184,11 +184,11 @@ namespace ExpressMapper
                 }
                 var mapComplexResult = GetDifferentTypeMemberMappingExpression(right, left, newDest);
 
-//                return nullCheckNestedMemberVisitor.CheckNullExpression != null
-//                    ? Expression.Condition(nullCheckNestedMemberVisitor.CheckNullExpression,
-//                        Expression.Assign(left, Expression.Default(left.Type)),
-//                        mapComplexResult)
-                  return mapComplexResult;
+                //                return nullCheckNestedMemberVisitor.CheckNullExpression != null
+                //                    ? Expression.Condition(nullCheckNestedMemberVisitor.CheckNullExpression,
+                //                        Expression.Assign(left, Expression.Default(left.Type)),
+                //                        mapComplexResult)
+                return mapComplexResult;
             }
             var binaryExpression = CreateAssignExpression(left,
                 right,
@@ -226,20 +226,20 @@ namespace ExpressMapper
             var left = setMethod;
             var right = getMethod;
 
-            if ((setNullableType ?? setType).IsEnum && (getType == typeof(string)))
+            if ((setNullableType ?? setType).GetInfo().IsEnum && (getType == typeof(string)))
             {
                 return Expression.IfThen(
                     Expression.NotEqual(getMethod, StaticExpressions.NullConstant),
                         Expression.Assign(left,
                             Expression.Convert(
-                                Expression.Call(typeof(Enum).GetMethod("Parse", new Type[] { typeof(Type), typeof(string), typeof(bool) }), Expression.Constant(setNullableType ?? setType), right, Expression.Constant(true)),
+                                Expression.Call(typeof(Enum).GetInfo().GetMethod("Parse", new Type[] { typeof(Type), typeof(string), typeof(bool) }), Expression.Constant(setNullableType ?? setType), right, Expression.Constant(true)),
                                 setType)));
             }
             return Expression.IfThen(
                 Expression.NotEqual(Expression.Convert(getMethod, typeof(object)), StaticExpressions.NullConstant),
                 Expression.Assign(left,
                     Expression.Convert(
-                        Expression.Call(typeof(Convert).GetMethod("ChangeType", new Type[] { typeof(object), typeof(Type) }), Expression.Convert(right, typeof(object)), Expression.Constant(setNullableType ?? setType)),
+                        Expression.Call(typeof(Convert).GetInfo().GetMethod("ChangeType", new Type[] { typeof(object), typeof(Type) }), Expression.Convert(right, typeof(object)), Expression.Constant(setNullableType ?? setType)),
                         setType)));
         }
 
@@ -263,8 +263,8 @@ namespace ExpressMapper
             var enumerator = Expression.Variable(closedEnumeratorSourceType,
                 string.Format("{0}Enum", Guid.NewGuid().ToString().Replace("-", "_")));
             var assignToEnum = Expression.Assign(enumerator,
-                Expression.Call(sourceVariable, closedEnumerableSourceType.GetMethod("GetEnumerator")));
-            var doMoveNext = Expression.Call(enumerator, typeof(IEnumerator).GetMethod("MoveNext"));
+                Expression.Call(sourceVariable, closedEnumerableSourceType.GetInfo().GetMethod("GetEnumerator")));
+            var doMoveNext = Expression.Call(enumerator, typeof(IEnumerator).GetInfo().GetMethod("MoveNext"));
 
             var current = Expression.Property(enumerator, "Current");
             var sourceColItmVariable = Expression.Variable(sourceType,
@@ -306,14 +306,14 @@ namespace ExpressMapper
             var sourceType = srcExpression.Type;
             var destType = destExpression.Type;
 
-            var tCol = GetEnumerableInterface( sourceType );
-            var tnCol = GetEnumerableInterface( destType );
+            var tCol = GetEnumerableInterface(sourceType);
+            var tnCol = GetEnumerableInterface(destType);
 
             var blockExpression = (tCol != null && tnCol != null)
                 ? MapCollection(tCol, tnCol, srcExpression, destExpression)
                 : MapProperty(sourceType, destType, srcExpression, destExpression, newDest);
 
-            var refSrcType = sourceType.IsClass;
+            var refSrcType = sourceType.GetInfo().IsClass;
             var destPropType = destType;
 
             if (!refSrcType) return blockExpression;
@@ -342,8 +342,8 @@ namespace ExpressMapper
             var closedEnumerableSourceType = GenericEnumerableType.MakeGenericType(sourceType);
             var enumerator = Expression.Variable(closedEnumeratorSourceType, "srcEnumerator");
             var assignToEnum = Expression.Assign(enumerator,
-                Expression.Call(sourceParameterExp, closedEnumerableSourceType.GetMethod("GetEnumerator")));
-            var doMoveNext = Expression.Call(enumerator, typeof(IEnumerator).GetMethod("MoveNext"));
+                Expression.Call(sourceParameterExp, closedEnumerableSourceType.GetInfo().GetMethod("GetEnumerator")));
+            var doMoveNext = Expression.Call(enumerator, typeof(IEnumerator).GetInfo().GetMethod("MoveNext"));
 
             var current = Expression.Property(enumerator, "Current");
             var sourceColItmVariable = Expression.Variable(sourceType, "ItmSrc");
@@ -373,8 +373,9 @@ namespace ExpressMapper
             return blockExpression;
         }
 
-        internal static Type GetCollectionElementType( Type type ) {
-            return type.IsArray ? type.GetElementType() : GetEnumerableInterface( type ).GetGenericArguments()[0];
+        internal static Type GetCollectionElementType(Type type)
+        {
+            return type.IsArray ? type.GetElementType() : GetEnumerableInterface(type).GetInfo().GetGenericArguments()[0];
         }
 
         internal LoopExpression CollectionLoopExpression(
@@ -413,56 +414,58 @@ namespace ExpressMapper
         {
             if (destPropType.IsArray)
             {
-                return Expression.Call(destColl, destList.GetMethod("ToArray"));
+                return Expression.Call(destColl, destList.GetInfo().GetMethod("ToArray"));
             }
 
-            if (!destPropType.IsGenericType && GetEnumerableInterface(destPropType) == null)
+            if (!destPropType.GetInfo().IsGenericType && GetEnumerableInterface(destPropType) == null)
             {
                 return destColl;
             }
 
-            if (typeof(IQueryable).IsAssignableFrom(destPropType))
+            if (typeof(IQueryable).GetInfo().IsAssignableFrom(destPropType))
             {
                 return Expression.Call(typeof(Queryable), "AsQueryable", new[] { destType }, destColl);
             }
 
-            if (destPropType.IsInterface && destPropType.IsAssignableFrom(destColl.Type)) {
+            if (destPropType.GetInfo().IsInterface && destPropType.GetInfo().IsAssignableFrom(destColl.Type))
+            {
                 // This will handle any destination interface implemented by List<T>
                 return destColl;
             }
 
             ConstructorInfo ctor = null;
 
-            if (destPropType.IsInterface)
+            if (destPropType.GetInfo().IsInterface)
             {
                 // We are targeting an interface type, we need to find a compatible collection type
                 // We could look for a loaded type that implements the target interface and has an appropriate
                 // constructor, but that is a bit too much magic for now.
-                throw new NotImplementedException(string.Format("Destination interface type {0} is not supported yet", destPropType.FullName));
+                throw new NotImplementedException(
+                    $"Destination interface type {destPropType.FullName} is not supported yet");
             }
             else
             {
-                ctor = destPropType.GetConstructors(BindingFlags.Public | BindingFlags.Instance).FirstOrDefault(
+                ctor = destPropType.GetInfo().GetConstructors(BindingFlags.Public | BindingFlags.Instance).FirstOrDefault(
                     ci => {
                         var param = ci.GetParameters();
-                        return param.Length == 1 && param[0].ParameterType.IsAssignableFrom(destList);
-                    } );
+                        return param.Length == 1 && param[0].ParameterType.GetInfo().IsAssignableFrom(destList);
+                    });
 
                 if (ctor == null)
                 {
-                    throw new Exception(string.Format("Could not find a constructor on {0} that accepts {1}", destPropType.Name, destList));
+                    throw new Exception($"Could not find a constructor on {destPropType.Name} that accepts {destList}");
                 }
             }
 
-            return Expression.New( ctor, destColl );
+            return Expression.New(ctor, destColl);
         }
 
         public static Type GetEnumerableInterface(Type type)
         {
             return
-                type.GetInterfaces()
-                    .FirstOrDefault( t => t.IsGenericType && t.GetGenericTypeDefinition() == GenericEnumerableType )
-                ?? ( type.IsGenericType && type.GetInterfaces().Any( t => t == typeof( IEnumerable ) ) ? type : null );
+                type.GetInfo().GetInterfaces()
+                    .FirstOrDefault(t => t.GetInfo().IsGenericType && t.GetGenericTypeDefinition() == GenericEnumerableType)
+                ?? (type.GetInfo().IsGenericType && type.GetInfo().GetInterfaces().Any(t => t == typeof(IEnumerable)) ? type : null);
         }
     }
 }

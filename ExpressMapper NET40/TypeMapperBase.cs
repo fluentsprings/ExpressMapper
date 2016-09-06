@@ -117,7 +117,7 @@ namespace ExpressMapper
                     throw new ExpressmapperException(
                         string.Format(
                             "Error error occured trying to compile mapping for: source {0}, destination {1}. See the inner exception for details.",
-                            typeof (T).FullName, typeof (TN).FullName), ex);
+                            typeof(T).FullName, typeof(TN).FullName), ex);
                 }
             }
             finally
@@ -175,7 +175,7 @@ namespace ExpressMapper
             var castToCustomGeneric = Expression.Convert(Expression.Constant((ITypeMapper)this), customGenericType);
             var genVariable = Expression.Variable(customGenericType);
             var assignExp = Expression.Assign(genVariable, castToCustomGeneric);
-            var methodInfo = customGenericType.GetMethod("MapTo", new[] { typeof(T), typeof(TN) });
+            var methodInfo = customGenericType.GetInfo().GetMethod("MapTo", new[] { typeof(T), typeof(TN) });
 
             var mapCall = Expression.Call(genVariable, methodInfo, srcTypedExp, dstTypedExp);
             var resultVarExp = Expression.Variable(typeof(object), "result");
@@ -245,7 +245,7 @@ namespace ExpressMapper
             {
                 var substVisitorSrc = new SubstituteParameterVisitor(SourceParameter);
                 var constructorExp = substVisitorSrc.Visit(ConstructorExp.Body);
-                
+
                 return Expression.Assign(DestFakeParameter, constructorExp);
             }
 
@@ -262,20 +262,21 @@ namespace ExpressMapper
         protected void ProcessAutoProperties()
         {
             var getFields =
-                typeof(T).GetFields(BindingFlags.FlattenHierarchy | BindingFlags.Instance | BindingFlags.Public);
+                typeof(T).GetInfo().GetFields(BindingFlags.FlattenHierarchy | BindingFlags.Instance | BindingFlags.Public);
             var setFields =
-                typeof(TN).GetFields(BindingFlags.FlattenHierarchy | BindingFlags.Instance | BindingFlags.Public);
+                typeof(TN).GetInfo().GetFields(BindingFlags.FlattenHierarchy | BindingFlags.Instance | BindingFlags.Public);
 
             var getProps =
-                typeof(T).GetProperties(BindingFlags.FlattenHierarchy | BindingFlags.Instance | BindingFlags.Public);
+                typeof(T).GetInfo().GetProperties(BindingFlags.FlattenHierarchy | BindingFlags.Instance | BindingFlags.Public);
             var setProps =
-                typeof(TN).GetProperties(BindingFlags.FlattenHierarchy | BindingFlags.Instance | BindingFlags.Public);
+                typeof(TN).GetInfo().GetProperties(BindingFlags.FlattenHierarchy | BindingFlags.Instance | BindingFlags.Public);
 
             var sourceMembers = getFields.Cast<MemberInfo>().Union(getProps);
             var destMembers = setFields.Cast<MemberInfo>().Union(setProps);
 
             var stringComparison = GetStringCase();
 
+//            var comparer = CultureInfo.CurrentCulture.CompareInfo.GetStringComparer(CompareOptions.OrdinalIgnoreCase);
             var comparer = StringComparer.Create(CultureInfo.CurrentCulture,
                 stringComparison == StringComparison.OrdinalIgnoreCase);
 

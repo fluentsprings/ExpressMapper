@@ -12,16 +12,14 @@ namespace ExpressMapper
     {
         private readonly Dictionary<string, MemberBinding> _bindingExpressions = new Dictionary<string, MemberBinding>();
 
-        public SourceTypeMapper(IMappingService service, IMappingServiceProvider serviceProvider) : base(service, serviceProvider) {}
+        public SourceTypeMapper(IMappingService service, IMappingServiceProvider serviceProvider) : base(service, serviceProvider) { }
 
-        public override CompilationTypes MapperType {
-            get { return CompilationTypes.Source;}
-        }
+        public override CompilationTypes MapperType => CompilationTypes.Source;
 
         protected override void InitializeRecursiveMappings(IMappingServiceProvider serviceProvider)
         {
             var mapMethod =
-                typeof(IMappingServiceProvider).GetMethods()
+                typeof(IMappingServiceProvider).GetInfo().GetMethods()
                     .First(mi => mi.Name == "Map" && mi.GetParameters().Length == 1)
                     .MakeGenericMethod(typeof(T), typeof(TN));
 
@@ -110,7 +108,7 @@ namespace ExpressMapper
 
                 QueryableExpression =
                     Expression.Lambda<Func<T, TN>>(
-                        Expression.MemberInit(Expression.New(typeof (TN)), _bindingExpressions.Values), SourceParameter);
+                        Expression.MemberInit(Expression.New(typeof(TN)), _bindingExpressions.Values), SourceParameter);
             }
             catch (Exception ex)
             {
@@ -125,24 +123,24 @@ namespace ExpressMapper
                     destProp.PropertyType);
 
             var tCol =
-                sourceExp.Type.GetInterfaces()
-                    .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>)) ??
-                (sourceExp.Type.IsGenericType
-                 && sourceExp.Type.GetInterfaces().Any(t => t == typeof(IEnumerable))
+                sourceExp.Type.GetInfo().GetInterfaces()
+                    .FirstOrDefault(t => t.GetInfo().IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>)) ??
+                (sourceExp.Type.GetInfo().IsGenericType
+                 && sourceExp.Type.GetInfo().GetInterfaces().Any(t => t == typeof(IEnumerable))
                     ? sourceExp.Type
                     : null);
 
-            var tnCol = destProp.PropertyType.GetInterfaces()
-                .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>)) ??
-                        (destProp.PropertyType.IsGenericType &&
-                         destProp.PropertyType.GetInterfaces().Any(t => t == typeof(IEnumerable))
+            var tnCol = destProp.PropertyType.GetInfo().GetInterfaces()
+                .FirstOrDefault(t => t.GetInfo().IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>)) ??
+                        (destProp.PropertyType.GetInfo().IsGenericType &&
+                         destProp.PropertyType.GetInfo().GetInterfaces().Any(t => t == typeof(IEnumerable))
                             ? destProp.PropertyType
                             : null);
 
             if (sourceExp.Type != typeof(string) && tCol != null && tnCol != null)
             {
-                var sourceGenericType = sourceExp.Type.GetGenericArguments()[0];
-                var destGenericType = destProp.PropertyType.IsArray ? destProp.PropertyType.GetElementType() : destProp.PropertyType.GetGenericArguments()[0];
+                var sourceGenericType = sourceExp.Type.GetInfo().GetGenericArguments()[0];
+                var destGenericType = destProp.PropertyType.IsArray ? destProp.PropertyType.GetElementType() : destProp.PropertyType.GetInfo().GetGenericArguments()[0];
 
                 var genericMemberQueryableExpression =
                     MappingService.GetMemberQueryableExpression(sourceGenericType,
@@ -151,9 +149,9 @@ namespace ExpressMapper
 
                 MethodInfo selectMethod = null;
                 foreach (
-                    var p in from m in typeof(Enumerable).GetMethods().Where(m => m.Name == "Select")
+                    var p in from m in typeof(Enumerable).GetInfo().GetMethods().Where(m => m.Name == "Select")
                              from p in m.GetParameters().Where(p => p.Name.Equals("selector"))
-                             where p.ParameterType.GetGenericArguments().Count() == 2
+                             where p.ParameterType.GetInfo().GetGenericArguments().Count() == 2
                              select p)
                     selectMethod = (MethodInfo)p.Member;
 
@@ -162,11 +160,11 @@ namespace ExpressMapper
                     selectMethod.MakeGenericMethod(sourceGenericType, destGenericType),
                     new[] { sourceExp, genericMemberQueryableExpression });
 
-                var destListAndCollTest = typeof(ICollection<>).MakeGenericType(destGenericType).IsAssignableFrom(destProp.PropertyType);
+                var destListAndCollTest = typeof(ICollection<>).MakeGenericType(destGenericType).GetInfo().IsAssignableFrom(destProp.PropertyType);
 
                 if (destListAndCollTest)
                 {
-                    var toArrayMethod = typeof(Enumerable).GetMethod("ToList");
+                    var toArrayMethod = typeof(Enumerable).GetInfo().GetMethod("ToList");
                     selectExpression = Expression.Call(null, toArrayMethod.MakeGenericMethod(destGenericType), selectExpression);
                 }
 

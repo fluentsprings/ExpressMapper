@@ -63,8 +63,6 @@
     <Compile Include="FlattenMapper.cs" />
     <Compile Include="IMappingContext.cs" />
     <Compile Include="IMappingServiceProvider.cs" />
-    <Compile Include="Ioc\DependencyResolver.cs" />
-    <Compile Include="Ioc\IContainer.cs" />
     <Compile Include="FlattenLinqMethod.cs" />
     <Compile Include="MapNotImplemented.cs" />
     <Compile Include="MappingServiceProvider.cs">
@@ -89,6 +87,7 @@
     <Compile Include="Mapper.cs" />
     <Compile Include="MemberConfiguration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TypeExtensions.cs" />
     <Compile Include="TypeMapperBase.cs" />
   </ItemGroup>
   <ItemGroup>

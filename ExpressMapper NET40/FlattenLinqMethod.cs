@@ -20,11 +20,11 @@ namespace ExpressMapper
 
         static FlattenLinqMethod()
         {
-            EnumerableMethodLookup = 
+            EnumerableMethodLookup =
                 (from givenName in ListOfSupportedLinqMethods
-                let checkReturnType = givenName[0] != '~'
-                let name = checkReturnType ? givenName : givenName.Substring(1)
-                select new FlattenLinqMethod(name, checkReturnType) ).ToList();
+                 let checkReturnType = givenName[0] != '~'
+                 let name = checkReturnType ? givenName : givenName.Substring(1)
+                 select new FlattenLinqMethod(name, checkReturnType)).ToList();
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace ExpressMapper
         /// <summary>
         /// If true then the return type should be checked to get the right version of the method
         /// </summary>
-        private readonly bool _checkReturnType ;
+        private readonly bool _checkReturnType;
 
         private FlattenLinqMethod(string methodName, bool checkReturnType)
         {
@@ -61,9 +61,9 @@ namespace ExpressMapper
 
         public MethodCallExpression AsMethodCallExpression(Expression propertyExpression, PropertyInfo propertyToActOn, PropertyInfo destProperty)
         {
-            var ienumerableType = propertyToActOn.PropertyType.GetGenericArguments().Single();
+            var ienumerableType = propertyToActOn.PropertyType.GetInfo().GetGenericArguments().Single();
 
-            var foundMethodInfo = typeof (Enumerable).GetMethods()
+            var foundMethodInfo = typeof(Enumerable).GetInfo().GetMethods()
                 .SingleOrDefault(m => m.Name == _methodName && m.GetParameters().Length == 1
                         && (!_checkReturnType || m.ReturnType == destProperty.PropertyType));
 

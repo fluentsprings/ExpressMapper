@@ -42,21 +42,21 @@ namespace ExpressMapper
             return _foundFlattens;
         }
 
-        private void ScanSourceProps(List<PropertyInfo> sourcePropsToScan, 
+        private void ScanSourceProps(List<PropertyInfo> sourcePropsToScan,
             string prefix = "", PropertyInfo[] sourcePropPath = null)
         {
             foreach (var destProp in _filteredDestProps.ToList())
                 //scan source property name against dest that has no direct match with any of the source property names
                 if (_filteredDestProps.Contains(destProp))
                     //This allows for entries to be removed from the list
-                    ScanSourceClassRecursively(sourcePropsToScan, destProp, prefix, sourcePropPath ?? new PropertyInfo [] {});
+                    ScanSourceClassRecursively(sourcePropsToScan, destProp, prefix, sourcePropPath ?? new PropertyInfo[] { });
         }
 
-        private void ScanSourceClassRecursively(IEnumerable<PropertyInfo> sourceProps, PropertyInfo destProp, 
-            string prefix, PropertyInfo [] sourcePropPath)
+        private void ScanSourceClassRecursively(IEnumerable<PropertyInfo> sourceProps, PropertyInfo destProp,
+            string prefix, PropertyInfo[] sourcePropPath)
         {
 
-            foreach (var matchedStartSrcProp in sourceProps.Where(x => destProp.Name.StartsWith(prefix+x.Name, _stringComparison)))
+            foreach (var matchedStartSrcProp in sourceProps.Where(x => destProp.Name.StartsWith(prefix + x.Name, _stringComparison)))
             {
                 var matchStart = prefix + matchedStartSrcProp.Name;
                 if (string.Equals(destProp.Name, matchStart, _stringComparison))
@@ -69,25 +69,25 @@ namespace ExpressMapper
                         Mapper.MapExists(matchedStartSrcProp.PropertyType, destProp.PropertyType))
                     {
                         //matched a) same type, or b) dest is a nullable version of source 
-                        _foundFlattens.Add( new FlattenMemberInfo(destProp, sourcePropPath, matchedStartSrcProp));
+                        _foundFlattens.Add(new FlattenMemberInfo(destProp, sourcePropPath, matchedStartSrcProp));
                         _filteredDestProps.Remove(destProp);        //matched, so take it out
                     }
 
                     return;
                 }
 
-                if (matchedStartSrcProp.PropertyType == typeof (string))
+                if (matchedStartSrcProp.PropertyType == typeof(string))
                     //string can only be directly matched
                     continue;
 
-                if (matchedStartSrcProp.PropertyType.IsClass)
+                if (matchedStartSrcProp.PropertyType.GetInfo().IsClass)
                 {
                     var classProps = GetPropertiesRightAccess(matchedStartSrcProp.PropertyType);
                     var clonedList = sourcePropPath.ToList();
                     clonedList.Add(matchedStartSrcProp);
                     ScanSourceClassRecursively(classProps, destProp, matchStart, clonedList.ToArray());
                 }
-                else if (matchedStartSrcProp.PropertyType.GetInterfaces().Any(i => i.Name == "IEnumerable"))
+                else if (matchedStartSrcProp.PropertyType.GetInfo().GetInterfaces().Any(i => i.Name == "IEnumerable"))
                 {
                     //its an enumerable class so see if the end relates to a LINQ method
                     var endOfName = destProp.Name.Substring(matchStart.Length);
@@ -103,12 +103,12 @@ namespace ExpressMapper
 
         private static PropertyInfo[] GetPropertiesRightAccess<T>()
         {
-            return GetPropertiesRightAccess(typeof (T));
+            return GetPropertiesRightAccess(typeof(T));
         }
 
         private static PropertyInfo[] GetPropertiesRightAccess(Type classType)
         {
-            return classType.GetProperties(BindingFlags.Instance | BindingFlags.Public);
+            return classType.GetInfo().GetProperties(BindingFlags.Instance | BindingFlags.Public);
         }
 
         private List<PropertyInfo> FilterOutExactMatches(PropertyInfo[] propsToFilter, PropertyInfo[] filterAgainst)

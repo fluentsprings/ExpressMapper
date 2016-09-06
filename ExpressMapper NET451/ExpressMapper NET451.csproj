@@ -140,6 +140,9 @@
     <Compile Include="..\ExpressMapper NET40\SubstituteParameterVisitor.cs">
       <Link>SubstituteParameterVisitor.cs</Link>
     </Compile>
+    <Compile Include="..\ExpressMapper NET40\TypeExtensions.cs">
+      <Link>TypeExtensions.cs</Link>
+    </Compile>
     <Compile Include="..\ExpressMapper NET40\TypeMapperBase.cs">
       <Link>TypeMapperBase.cs</Link>
     </Compile>
