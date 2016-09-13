@@ -111,9 +111,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ExpressMapper NET451\ExpressMapper NET451.csproj">
+    <ProjectReference Include="..\ExpressMapper NET45\ExpressMapper NET45.csproj">
       <Project>{5e211506-6d4e-4cd8-b454-d02672cf948a}</Project>
-      <Name>ExpressMapper NET451</Name>
+      <Name>ExpressMapper NET45</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -4,13 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{67AC5D64-8CA8-481F-AD23-5788755F4A33}</ProjectGuid>
+    <ProjectGuid>{5E211506-6D4E-4CD8-B454-D02672CF948A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ExpressMapper</RootNamespace>
     <AssemblyName>ExpressMapper</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -139,18 +140,12 @@
     <Compile Include="..\ExpressMapper NET40\SubstituteParameterVisitor.cs">
       <Link>SubstituteParameterVisitor.cs</Link>
     </Compile>
-    <Compile Include="..\ExpressMapper NET40\TypeExtensions.cs">  
-      <Link>TypeExtensions.cs</Link>  
-    </Compile> 
+    <Compile Include="..\ExpressMapper NET40\TypeExtensions.cs">
+      <Link>TypeExtensions.cs</Link>
+    </Compile>
     <Compile Include="..\ExpressMapper NET40\TypeMapperBase.cs">
       <Link>TypeMapperBase.cs</Link>
     </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ExpressMapper NET40\ExpressMapper NET40.csproj">
-      <Project>{E701191E-BF2E-41B8-A4F0-3D8954E3DD58}</Project>
-      <Name>ExpressMapper NET40</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="Expressmapper.snk" />
