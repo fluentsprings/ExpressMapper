@@ -93,7 +93,7 @@ namespace ExpressMapper
 
             var propertyInfo = memberExpression.Member as PropertyInfo;
 
-            if (propertyInfo != null && !propertyInfo.CanWrite && !propertyInfo.GetSetMethod(true).IsPublic)
+            if (propertyInfo != null && !propertyInfo.CanWrite || (propertyInfo != null && propertyInfo.CanWrite && !propertyInfo.GetSetMethod(true).IsPublic))
             {
                 Ignore(dest);
             }
