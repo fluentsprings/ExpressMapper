@@ -54,6 +54,16 @@ namespace ExpressMapper.Tests
         }
 
         [Test]
+        public void RegisterCustomStringToStringTest()
+        {
+            Mapper.Register<TestDefaultDecimalToStringViewModel, TestDefaultDecimalToStringViewModel>();
+            Mapper.RegisterCustom<string, string>(src => src ?? "");
+            var tst = new TestDefaultDecimalToStringViewModel();
+            var result = Mapper.Map<TestDefaultDecimalToStringViewModel, TestDefaultDecimalToStringViewModel>(tst);
+            Assert.AreEqual(result.TestString, "");
+        }
+
+        [Test]
         public void DefaultPrimitiveTypePropertyToStringTest()
         {
             Mapper.Register<TestDefaultDecimal, TestDefaultDecimalToStringViewModel>()
@@ -74,9 +84,9 @@ namespace ExpressMapper.Tests
                 .Member(t => t.Enabled, s => s.enabled == "Y");
             Mapper.Compile();
 
-           var source = new Source { enabled = "N" };
-           var result = Mapper.Map<Source, TargetViewModel>(source);
-           Assert.AreEqual(result.Enabled, false);
+            var source = new Source { enabled = "N" };
+            var result = Mapper.Map<Source, TargetViewModel>(source);
+            Assert.AreEqual(result.Enabled, false);
         }
 
         [Test]
@@ -293,7 +303,7 @@ namespace ExpressMapper.Tests
             Assert.AreEqual(result, srcDst.Value);
         }
 
-        private void MapBaseMember<T, TN>(IMemberConfiguration<T,TN> mapConfig) 
+        private void MapBaseMember<T, TN>(IMemberConfiguration<T, TN> mapConfig)
             where T : Gift
             where TN : GiftViewModel
         {
@@ -948,7 +958,7 @@ namespace ExpressMapper.Tests
                 Assert.AreEqual(result.Collection.ElementAt(i), testResult.Item3.Collection.ElementAt(i));
             }
         }
-        
+
         [Test]
         public void ExistingDestDestCollGreater()
         {
@@ -1201,7 +1211,7 @@ namespace ExpressMapper.Tests
             };
 
             var typoCaseViewModel = Mapper.Map<TypoCase, TypoCaseViewModel>(typoCase);
-            
+
             Assert.AreEqual(typoCaseViewModel.Id, Guid.Empty);
             Assert.AreEqual(typoCaseViewModel.Name, null);
             Assert.AreEqual(typoCase.TestId, typoCaseViewModel.TestId);

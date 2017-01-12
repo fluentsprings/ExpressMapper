@@ -121,40 +121,34 @@ namespace ExpressMapper
             var destType = destNullableType ?? left.Type;
             var sourceType = sourceNullableType ?? right.Type;
 
+            var customMapExpression = GetCustomMapExpression(right.Type, left.Type);
+            if (customMapExpression != null)
+            {
+                var srcExp = Expression.Variable(right.Type,
+                    string.Format("{0}Src", Guid.NewGuid().ToString("N")));
+                var assignSrcExp = Expression.Assign(srcExp, right);
+
+                var destExp = Expression.Variable(left.Type,
+                    string.Format("{0}Dst", Guid.NewGuid().ToString("N")));
+                var assignDestExp = Expression.Assign(destExp, left);
+
+                // try precise substitute visitor
+                var substituteParameterVisitor =
+                    new PreciseSubstituteParameterVisitor(
+                        new KeyValuePair<ParameterExpression, ParameterExpression>(
+                            Expression.Variable(right.Type, "srcTyped"), srcExp),
+                        new KeyValuePair<ParameterExpression, ParameterExpression>(
+                            Expression.Variable(left.Type, "dstTyped"), destExp));
+
+                var blockExpression = substituteParameterVisitor.Visit(customMapExpression) as BlockExpression;
+
+                var assignResultExp = Expression.Assign(left, destExp);
+
+                return Expression.Block(new[] { srcExp, destExp }, assignSrcExp, assignDestExp, blockExpression, assignResultExp);
+            }
+
             if (ComplexMapCondition(sourceType, destType))
             {
-                var customMapExpression = GetCustomMapExpression(right.Type, left.Type);
-                if (customMapExpression != null)
-                {
-                    var srcExp = Expression.Variable(right.Type,
-                        string.Format("{0}Src", Guid.NewGuid().ToString("N")));
-                    var assignSrcExp = Expression.Assign(srcExp, right);
-
-                    var destExp = Expression.Variable(left.Type,
-                        string.Format("{0}Dst", Guid.NewGuid().ToString("N")));
-                    var assignDestExp = Expression.Assign(destExp, left);
-
-                    // try precise substitute visitor
-                    var substituteParameterVisitor =
-                        new PreciseSubstituteParameterVisitor(
-                            new KeyValuePair<ParameterExpression, ParameterExpression>(
-                                Expression.Variable(right.Type, "srcTyped"), srcExp),
-                            new KeyValuePair<ParameterExpression, ParameterExpression>(
-                                Expression.Variable(left.Type, "dstTyped"), destExp));
-
-                    var blockExpression = substituteParameterVisitor.Visit(customMapExpression) as BlockExpression;
-
-                    var assignResultExp = Expression.Assign(left, destExp);
-                    var resultBlockExp = Expression.Block(new[] { srcExp, destExp }, assignSrcExp, assignDestExp, blockExpression, assignResultExp);
-
-                    var checkNullExp =
-                         Expression.IfThenElse(Expression.Equal(right, Expression.Default(right.Type)),
-                            Expression.Assign(left, Expression.Default(left.Type)), resultBlockExp);
-
-                    var releaseExp = Expression.Block(new ParameterExpression[] { }, (right.Type.GetInfo().IsPrimitive || right.Type.GetInfo().IsValueType ? resultBlockExp : (Expression)checkNullExp));
-
-                    return releaseExp;
-                }
 
                 var returnTypeDifferenceVisitor = new ReturnTypeDifferenceVisitor(right);
                 returnTypeDifferenceVisitor.Visit(right);
@@ -196,7 +190,9 @@ namespace ExpressMapper
                 destNullableType,
                 sourceNullableType);
 
-            var conditionalExpression = nullCheckNestedMemberVisitor.CheckNullExpression != null ? Expression.Condition(nullCheckNestedMemberVisitor.CheckNullExpression, Expression.Assign(left, Expression.Default(left.Type)), binaryExpression) : (Expression)binaryExpression;
+            var conditionalExpression = nullCheckNestedMemberVisitor.CheckNullExpression != null ?
+                Expression.Condition(nullCheckNestedMemberVisitor.CheckNullExpression,
+                Expression.Assign(left, Expression.Default(left.Type)), binaryExpression) : binaryExpression;
 
             return conditionalExpression;
         }
@@ -446,7 +442,8 @@ namespace ExpressMapper
             else
             {
                 ctor = destPropType.GetInfo().GetConstructors(BindingFlags.Public | BindingFlags.Instance).FirstOrDefault(
-                    ci => {
+                    ci =>
+                    {
                         var param = ci.GetParameters();
                         return param.Length == 1 && param[0].ParameterType.GetInfo().IsAssignableFrom(destList);
                     });
