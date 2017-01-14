@@ -1359,5 +1359,26 @@ namespace ExpressMapper.Tests
             Assert.AreEqual(destBrand.Id, srcBrand.Id);
             Assert.AreEqual(destBrand.Name, srcBrand.Name);
         }
+
+
+        [Test]
+        public void InheritanceIncludeTest()
+        {
+            Mapper.Register<BaseControl, BaseControlViewModel>()
+                .Member(dst => dst.id_ctrl, src => src.Id)
+                .Member(dst => dst.name_ctrl, src => src.Name)
+                .Include<TextBox, TextBoxViewModel>();
+            Mapper.Compile();
+
+            var textBox = new TextBox
+            {
+                Id = Guid.NewGuid(),
+                Name = "Just a text box",
+                Description = "Just a text box - very simple description",
+                Text = "Hello World!"
+            };
+
+            var baseControlViewModel = Mapper.Map<BaseControl, BaseControlViewModel>(textBox);
+        }
     }
 }

@@ -47,6 +47,7 @@
     <Compile Include="Generator\Functional.cs" />
     <Compile Include="Generator\Simple.cs" />
     <Compile Include="Models\Address.cs" />
+    <Compile Include="Models\BaseControl.cs" />
     <Compile Include="Models\Booking.cs" />
     <Compile Include="Models\Brand.cs" />
     <Compile Include="Models\CategoryTrip.cs" />
@@ -67,6 +68,8 @@
     <Compile Include="Models\ItemModel.cs" />
     <Compile Include="Models\Source.cs" />
     <Compile Include="Models\TestDefaultDecimal.cs" />
+    <Compile Include="Models\TextBox.cs" />
+    <Compile Include="ViewModels\BaseControlViewModel.cs" />
     <Compile Include="ViewModels\FlattenCircularReferenceDto.cs" />
     <Compile Include="ViewModels\FlattenFatherSonDtoForGrandsonDto.cs" />
     <Compile Include="ViewModels\FlattenFatherSonGrandsonLowerCaseDto.cs" />
@@ -137,6 +140,7 @@
     <Compile Include="ViewModels\TestItemViewModel.cs" />
     <Compile Include="ViewModels\TestViewModel.cs" />
     <Compile Include="Models\TripType.cs" />
+    <Compile Include="ViewModels\TextBoxViewModel.cs" />
     <Compile Include="ViewModels\TicketViewModel.cs" />
     <Compile Include="ViewModels\TripCatalogViewModel.cs" />
     <Compile Include="ViewModels\TripTypeViewModel.cs" />

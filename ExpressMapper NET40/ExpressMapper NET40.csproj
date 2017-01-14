@@ -36,7 +36,8 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>Expressmapper.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <DelaySign>false</DelaySign>
@@ -51,49 +52,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CollectionTypes.cs" />
-    <Compile Include="CompilationTypes.cs" />
-    <Compile Include="Constants.cs" />
-    <Compile Include="DefaultMappingContext.cs" />
-    <Compile Include="DelegateCustomTypeMapper.cs" />
-    <Compile Include="DestinationTypeMapper.cs" />
-    <Compile Include="ExpressmapperException.cs" />
-    <Compile Include="ExpressmapperExtensions.cs" />
-    <Compile Include="FlattenMemberInfo.cs" />
-    <Compile Include="FlattenMapper.cs" />
-    <Compile Include="IMappingContext.cs" />
-    <Compile Include="IMappingServiceProvider.cs" />
-    <Compile Include="FlattenLinqMethod.cs" />
-    <Compile Include="MapNotImplemented.cs" />
-    <Compile Include="MappingServiceProvider.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="NullCheckNestedMemberVisitor.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DestinationMappingService.cs" />
-    <Compile Include="IMappingService.cs" />
-    <Compile Include="MappingServiceBase.cs" />
-    <Compile Include="PreciseSubstituteParameterVisitor.cs" />
-    <Compile Include="ProjectionAccessMemberVisitor.cs" />
-    <Compile Include="ReturnTypeDifferenceVisitor.cs" />
-    <Compile Include="SourceMappingService.cs" />
-    <Compile Include="SourceTypeMapper.cs" />
-    <Compile Include="StaticExpressions.cs" />
-    <Compile Include="SubstituteParameterVisitor.cs" />
-    <Compile Include="ITypeMapper.cs" />
-    <Compile Include="ICustomTypeMapper.cs" />
-    <Compile Include="IMemberConfiguration.cs" />
-    <Compile Include="Mapper.cs" />
-    <Compile Include="MemberConfiguration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TypeExtensions.cs" />
-    <Compile Include="TypeMapperBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Expressmapper.snk" />
   </ItemGroup>
-  <ItemGroup />
+  <Import Project="..\Expressmapper.Shared\Expressmapper.Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
