@@ -774,7 +774,8 @@ namespace ExpressMapper.Tests
         public void AccessSourceNestedProperty()
         {
             Mapper.Register<TestModel, TestViewModel>()
-                .Member(dest => dest.Name, src => string.Format("Test - {0} - and date: {1} plus {2}", src.Country.Name, DateTime.Now, src.Country.Code));
+                .Member(dest => dest.Name, src =>
+                        $"Test - {src.Country.Name} - and date: {DateTime.Now} plus {src.Country.Code}");
             Mapper.Register<Country, CountryViewModel>();
             Mapper.Register<Size, SizeViewModel>();
 
@@ -790,7 +791,8 @@ namespace ExpressMapper.Tests
         public void AccessSourceManyNestedProperties()
         {
             Mapper.Register<Trip, TripViewModel>()
-                .Member(dest => dest.Name, src => string.Format("Type: {0}, Catalog: {1}, Category: {2}", src.Category.Catalog.TripType.Name, src.Category.Catalog.Name, src.Category.Name))
+                .Member(dest => dest.Name, src =>
+                        $"Type: {src.Category.Catalog.TripType.Name}, Catalog: {src.Category.Catalog.Name}, Category: {src.Category.Name}")
                 .Ignore(dest => dest.Category);
 
             Mapper.Compile();

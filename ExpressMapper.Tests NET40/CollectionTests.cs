@@ -307,6 +307,49 @@ namespace ExpressMapper.Tests
         }
 
         [Test]
+        public void InheritanceIncludeTest()
+        {
+            Mapper.Register<BaseControl, BaseControlViewModel>()
+                .Member(dst => dst.id_ctrl, src => src.Id)
+                .Member(dst => dst.name_ctrl, src => src.Name)
+                .Include<TextBox, TextBoxViewModel>()
+                .Include<ComboBox, ComboBoxViewModel>();
+
+            Mapper.Register<ComboBox, ComboBoxViewModel>()
+                .Member(dest => dest.AmountOfElements, src => src.NumberOfElements);
+
+            Mapper.Compile();
+
+            var textBox = new TextBox
+            {
+                Id = Guid.NewGuid(),
+                Name = "Just a text box",
+                Description = "Just a text box - very simple description",
+                Text = "Hello World!"
+            };
+
+            var comboBox = new ComboBox
+            {
+                Id = Guid.NewGuid(),
+                Name = "Just a combo box",
+                Description = "Just a combo box - very simple description",
+                GeneralName = "Super Combo mombo",
+                NumberOfElements = 103
+            };
+
+            var controls = new List<BaseControl>
+            {
+                textBox, comboBox
+            };
+
+            var controlVms = Mapper.Map<List<BaseControl>, IEnumerable<BaseControlViewModel>>(controls);
+            Assert.NotNull(controlVms);
+            Assert.True(controlVms.Any());
+            Assert.True(controlVms.Any(c => c is TextBoxViewModel));
+            Assert.True(controlVms.Any(c => c is ComboBoxViewModel));
+        }
+
+        [Test]
         public void NestedInheritanceIncludeTest()
         {
             Mapper.Register<BaseControl, BaseControlViewModel>()

@@ -10,19 +10,19 @@ namespace ExpressMapper.Tests
     [TestFixture]
     public class ExceptionTests : BaseTestClass
     {
-        [Test]
-        public void MappingRegisteredMoreThanOnceTest()
-        {
-            Mapper.Register<Size, SizeViewModel>();
+        //[Test]
+        //public void MappingRegisteredMoreThanOnceTest()
+        //{
+        //    Mapper.Register<Size, SizeViewModel>();
 
-            var exceptionMessage = string.Format("Mapping from {0} to {1} is already registered",
-                typeof (Size).FullName, typeof (SizeViewModel).FullName);
-            Assert.Throws<InvalidOperationException>(() =>
-            {
-                Mapper.Register<Size, SizeViewModel>();
+        //    var exceptionMessage = string.Format("Mapping from {0} to {1} is already registered",
+        //        typeof (Size).FullName, typeof (SizeViewModel).FullName);
+        //    Assert.Throws<InvalidOperationException>(() =>
+        //    {
+        //        Mapper.Register<Size, SizeViewModel>();
 
-            }, exceptionMessage);
-        }
+        //    }, exceptionMessage);
+        //}
 
         [Test]
         public void RegisteringCollectionTypesTest()

@@ -154,6 +154,18 @@ namespace ExpressMapper
             return this;
         }
 
+        public IMemberConfiguration<T, TN> Include<TSub, TNSub>() where TSub : T
+                                                                  where TNSub : TN
+        {
+            foreach (var typeMapper in _typeMappers)
+            {
+                typeMapper.BaseType = true;
+            }
+
+            _mappingServiceProvider.Register<TSub, TNSub>(_typeMappers.First() as IMemberConfigParameters);
+            return this;
+        }
+
         #region flatten code
 
         /// <summary>
@@ -176,17 +188,6 @@ namespace ExpressMapper
                 typeMapper.Flatten();
             }
 
-            return this;
-        }
-
-        public IMemberConfiguration<T, TN> Include<TSub, TNSub>()
-        {
-            foreach (var typeMapper in _typeMappers)
-            {
-                typeMapper.BaseType = true;
-            }
-            
-            _mappingServiceProvider.Register<TSub, TNSub>(_typeMappers.First() as IMemberConfigParameters);
             return this;
         }
 

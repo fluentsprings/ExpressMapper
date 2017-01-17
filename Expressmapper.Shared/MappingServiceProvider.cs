@@ -65,6 +65,11 @@ namespace ExpressMapper
             return RegisterInternal<T, TN>();
         }
 
+        private IMemberConfiguration<T, TN> Register<T, TN>(T src, TN dest)
+        {
+            return RegisterInternal<T, TN>();
+        }
+
         public IMemberConfiguration<T, TN> Register<T, TN>(IMemberConfigParameters baseType)
         {
             var memberConfiguration = Register<T, TN>();
@@ -279,7 +284,7 @@ namespace ExpressMapper
 
         public TN Map<T, TN>(T src, TN dest)
         {
-            if (src.GetType() == typeof(T) && (dest.GetType() == typeof(TN)/* || dest == default(TN)*/))
+            if (src.GetType() == typeof(T) && (dest.GetType() == typeof(TN)))
             {
                 return MapInternal<T, TN>(src, dest);
             }
@@ -374,7 +379,7 @@ namespace ExpressMapper
             return MapNonGenericInternal(srcType, dstType, src, dest);
         }
 
-        private object MapNonGenericInternal(Type srcType, Type dstType, object src, object dest = null)
+        private object MapNonGenericInternal(Type srcType, Type dstType, object src, object dest = null, bool dynamicTrial = false)
         {
             if (src == null)
             {
@@ -476,8 +481,16 @@ namespace ExpressMapper
                     : _mappingServices.First(m => m.DestinationSupport).MapCollection(cacheKey).DynamicInvoke(src, dest));
                 return result;
             }
-            throw new MapNotImplementedException(
-                $"There is no mapping has been found. Source Type: {srcType.FullName}, Destination Type: {dstType.FullName}");
+
+            if (dynamicTrial)
+            {
+                throw new MapNotImplementedException(
+                    $"There is no mapping has been found. Source Type: {srcType.FullName}, Destination Type: {dstType.FullName}");
+            }
+            dynamic source = src;
+            dynamic destination = dest;
+            Register(source, destination);
+            return MapNonGenericInternal(srcType, dstType, src, dest, true);
         }
 
         #region Helper methods
