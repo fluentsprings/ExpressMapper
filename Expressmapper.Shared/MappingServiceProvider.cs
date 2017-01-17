@@ -323,14 +323,14 @@ namespace ExpressMapper
             var tCol =
                 typeof(T).GetInfo().GetInterfaces()
                     .FirstOrDefault(t => t.GetInfo().IsGenericType && t.GetGenericTypeDefinition() == GenericEnumerableType) ??
-                    (typeof(T).GetInfo().IsGenericType
-                        && typeof(T).GetInfo().GetInterfaces().Any(t => t == typeof(IEnumerable)) ? typeof(T)
-                        : null);
+                (typeof(T).GetInfo().IsGenericType
+                 && typeof(T).GetInfo().GetInterfaces().Any(t => t == typeof(IEnumerable)) ? typeof(T)
+                    : null);
 
             var tnCol = typeof(TN).GetInfo().GetInterfaces()
-                .FirstOrDefault(t => t.GetInfo().IsGenericType && t.GetGenericTypeDefinition() == GenericEnumerableType) ??
-                         (typeof(TN).GetInfo().IsGenericType && typeof(TN).GetInfo().GetInterfaces().Any(t => t == typeof(IEnumerable)) ? typeof(TN)
-                             : null);
+                            .FirstOrDefault(t => t.GetInfo().IsGenericType && t.GetGenericTypeDefinition() == GenericEnumerableType) ??
+                        (typeof(TN).GetInfo().IsGenericType && typeof(TN).GetInfo().GetInterfaces().Any(t => t == typeof(IEnumerable)) ? typeof(TN)
+                            : null);
 
             if ((tCol == null || tnCol == null))
             {
@@ -467,7 +467,7 @@ namespace ExpressMapper
                     : null);
 
             var tnCol = dstType.GetInfo().GetInterfaces()
-                .FirstOrDefault(t => t.GetInfo().IsGenericType && t.GetGenericTypeDefinition() == GenericEnumerableType) ??
+                            .FirstOrDefault(t => t.GetInfo().IsGenericType && t.GetGenericTypeDefinition() == GenericEnumerableType) ??
                         (dstType.GetInfo().IsGenericType && dstType.GetInfo().GetInterfaces().Any(t => t == typeof(IEnumerable))
                             ? dstType
                             : null);

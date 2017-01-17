@@ -474,8 +474,10 @@ namespace ExpressMapper
 
             // todo : implement visitor to replace base type to the subclass' type
             CustomFunctionMembers =
-                new List<KeyValuePair<MemberExpression, Expression>>(baseClassConfiguration.CustomFunctionMembers.Count);
-            CustomMembers = new List<KeyValuePair<MemberExpression, Expression>>(baseClassConfiguration.CustomMembers.Count);
+                new List<KeyValuePair<MemberExpression, Expression>>(baseClassConfiguration.CustomFunctionMembers
+                    .Count);
+            CustomMembers =
+                new List<KeyValuePair<MemberExpression, Expression>>(baseClassConfiguration.CustomMembers.Count);
             FlattenMembers =
                 new List<KeyValuePair<MemberExpression, Expression>>(baseClassConfiguration.FlattenMembers.Count);
 
@@ -509,27 +511,27 @@ namespace ExpressMapper
     }
 
     /// <summary>
-        /// ReplaceMemberTypeVisitor
+    /// ReplaceMemberTypeVisitor
+    /// </summary>
+    public class ReplaceMemberTypeVisitor : ExpressionVisitor
+    {
+        private readonly Type _replacementType;
+        private readonly Expression _instanceExp;
+
+        /// <summary>
+        /// ReplaceMemberTypeVisitor constructor
         /// </summary>
-        public class ReplaceMemberTypeVisitor : ExpressionVisitor
+        public ReplaceMemberTypeVisitor(Type replacementType, Expression instanceExp)
         {
-            private readonly Type _replacementType;
-            private readonly Expression _instanceExp;
+            _replacementType = replacementType;
+            _instanceExp = instanceExp;
+        }
 
-            /// <summary>
-            /// ReplaceMemberTypeVisitor constructor
-            /// </summary>
-            public ReplaceMemberTypeVisitor(Type replacementType, Expression instanceExp)
-            {
-                _replacementType = replacementType;
-                _instanceExp = instanceExp;
-            }
-
-            protected override Expression VisitMember(MemberExpression node)
-            {
-                return node.Member.DeclaringType.IsAssignableFrom(_replacementType)
-                    ? Expression.PropertyOrField(_instanceExp, node.Member.Name)
-                    : base.VisitMember(node);
-            }
+        protected override Expression VisitMember(MemberExpression node)
+        {
+            return node.Member.DeclaringType.IsAssignableFrom(_replacementType)
+                ? Expression.PropertyOrField(_instanceExp, node.Member.Name)
+                : base.VisitMember(node);
         }
     }
+}

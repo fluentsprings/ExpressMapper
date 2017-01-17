@@ -12,7 +12,7 @@ namespace ExpressMapper
     {
         private readonly Dictionary<string, MemberBinding> _bindingExpressions = new Dictionary<string, MemberBinding>();
 
-        public SourceTypeMapper(IMappingService service, IMappingServiceProvider serviceProvider) : base(service, serviceProvider) {}
+        public SourceTypeMapper(IMappingService service, IMappingServiceProvider serviceProvider) : base(service, serviceProvider) { }
 
         public override CompilationTypes MapperType => CompilationTypes.Source;
 
@@ -108,7 +108,7 @@ namespace ExpressMapper
 
                 QueryableExpression =
                     Expression.Lambda<Func<T, TN>>(
-                        Expression.MemberInit(Expression.New(typeof (TN)), _bindingExpressions.Values), SourceParameter);
+                        Expression.MemberInit(Expression.New(typeof(TN)), _bindingExpressions.Values), SourceParameter);
             }
             catch (Exception ex)
             {
@@ -131,7 +131,7 @@ namespace ExpressMapper
                     : null);
 
             var tnCol = destProp.PropertyType.GetInfo().GetInterfaces()
-                .FirstOrDefault(t => t.GetInfo().IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>)) ??
+                            .FirstOrDefault(t => t.GetInfo().IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>)) ??
                         (destProp.PropertyType.GetInfo().IsGenericType &&
                          destProp.PropertyType.GetInfo().GetInterfaces().Any(t => t == typeof(IEnumerable))
                             ? destProp.PropertyType
@@ -150,9 +150,9 @@ namespace ExpressMapper
                 MethodInfo selectMethod = null;
                 foreach (
                     var p in from m in typeof(Enumerable).GetInfo().GetMethods().Where(m => m.Name == "Select")
-                             from p in m.GetParameters().Where(p => p.Name.Equals("selector"))
-                             where p.ParameterType.GetInfo().GetGenericArguments().Count() == 2
-                             select p)
+                    from p in m.GetParameters().Where(p => p.Name.Equals("selector"))
+                    where p.ParameterType.GetInfo().GetGenericArguments().Count() == 2
+                    select p)
                     selectMethod = (MethodInfo)p.Member;
 
                 Expression selectExpression = Expression.Call(

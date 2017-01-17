@@ -7,10 +7,12 @@ namespace ExpressMapper
 {
     public class MemberConfiguration<T, TN> : IMemberConfiguration<T, TN>
     {
+        private readonly IMappingServiceProvider _mappingServiceProvider;
         private readonly ITypeMapper<T, TN>[] _typeMappers;
-        public MemberConfiguration(ITypeMapper<T, TN>[] typeMappers)
+        public MemberConfiguration(ITypeMapper<T, TN>[] typeMappers, IMappingServiceProvider mappingServiceProvider)
         {
             _typeMappers = typeMappers;
+            _mappingServiceProvider = mappingServiceProvider;
         }
 
         public IMemberConfiguration<T, TN> InstantiateFunc(Func<T, TN> constructor)
@@ -93,7 +95,7 @@ namespace ExpressMapper
 
             var propertyInfo = memberExpression.Member as PropertyInfo;
 
-            if (propertyInfo != null && !propertyInfo.CanWrite && !propertyInfo.GetSetMethod(true).IsPublic)
+            if (propertyInfo != null && !propertyInfo.CanWrite || (propertyInfo != null && propertyInfo.CanWrite && !propertyInfo.GetSetMethod(true).IsPublic))
             {
                 Ignore(dest);
             }
@@ -152,10 +154,22 @@ namespace ExpressMapper
             return this;
         }
 
+        public IMemberConfiguration<T, TN> Include<TSub, TNSub>() where TSub : T
+            where TNSub : TN
+        {
+            foreach (var typeMapper in _typeMappers)
+            {
+                typeMapper.BaseType = true;
+            }
+
+            _mappingServiceProvider.Register<TSub, TNSub>(_typeMappers.First() as IMemberConfigParameters);
+            return this;
+        }
+
         #region flatten code
 
         /// <summary>
-        /// This will apply the flattening algorithm to the source. 
+        /// This will apply the flattening algorithm to the source.
         /// This allow properties in nested source classes to be assigned to a top level destination property.
         /// Matching is done by concatenated names, and also a few Linq commands
         /// e.g. dest.NestedClassMyProperty would contain the property src.NestedClass.MyProperty (as long as types match)
@@ -168,7 +182,7 @@ namespace ExpressMapper
 
             if (sourceMapperBase == null)
                 throw new Exception("Failed to find the source mapping.");
-            
+
             foreach (var typeMapper in _typeMappers)
             {
                 typeMapper.Flatten();

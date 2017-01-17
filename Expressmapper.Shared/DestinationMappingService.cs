@@ -245,7 +245,7 @@ namespace ExpressMapper
                 var closedEnumeratorDestType = typeof(IEnumerator<>).MakeGenericType(destType);
                 var closedEnumerableDestType = GenericEnumerableType.MakeGenericType(destType);
                 var enumeratorDest = Expression.Variable(closedEnumeratorDestType,
-                    $"{Guid.NewGuid().ToString("N")}EnumDst");
+                    $"{Guid.NewGuid():N}EnumDst");
                 var assignToEnumDest = Expression.Assign(enumeratorDest,
                     Expression.Call(destVariable, closedEnumerableDestType.GetInfo().GetMethod("GetEnumerator")));
                 var doMoveNextDest = Expression.Call(enumeratorDest, typeof(IEnumerator).GetInfo().GetMethod("MoveNext"));
