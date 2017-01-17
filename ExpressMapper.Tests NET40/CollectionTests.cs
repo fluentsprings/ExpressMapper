@@ -1,4 +1,5 @@
-﻿using ExpressMapper.Tests.Model.Generator;
+﻿using System;
+using ExpressMapper.Tests.Model.Generator;
 using ExpressMapper.Tests.Model.Models;
 using ExpressMapper.Tests.Model.ViewModels;
 using NUnit.Framework;
@@ -303,6 +304,54 @@ namespace ExpressMapper.Tests
             Assert.AreEqual(1, result[1].Childs.Count);
             Assert.AreEqual("ObjectB2", result[1].Code);
             Assert.AreEqual("ObjectA2", result[1].Childs[0].Code);
+        }
+
+        [Test]
+        public void NestedInheritanceIncludeTest()
+        {
+            Mapper.Register<BaseControl, BaseControlViewModel>()
+                .Member(dst => dst.id_ctrl, src => src.Id)
+                .Member(dst => dst.name_ctrl, src => src.Name)
+                .Include<TextBox, TextBoxViewModel>()
+                .Include<ComboBox, ComboBoxViewModel>();
+
+            Mapper.Register<ComboBox, ComboBoxViewModel>()
+                .Member(dest => dest.AmountOfElements, src => src.NumberOfElements);
+
+            Mapper.Register<Gui, GuiViewModel>()
+                .Member(dest => dest.ControlViewModels, src => src.Controls);
+            Mapper.Compile();
+
+            var textBox = new TextBox
+            {
+                Id = Guid.NewGuid(),
+                Name = "Just a text box",
+                Description = "Just a text box - very simple description",
+                Text = "Hello World!"
+            };
+
+            var comboBox = new ComboBox
+            {
+                Id = Guid.NewGuid(),
+                Name = "Just a combo box",
+                Description = "Just a combo box - very simple description",
+                GeneralName = "Super Combo mombo",
+                NumberOfElements = 103
+            };
+
+            var gui = new Gui()
+            {
+                Controls = new List<BaseControl>
+                {
+                    textBox, comboBox
+                }
+            };
+
+            var guiViewModel = Mapper.Map<Gui, GuiViewModel>(gui);
+            Assert.NotNull(guiViewModel.ControlViewModels);
+            Assert.True(guiViewModel.ControlViewModels.Any());
+            Assert.True(guiViewModel.ControlViewModels.Any(c => c is TextBoxViewModel));
+            Assert.True(guiViewModel.ControlViewModels.Any(c => c is ComboBoxViewModel));
         }
 
         public class ObjectA

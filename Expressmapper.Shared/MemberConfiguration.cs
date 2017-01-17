@@ -179,9 +179,15 @@ namespace ExpressMapper
             return this;
         }
 
-        public IMemberConfiguration<TSub, TNSub> Include<TSub, TNSub>()
+        public IMemberConfiguration<T, TN> Include<TSub, TNSub>()
         {
-            return _mappingServiceProvider.Register<TSub, TNSub>(_typeMappers.First() as IMemberConfigParameters);
+            foreach (var typeMapper in _typeMappers)
+            {
+                typeMapper.BaseType = true;
+            }
+            
+            _mappingServiceProvider.Register<TSub, TNSub>(_typeMappers.First() as IMemberConfigParameters);
+            return this;
         }
 
         #endregion

@@ -23,6 +23,10 @@ namespace ExpressMapper
         protected IMappingService MappingService { get; set; }
         protected IMappingServiceProvider MappingServiceProvider { get; set; }
         protected Dictionary<MemberInfo, MemberInfo> AutoMembers = new Dictionary<MemberInfo, MemberInfo>();
+        public bool BaseType { get; set; }
+
+
+        public IMemberConfiguration<T, TN> MemberConfiguration { get; set; }
         public List<KeyValuePair<MemberExpression, Expression>> CustomMembers { get; private set; }
         public List<KeyValuePair<MemberExpression, Expression>> FlattenMembers { get; private set; }
         public List<KeyValuePair<MemberExpression, Expression>> CustomFunctionMembers { get; private set; }
@@ -96,7 +100,8 @@ namespace ExpressMapper
 
         public void Compile(CompilationTypes compilationType, bool forceByDemand = false)
         {
-            if (!forceByDemand && ((CompilationTypeOverride && (MapperType & CompilationTypeMember) != MapperType) || (!CompilationTypeOverride && (MapperType & compilationType) != MapperType)))
+            if (!forceByDemand && ((CompilationTypeOverride && (MapperType & CompilationTypeMember) != MapperType) ||
+                                   (!CompilationTypeOverride && (MapperType & compilationType) != MapperType)))
             {
                 return;
             }
@@ -116,7 +121,8 @@ namespace ExpressMapper
                 catch (Exception ex)
                 {
                     throw new ExpressmapperException(
-                        $"Error error occured trying to compile mapping for: source {typeof(T).FullName}, destination {typeof(TN).FullName}. See the inner exception for details.", ex);
+                        $"Error error occured trying to compile mapping for: source {typeof(T).FullName}, destination {typeof(TN).FullName}. See the inner exception for details.",
+                        ex);
                 }
             }
             finally
@@ -144,13 +150,15 @@ namespace ExpressMapper
 
         public Tuple<List<Expression>, ParameterExpression, ParameterExpression> GetMapExpressions()
         {
-            if (_compiling)
+            if (_compiling || BaseType)
             {
-                return new Tuple<List<Expression>, ParameterExpression, ParameterExpression>(new List<Expression>(RecursiveExpressionResult), SourceParameter, DestFakeParameter);
+                return new Tuple<List<Expression>, ParameterExpression, ParameterExpression>(
+                    new List<Expression>(RecursiveExpressionResult), SourceParameter, DestFakeParameter);
             }
 
             Compile(MapperType);
-            return new Tuple<List<Expression>, ParameterExpression, ParameterExpression>(new List<Expression>(ResultExpressionList), SourceParameter, DestFakeParameter);
+            return new Tuple<List<Expression>, ParameterExpression, ParameterExpression>(
+                new List<Expression>(ResultExpressionList), SourceParameter, DestFakeParameter);
         }
 
         public Func<object, object, object> GetNonGenericMapFunc()
@@ -171,18 +179,20 @@ namespace ExpressMapper
             var dstAssigned = Expression.Assign(dstTypedExp, dstConverted);
 
             var customGenericType = typeof(ITypeMapper<,>).MakeGenericType(typeof(T), typeof(TN));
-            var castToCustomGeneric = Expression.Convert(Expression.Constant((ITypeMapper)this), customGenericType);
+            var castToCustomGeneric = Expression.Convert(Expression.Constant((ITypeMapper) this), customGenericType);
             var genVariable = Expression.Variable(customGenericType);
             var assignExp = Expression.Assign(genVariable, castToCustomGeneric);
-            var methodInfo = customGenericType.GetInfo().GetMethod("MapTo", new[] { typeof(T), typeof(TN) });
+            var methodInfo = customGenericType.GetInfo().GetMethod("MapTo", new[] {typeof(T), typeof(TN)});
 
             var mapCall = Expression.Call(genVariable, methodInfo, srcTypedExp, dstTypedExp);
             var resultVarExp = Expression.Variable(typeof(object), "result");
             var convertToObj = Expression.Convert(mapCall, typeof(object));
             var assignResult = Expression.Assign(resultVarExp, convertToObj);
 
-            var blockExpression = Expression.Block(new[] { srcTypedExp, dstTypedExp, genVariable, resultVarExp }, new Expression[] { srcAssigned, dstAssigned, assignExp, assignResult, resultVarExp });
-            var lambda = Expression.Lambda<Func<object, object, object>>(blockExpression, parameterExpression, destParameterExp);
+            var blockExpression = Expression.Block(new[] {srcTypedExp, dstTypedExp, genVariable, resultVarExp},
+                new Expression[] {srcAssigned, dstAssigned, assignExp, assignResult, resultVarExp});
+            var lambda =
+                Expression.Lambda<Func<object, object, object>>(blockExpression, parameterExpression, destParameterExp);
             NonGenericMapFunc = lambda.Compile();
 
             return NonGenericMapFunc;
@@ -196,7 +206,8 @@ namespace ExpressMapper
             MapMember(callSetPropMethod, callGetPropMethod);
         }
 
-        public void MapMember<TSourceMember, TDestMember>(Expression<Func<TN, TDestMember>> left, Expression<Func<T, TSourceMember>> right)
+        public void MapMember<TSourceMember, TDestMember>(Expression<Func<TN, TDestMember>> left,
+            Expression<Func<T, TSourceMember>> right)
         {
             if (left == null)
             {
@@ -208,7 +219,8 @@ namespace ExpressMapper
                 throw new ArgumentNullException(RightStr);
             }
 
-            CustomMembers.Add(new KeyValuePair<MemberExpression, Expression>(left.Body as MemberExpression, right.Body));
+            CustomMembers.Add(
+                new KeyValuePair<MemberExpression, Expression>(left.Body as MemberExpression, right.Body));
             //MapMember(left.Body as MemberExpression, right.Body);
         }
 
@@ -261,14 +273,18 @@ namespace ExpressMapper
         protected void ProcessAutoProperties()
         {
             var getFields =
-                typeof(T).GetInfo().GetFields(BindingFlags.FlattenHierarchy | BindingFlags.Instance | BindingFlags.Public);
+                typeof(T).GetInfo()
+                    .GetFields(BindingFlags.FlattenHierarchy | BindingFlags.Instance | BindingFlags.Public);
             var setFields =
-                typeof(TN).GetInfo().GetFields(BindingFlags.FlattenHierarchy | BindingFlags.Instance | BindingFlags.Public);
+                typeof(TN).GetInfo()
+                    .GetFields(BindingFlags.FlattenHierarchy | BindingFlags.Instance | BindingFlags.Public);
 
             var getProps =
-                typeof(T).GetInfo().GetProperties(BindingFlags.FlattenHierarchy | BindingFlags.Instance | BindingFlags.Public);
+                typeof(T).GetInfo()
+                    .GetProperties(BindingFlags.FlattenHierarchy | BindingFlags.Instance | BindingFlags.Public);
             var setProps =
-                typeof(TN).GetInfo().GetProperties(BindingFlags.FlattenHierarchy | BindingFlags.Instance | BindingFlags.Public);
+                typeof(TN).GetInfo()
+                    .GetProperties(BindingFlags.FlattenHierarchy | BindingFlags.Instance | BindingFlags.Public);
 
             var sourceMembers = getFields.Cast<MemberInfo>().Union(getProps);
             var destMembers = setFields.Cast<MemberInfo>().Union(setProps);
@@ -281,14 +297,16 @@ namespace ExpressMapper
 
             foreach (var prop in sourceMembers)
             {
-                if (IgnoreMemberList.Contains(prop.Name, comparer) || CustomPropertyCache.Keys.Contains(prop.Name, comparer))
+                if (IgnoreMemberList.Contains(prop.Name, comparer) ||
+                    CustomPropertyCache.Keys.Contains(prop.Name, comparer))
                 {
                     continue;
                 }
                 var setprop = destMembers.FirstOrDefault(x => string.Equals(x.Name, prop.Name, stringComparison));
 
                 var propertyInfo = setprop as PropertyInfo;
-                if ((propertyInfo == null && setprop == null) || (propertyInfo != null && (!propertyInfo.CanWrite || !propertyInfo.GetSetMethod(true).IsPublic)))
+                if ((propertyInfo == null && setprop == null) ||
+                    (propertyInfo != null && (!propertyInfo.CanWrite || !propertyInfo.GetSetMethod(true).IsPublic)))
                 {
                     IgnoreMemberList.Add(prop.Name);
                     continue;
@@ -374,7 +392,8 @@ namespace ExpressMapper
             var parameterExpression = Expression.Parameter(typeof(T));
             var rightExpression = Expression.Invoke(expr, parameterExpression);
 
-            CustomFunctionMembers.Add(new KeyValuePair<MemberExpression, Expression>(memberExpression, rightExpression));
+            CustomFunctionMembers.Add(
+                new KeyValuePair<MemberExpression, Expression>(memberExpression, rightExpression));
             //MapFunction<TMember, TNMember>(left, rightExpression, memberExpression);
         }
 
@@ -382,7 +401,8 @@ namespace ExpressMapper
         {
             if (left.Member.DeclaringType != rightExpression.Type)
             {
-                var mapComplexResult = MappingService.GetDifferentTypeMemberMappingExpression(rightExpression, left, false);
+                var mapComplexResult =
+                    MappingService.GetDifferentTypeMemberMappingExpression(rightExpression, left, false);
                 CustomPropertyCache[left.Member.Name] = mapComplexResult;
             }
             else
@@ -428,7 +448,8 @@ namespace ExpressMapper
             }
         }
 
-        protected List<KeyValuePair<MemberExpression, Expression>> TranslateExpression(IEnumerable<KeyValuePair<MemberExpression, Expression>> expressions)
+        protected List<KeyValuePair<MemberExpression, Expression>> TranslateExpression(
+            IEnumerable<KeyValuePair<MemberExpression, Expression>> expressions)
         {
             var result = new List<KeyValuePair<MemberExpression, Expression>>(expressions.Count());
             foreach (var customMember in expressions)
@@ -452,11 +473,63 @@ namespace ExpressMapper
             CompilationTypeMember = baseClassConfiguration.CompilationTypeMember;
 
             // todo : implement visitor to replace base type to the subclass' type
-            CustomFunctionMembers = new List<KeyValuePair<MemberExpression, Expression>>(baseClassConfiguration.CustomFunctionMembers);
-            CustomMembers = new List<KeyValuePair<MemberExpression, Expression>>(baseClassConfiguration.CustomMembers);
-            FlattenMembers = new List<KeyValuePair<MemberExpression, Expression>>(baseClassConfiguration.FlattenMembers);
+            CustomFunctionMembers =
+                new List<KeyValuePair<MemberExpression, Expression>>(baseClassConfiguration.CustomFunctionMembers.Count);
+            CustomMembers = new List<KeyValuePair<MemberExpression, Expression>>(baseClassConfiguration.CustomMembers.Count);
+            FlattenMembers =
+                new List<KeyValuePair<MemberExpression, Expression>>(baseClassConfiguration.FlattenMembers.Count);
 
-            IgnoreMemberList = new List<string>(baseClassConfiguration.IgnoreMemberList);
+            IgnoreMemberList =
+                new List<string>(baseClassConfiguration.IgnoreMemberList);
+
+            var replaceDestMemberTypeVisitor = new ReplaceMemberTypeVisitor(DestinationType, DestFakeParameter);
+            var replaceSrcMemberTypeVisitor = new ReplaceMemberTypeVisitor(SourceType, SourceParameter);
+
+            foreach (var customMember in baseClassConfiguration.CustomMembers)
+            {
+                var destExp = replaceDestMemberTypeVisitor.Visit(customMember.Key) as MemberExpression;
+                var srcExp = replaceSrcMemberTypeVisitor.Visit(customMember.Value);
+                CustomMembers.Add(new KeyValuePair<MemberExpression, Expression>(destExp, srcExp));
+            }
+
+            foreach (var customMember in baseClassConfiguration.CustomFunctionMembers)
+            {
+                var destExp = replaceDestMemberTypeVisitor.Visit(customMember.Key) as MemberExpression;
+                var srcExp = replaceSrcMemberTypeVisitor.Visit(customMember.Value);
+                CustomFunctionMembers.Add(new KeyValuePair<MemberExpression, Expression>(destExp, srcExp));
+            }
+
+            foreach (var customMember in baseClassConfiguration.FlattenMembers)
+            {
+                var destExp = replaceDestMemberTypeVisitor.Visit(customMember.Key) as MemberExpression;
+                var srcExp = replaceSrcMemberTypeVisitor.Visit(customMember.Value);
+                FlattenMembers.Add(new KeyValuePair<MemberExpression, Expression>(destExp, srcExp));
+            }
         }
     }
-}
+
+    /// <summary>
+        /// ReplaceMemberTypeVisitor
+        /// </summary>
+        public class ReplaceMemberTypeVisitor : ExpressionVisitor
+        {
+            private readonly Type _replacementType;
+            private readonly Expression _instanceExp;
+
+            /// <summary>
+            /// ReplaceMemberTypeVisitor constructor
+            /// </summary>
+            public ReplaceMemberTypeVisitor(Type replacementType, Expression instanceExp)
+            {
+                _replacementType = replacementType;
+                _instanceExp = instanceExp;
+            }
+
+            protected override Expression VisitMember(MemberExpression node)
+            {
+                return node.Member.DeclaringType.IsAssignableFrom(_replacementType)
+                    ? Expression.PropertyOrField(_instanceExp, node.Member.Name)
+                    : base.VisitMember(node);
+            }
+        }
+    }

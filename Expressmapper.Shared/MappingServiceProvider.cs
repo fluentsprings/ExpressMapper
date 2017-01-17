@@ -113,8 +113,8 @@ namespace ExpressMapper
                 if (SourceService.TypeMappers.ContainsKey(cacheKey) &&
                     DestinationService.TypeMappers.ContainsKey(cacheKey))
                 {
-                    throw new InvalidOperationException(
-                        $"Mapping from {src.FullName} to {dest.FullName} is already registered");
+                    var typeMapper = SourceService.TypeMappers[cacheKey] as ITypeMapper<T, TN>;
+                    return typeMapper?.MemberConfiguration;
                 }
 
                 if (src.GetInfo().GetInterfaces().Any(t => t.Name.Contains(typeof(IEnumerable).Name)) &&
@@ -138,8 +138,11 @@ namespace ExpressMapper
 
                 SourceService.TypeMappers[cacheKey] = sourceClassMapper;
                 DestinationService.TypeMappers[cacheKey] = destinationClassMapper;
-                return
-                    new MemberConfiguration<T, TN>(new ITypeMapper<T, TN>[] { sourceClassMapper, destinationClassMapper }, this);
+                var memberConfiguration = new MemberConfiguration<T, TN>(
+                    new ITypeMapper<T, TN>[] {sourceClassMapper, destinationClassMapper}, this);
+                sourceClassMapper.MemberConfiguration = memberConfiguration;
+                destinationClassMapper.MemberConfiguration = memberConfiguration;
+                return memberConfiguration;
             }
         }
 
