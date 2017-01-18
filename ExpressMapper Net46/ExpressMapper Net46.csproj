@@ -28,6 +28,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\ExpressMapper.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -46,112 +47,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\ExpressMapper NET40\CollectionTypes.cs">
-      <Link>CollectionTypes.cs</Link>
-    </Compile>
-    <Compile Include="..\ExpressMapper NET40\CompilationTypes.cs">
-      <Link>CompilationTypes.cs</Link>
-    </Compile>
-    <Compile Include="..\ExpressMapper NET40\Constants.cs">
-      <Link>Constants.cs</Link>
-    </Compile>
-    <Compile Include="..\ExpressMapper NET40\DefaultMappingContext.cs">
-      <Link>DefaultMappingContext.cs</Link>
-    </Compile>
-    <Compile Include="..\ExpressMapper NET40\DelegateCustomTypeMapper.cs">
-      <Link>DelegateCustomTypeMapper.cs</Link>
-    </Compile>
-    <Compile Include="..\ExpressMapper NET40\DestinationMappingService.cs">
-      <Link>DestinationMappingService.cs</Link>
-    </Compile>
-    <Compile Include="..\ExpressMapper NET40\DestinationTypeMapper.cs">
-      <Link>DestinationTypeMapper.cs</Link>
-    </Compile>
-    <Compile Include="..\ExpressMapper NET40\ExpressmapperException.cs">
-      <Link>ExpressmapperException.cs</Link>
-    </Compile>
-    <Compile Include="..\ExpressMapper NET40\ExpressmapperExtensions.cs">
-      <Link>ExpressmapperExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\ExpressMapper NET40\FlattenLinqMethod.cs">
-      <Link>FlattenLinqMethod.cs</Link>
-    </Compile>
-    <Compile Include="..\ExpressMapper NET40\FlattenMapper.cs">
-      <Link>FlattenMapper.cs</Link>
-    </Compile>
-    <Compile Include="..\ExpressMapper NET40\FlattenMemberInfo.cs">
-      <Link>FlattenMemberInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\ExpressMapper NET40\ICustomTypeMapper.cs">
-      <Link>ICustomTypeMapper.cs</Link>
-    </Compile>
-    <Compile Include="..\ExpressMapper NET40\IMappingContext.cs">
-      <Link>IMappingContext.cs</Link>
-    </Compile>
-    <Compile Include="..\ExpressMapper NET40\IMappingService.cs">
-      <Link>IMappingService.cs</Link>
-    </Compile>
-    <Compile Include="..\ExpressMapper NET40\IMappingServiceProvider.cs">
-      <Link>IMappingServiceProvider.cs</Link>
-    </Compile>
-    <Compile Include="..\ExpressMapper NET40\IMemberConfiguration.cs">
-      <Link>IMemberConfiguration.cs</Link>
-    </Compile>
-    <Compile Include="..\ExpressMapper NET40\ITypeMapper.cs">
-      <Link>ITypeMapper.cs</Link>
-    </Compile>
-    <Compile Include="..\ExpressMapper NET40\MapNotImplemented.cs">
-      <Link>MapNotImplemented.cs</Link>
-    </Compile>
-    <Compile Include="..\ExpressMapper NET40\Mapper.cs">
-      <Link>Mapper.cs</Link>
-    </Compile>
-    <Compile Include="..\ExpressMapper NET40\MappingServiceBase.cs">
-      <Link>MappingServiceBase.cs</Link>
-    </Compile>
-    <Compile Include="..\ExpressMapper NET40\MappingServiceProvider.cs">
-      <Link>MappingServiceProvider.cs</Link>
-    </Compile>
-    <Compile Include="..\ExpressMapper NET40\MemberConfiguration.cs">
-      <Link>MemberConfiguration.cs</Link>
-    </Compile>
-    <Compile Include="..\ExpressMapper NET40\NullCheckNestedMemberVisitor.cs">
-      <Link>NullCheckNestedMemberVisitor.cs</Link>
-    </Compile>
-    <Compile Include="..\ExpressMapper NET40\PreciseSubstituteParameterVisitor.cs">
-      <Link>PreciseSubstituteParameterVisitor.cs</Link>
-    </Compile>
-    <Compile Include="..\ExpressMapper NET40\ProjectionAccessMemberVisitor.cs">
-      <Link>ProjectionAccessMemberVisitor.cs</Link>
-    </Compile>
     <Compile Include="..\ExpressMapper NET40\Properties\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\ExpressMapper NET40\ReturnTypeDifferenceVisitor.cs">
-      <Link>ReturnTypeDifferenceVisitor.cs</Link>
-    </Compile>
-    <Compile Include="..\ExpressMapper NET40\SourceMappingService.cs">
-      <Link>SourceMappingService.cs</Link>
-    </Compile>
-    <Compile Include="..\ExpressMapper NET40\SourceTypeMapper.cs">
-      <Link>SourceTypeMapper.cs</Link>
-    </Compile>
-    <Compile Include="..\ExpressMapper NET40\StaticExpressions.cs">
-      <Link>StaticExpressions.cs</Link>
-    </Compile>
-    <Compile Include="..\ExpressMapper NET40\SubstituteParameterVisitor.cs">
-      <Link>SubstituteParameterVisitor.cs</Link>
-    </Compile>
-    <Compile Include="..\ExpressMapper NET40\TypeExtensions.cs">
-      <Link>TypeExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\ExpressMapper NET40\TypeMapperBase.cs">
-      <Link>TypeMapperBase.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Expressmapper.snk" />
   </ItemGroup>
+  <Import Project="..\Expressmapper.Shared\Expressmapper.Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

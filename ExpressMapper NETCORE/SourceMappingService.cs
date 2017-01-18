@@ -56,11 +56,11 @@ namespace ExpressMapper
                 src.GetInfo().GetInterfaces()
                     .FirstOrDefault(t => t.GetInfo().IsGenericType && t.GetGenericTypeDefinition() == GenericEnumerableType) ??
                 (src.GetInfo().IsGenericType
-                    && src.GetInfo().GetInterfaces().Any(t => t == typeof(IEnumerable)) ? src
+                 && src.GetInfo().GetInterfaces().Any(t => t == typeof(IEnumerable)) ? src
                     : null);
 
             var tnCol = dst.GetInfo().GetInterfaces()
-                .FirstOrDefault(t => t.GetInfo().IsGenericType && t.GetGenericTypeDefinition() == GenericEnumerableType) ??
+                            .FirstOrDefault(t => t.GetInfo().IsGenericType && t.GetGenericTypeDefinition() == GenericEnumerableType) ??
                         (dst.GetInfo().IsGenericType && dst.GetInfo().GetInterfaces().Any(t => t == typeof(IEnumerable)) ? dst
                             : null);
             if (tCol == null || tnCol == null || (src == typeof(string) && dst == typeof(string)))
@@ -83,9 +83,9 @@ namespace ExpressMapper
 
             var substBlock =
                 new PreciseSubstituteParameterVisitor(
-                    new KeyValuePair<ParameterExpression, ParameterExpression>(exprForType.Item2, sourceVariable),
-                    new KeyValuePair<ParameterExpression, ParameterExpression>(exprForType.Item3, destVariable))
-                    .Visit(blockForSubstitution) as
+                            new KeyValuePair<ParameterExpression, ParameterExpression>(exprForType.Item2, sourceVariable),
+                            new KeyValuePair<ParameterExpression, ParameterExpression>(exprForType.Item3, destVariable))
+                        .Visit(blockForSubstitution) as
                     BlockExpression;
             //var substBlock =
             //    new SubstituteParameterVisitor(sourceVariable, destVariable).Visit(blockForSubstitution) as

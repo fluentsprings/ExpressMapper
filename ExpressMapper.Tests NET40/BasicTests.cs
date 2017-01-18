@@ -774,7 +774,8 @@ namespace ExpressMapper.Tests
         public void AccessSourceNestedProperty()
         {
             Mapper.Register<TestModel, TestViewModel>()
-                .Member(dest => dest.Name, src => string.Format("Test - {0} - and date: {1} plus {2}", src.Country.Name, DateTime.Now, src.Country.Code));
+                .Member(dest => dest.Name, src =>
+                        $"Test - {src.Country.Name} - and date: {DateTime.Now} plus {src.Country.Code}");
             Mapper.Register<Country, CountryViewModel>();
             Mapper.Register<Size, SizeViewModel>();
 
@@ -790,7 +791,8 @@ namespace ExpressMapper.Tests
         public void AccessSourceManyNestedProperties()
         {
             Mapper.Register<Trip, TripViewModel>()
-                .Member(dest => dest.Name, src => string.Format("Type: {0}, Catalog: {1}, Category: {2}", src.Category.Catalog.TripType.Name, src.Category.Catalog.Name, src.Category.Name))
+                .Member(dest => dest.Name, src =>
+                        $"Type: {src.Category.Catalog.TripType.Name}, Catalog: {src.Category.Catalog.Name}, Category: {src.Category.Name}")
                 .Ignore(dest => dest.Category);
 
             Mapper.Compile();
@@ -1358,6 +1360,63 @@ namespace ExpressMapper.Tests
 
             Assert.AreEqual(destBrand.Id, srcBrand.Id);
             Assert.AreEqual(destBrand.Name, srcBrand.Name);
+        }
+
+
+        [Test]
+        public void InheritanceIncludeTest()
+        {
+            Mapper.Register<BaseControl, BaseControlViewModel>()
+                .Member(dst => dst.id_ctrl, src => src.Id)
+                .Member(dst => dst.name_ctrl, src => src.Name)
+                .Include<TextBox, TextBoxViewModel>();
+            Mapper.Compile();
+
+            var textBox = new TextBox
+            {
+                Id = Guid.NewGuid(),
+                Name = "Just a text box",
+                Description = "Just a text box - very simple description",
+                Text = "Hello World!"
+            };
+
+            var baseControlViewModel = Mapper.Map<BaseControl, BaseControlViewModel>(textBox);
+            Assert.AreEqual(baseControlViewModel.id_ctrl, textBox.Id);
+            Assert.AreEqual(baseControlViewModel.name_ctrl, textBox.Name);
+            Assert.IsTrue(baseControlViewModel is TextBoxViewModel);
+        }
+
+        [Test]
+        public void NestedInheritanceIncludeTest()
+        {
+            Mapper.Register<BaseControl, BaseControlViewModel>()
+                .Member(dst => dst.id_ctrl, src => src.Id)
+                .Member(dst => dst.name_ctrl, src => src.Name)
+                .Include<TextBox, TextBoxViewModel>();
+            Mapper.Register<UserInterface, UserInterfaceViewModel>()
+                .Member(dest => dest.ControlViewModel, src => src.Control);
+            Mapper.Compile();
+
+            var textBox = new TextBox
+            {
+                Id = Guid.NewGuid(),
+                Name = "Just a text box",
+                Description = "Just a text box - very simple description",
+                Text = "Hello World!"
+            };
+
+            var userInterface = new UserInterface
+            {
+                Control = textBox
+            };
+
+            var uiViewModel = Mapper.Map<UserInterface, UserInterfaceViewModel>(userInterface);
+            Assert.NotNull(uiViewModel.ControlViewModel);
+            Assert.True(uiViewModel.ControlViewModel is TextBoxViewModel);
+            Assert.AreEqual(uiViewModel.ControlViewModel.Description, textBox.Description);
+            Assert.AreEqual(uiViewModel.ControlViewModel.id_ctrl, textBox.Id);
+            Assert.AreEqual(uiViewModel.ControlViewModel.name_ctrl, textBox.Name);
+            Assert.AreEqual(((TextBoxViewModel)uiViewModel.ControlViewModel).Text, textBox.Text);
         }
     }
 }

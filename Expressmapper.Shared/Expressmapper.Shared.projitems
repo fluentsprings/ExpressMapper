@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>75c7dd14-fd53-462d-9fb3-aa5e31380b55</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Expressmapper.Shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)CollectionTypes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CompilationTypes.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Constants.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DefaultMappingContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DelegateCustomTypeMapper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DestinationMappingService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DestinationTypeMapper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ExpressmapperException.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ExpressmapperExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FlattenLinqMethod.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FlattenMapper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FlattenMemberInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ICustomTypeMapper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IMappingContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IMappingService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IMappingServiceProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IMemberConfigParameters.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IMemberConfiguration.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ITypeMapper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MapNotImplemented.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Mapper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MappingServiceBase.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MappingServiceProvider.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)MemberConfiguration.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)NullCheckNestedMemberVisitor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)PreciseSubstituteParameterVisitor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ProjectionAccessMemberVisitor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ReturnTypeDifferenceVisitor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SourceMappingService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SourceTypeMapper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)StaticExpressions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SubstituteParameterVisitor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TypeExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TypeMapperBase.cs" />
+  </ItemGroup>
+</Project>

@@ -98,9 +98,9 @@ namespace ExpressMapper
             var blockForSubstitution = Expression.Block(mapExprForType);
             var substBlock =
                 new PreciseSubstituteParameterVisitor(
-                    new KeyValuePair<ParameterExpression, ParameterExpression>(mapExpressions.Item2, sourceVariable),
-                    new KeyValuePair<ParameterExpression, ParameterExpression>(mapExpressions.Item3, destVariable))
-                    .Visit(blockForSubstitution) as
+                            new KeyValuePair<ParameterExpression, ParameterExpression>(mapExpressions.Item2, sourceVariable),
+                            new KeyValuePair<ParameterExpression, ParameterExpression>(mapExpressions.Item3, destVariable))
+                        .Visit(blockForSubstitution) as
                     BlockExpression;
 
             //var substBlock =
@@ -183,7 +183,7 @@ namespace ExpressMapper
 
             BlockExpression resultExpression;
             var isICollection = !destVariable.Type.IsArray && (destVariable.Type.GetInfo().GetInterfaces()
-                .FirstOrDefault(t => t.GetInfo().IsGenericType && t.GetGenericTypeDefinition() == typeof(ICollection<>)) != null ||
+                                                                   .FirstOrDefault(t => t.GetInfo().IsGenericType && t.GetGenericTypeDefinition() == typeof(ICollection<>)) != null ||
                                                                destVariable.Type == destCollection);
 
             var srcCount = Expression.Call(typeof(Enumerable), "Count", new[] { sourceType }, sourceVariable);
@@ -245,7 +245,7 @@ namespace ExpressMapper
                 var closedEnumeratorDestType = typeof(IEnumerator<>).MakeGenericType(destType);
                 var closedEnumerableDestType = GenericEnumerableType.MakeGenericType(destType);
                 var enumeratorDest = Expression.Variable(closedEnumeratorDestType,
-                    $"{Guid.NewGuid().ToString("N")}EnumDst");
+                    $"{Guid.NewGuid():N}EnumDst");
                 var assignToEnumDest = Expression.Assign(enumeratorDest,
                     Expression.Call(destVariable, closedEnumerableDestType.GetInfo().GetMethod("GetEnumerator")));
                 var doMoveNextDest = Expression.Call(enumeratorDest, typeof(IEnumerator).GetInfo().GetMethod("MoveNext"));

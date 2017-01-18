@@ -47,10 +47,12 @@
     <Compile Include="Generator\Functional.cs" />
     <Compile Include="Generator\Simple.cs" />
     <Compile Include="Models\Address.cs" />
+    <Compile Include="Models\BaseControl.cs" />
     <Compile Include="Models\Booking.cs" />
     <Compile Include="Models\Brand.cs" />
     <Compile Include="Models\CategoryTrip.cs" />
     <Compile Include="Models\City.cs" />
+    <Compile Include="Models\ComboBox.cs" />
     <Compile Include="Models\Composition.cs" />
     <Compile Include="Models\Contact.cs" />
     <Compile Include="Models\Country.cs" />
@@ -64,9 +66,14 @@
     <Compile Include="Models\FlattenCircularReference.cs" />
     <Compile Include="Models\Gift.cs" />
     <Compile Include="Models\Grandson.cs" />
+    <Compile Include="Models\Gui.cs" />
     <Compile Include="Models\ItemModel.cs" />
     <Compile Include="Models\Source.cs" />
     <Compile Include="Models\TestDefaultDecimal.cs" />
+    <Compile Include="Models\TextBox.cs" />
+    <Compile Include="Models\UserInterface.cs" />
+    <Compile Include="ViewModels\BaseControlViewModel.cs" />
+    <Compile Include="ViewModels\ComboBoxViewModel.cs" />
     <Compile Include="ViewModels\FlattenCircularReferenceDto.cs" />
     <Compile Include="ViewModels\FlattenFatherSonDtoForGrandsonDto.cs" />
     <Compile Include="ViewModels\FlattenFatherSonGrandsonLowerCaseDto.cs" />
@@ -116,6 +123,7 @@
     <Compile Include="ViewModels\FlattenFatherSonGrandsonDto.cs" />
     <Compile Include="ViewModels\FlattenSimpleClass.cs" />
     <Compile Include="ViewModels\GiftViewModel.cs" />
+    <Compile Include="ViewModels\GuiViewModel.cs" />
     <Compile Include="ViewModels\ItemModelViewModel.cs" />
     <Compile Include="ViewModels\MailViewModel.cs" />
     <Compile Include="ViewModels\OrganizationViewModel.cs" />
@@ -137,6 +145,7 @@
     <Compile Include="ViewModels\TestItemViewModel.cs" />
     <Compile Include="ViewModels\TestViewModel.cs" />
     <Compile Include="Models\TripType.cs" />
+    <Compile Include="ViewModels\TextBoxViewModel.cs" />
     <Compile Include="ViewModels\TicketViewModel.cs" />
     <Compile Include="ViewModels\TripCatalogViewModel.cs" />
     <Compile Include="ViewModels\TripTypeViewModel.cs" />
@@ -144,6 +153,7 @@
     <Compile Include="ViewModels\TypoCaseViewModel.cs" />
     <Compile Include="ViewModels\UnitOfWorkViewModel.cs" />
     <Compile Include="ViewModels\UnitViewModel.cs" />
+    <Compile Include="ViewModels\UserInterfaceViewModel.cs" />
     <Compile Include="ViewModels\VenueViewModel.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

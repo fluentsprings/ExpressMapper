@@ -13,7 +13,7 @@ namespace ExpressMapper
 
         #endregion
 
-        public DestinationTypeMapper(IMappingService service, IMappingServiceProvider serviceProvider) : base(service, serviceProvider){}
+        public DestinationTypeMapper(IMappingService service, IMappingServiceProvider serviceProvider) : base(service, serviceProvider) { }
 
         public override CompilationTypes MapperType => CompilationTypes.Destination;
 

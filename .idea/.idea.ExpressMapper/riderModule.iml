@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="RIDER_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$/../..">
+      <sourceFolder url="file://$MODULE_DIR$/../../Benchmarks" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../ExpressMapper NET40" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../ExpressMapper NET45" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../ExpressMapper Net46" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../ExpressMapper NETCORE" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../ExpressMapper PCL NET45" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../Expressmapper.Shared" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../ExpressMapper.Tests NET40" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../ExpressMapper.Tests NET45" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../ExpressMapper.Tests NETCORE" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../ExpressMapper.Tests.Model" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../ExpressMapper.Tests.Model NETCORE" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../ExpressMapper.Tests.Projections" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../packages/AutoMapper.3.3.1/lib/net40" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Benchmarks/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Benchmarks/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../ExpressMapper NET40/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../ExpressMapper NET40/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../ExpressMapper NET45/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../ExpressMapper NET45/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../ExpressMapper NETCORE/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../ExpressMapper NETCORE/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../ExpressMapper Net46/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../ExpressMapper Net46/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../ExpressMapper PCL NET45/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../ExpressMapper PCL NET45/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../ExpressMapper.Tests NET40/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../ExpressMapper.Tests NET40/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../ExpressMapper.Tests NET45/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../ExpressMapper.Tests NET45/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../ExpressMapper.Tests NETCORE/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../ExpressMapper.Tests NETCORE/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../ExpressMapper.Tests.Model NETCORE/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../ExpressMapper.Tests.Model NETCORE/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../ExpressMapper.Tests.Model/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../ExpressMapper.Tests.Model/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../ExpressMapper.Tests.Projections/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../ExpressMapper.Tests.Projections/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../packages" />
+    </content>
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>

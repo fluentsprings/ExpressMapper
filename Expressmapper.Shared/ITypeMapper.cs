@@ -7,6 +7,9 @@ namespace ExpressMapper
 {
     public interface ITypeMapper
     {
+        bool BaseType { get; set; }
+        Type SourceType { get; }
+        Type DestinationType { get; }
         Expression QueryableGeneralExpression { get; }
         Func<object, object, object> GetNonGenericMapFunc();
         Tuple<List<Expression>, ParameterExpression, ParameterExpression> GetMapExpressions();
@@ -20,6 +23,7 @@ namespace ExpressMapper
     /// <typeparam name="TN">destination</typeparam>
     public interface ITypeMapper<T, TN> : ITypeMapper
     {
+        IMemberConfiguration<T, TN> MemberConfiguration { get; set; }
         Expression<Func<T, TN>> QueryableExpression { get; }
         TN MapTo(T src, TN dest);
         void Ignore<TMember>(Expression<Func<TN, TMember>> left);
@@ -35,5 +39,6 @@ namespace ExpressMapper
         void AfterMap(Action<T,TN> afterMap);
         void Flatten();
         CompilationTypes MapperType { get; }
+        void ImportMemberConfigParameters(IMemberConfigParameters baseClassConfiguration);
     }
 }
