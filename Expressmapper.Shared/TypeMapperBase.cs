@@ -529,7 +529,7 @@ namespace ExpressMapper
 
         protected override Expression VisitMember(MemberExpression node)
         {
-            return node.Member.DeclaringType.IsAssignableFrom(_replacementType)
+            return node.Member.DeclaringType.GetInfo().IsAssignableFrom(_replacementType)
                 ? Expression.PropertyOrField(_instanceExp, node.Member.Name)
                 : base.VisitMember(node);
         }

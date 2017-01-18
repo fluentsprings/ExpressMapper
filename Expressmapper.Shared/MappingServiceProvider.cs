@@ -132,6 +132,13 @@ namespace ExpressMapper
                 var sourceClassMapper = new SourceTypeMapper<T, TN>(SourceService, this);
                 var destinationClassMapper = new DestinationTypeMapper<T, TN>(DestinationService, this);
 
+                SourceService.TypeMappers[cacheKey] = sourceClassMapper;
+                DestinationService.TypeMappers[cacheKey] = destinationClassMapper;
+                var memberConfiguration = new MemberConfiguration<T, TN>(
+                    new ITypeMapper<T, TN>[] { sourceClassMapper, destinationClassMapper }, this);
+                sourceClassMapper.MemberConfiguration = memberConfiguration;
+                destinationClassMapper.MemberConfiguration = memberConfiguration;
+
                 if (!CustomMappingsBySource.ContainsKey(src.GetHashCode()))
                 {
                     CustomMappingsBySource[src.GetHashCode()] = new List<long>();
@@ -141,12 +148,6 @@ namespace ExpressMapper
                     CustomMappingsBySource[src.GetHashCode()].Add(cacheKey);
                 }
 
-                SourceService.TypeMappers[cacheKey] = sourceClassMapper;
-                DestinationService.TypeMappers[cacheKey] = destinationClassMapper;
-                var memberConfiguration = new MemberConfiguration<T, TN>(
-                    new ITypeMapper<T, TN>[] {sourceClassMapper, destinationClassMapper}, this);
-                sourceClassMapper.MemberConfiguration = memberConfiguration;
-                destinationClassMapper.MemberConfiguration = memberConfiguration;
                 return memberConfiguration;
             }
         }
@@ -385,9 +386,22 @@ namespace ExpressMapper
             {
                 return null;
             }
+
+            var cacheKey = CalculateCacheKey(srcType, dstType);
+            if (CustomMappers.ContainsKey(cacheKey))
+            {
+                var customTypeMapper = CustomMappers[cacheKey];
+                var typeMapper = customTypeMapper();
+                if (!_customTypeMapperCache.ContainsKey(cacheKey))
+                {
+                    CompileNonGenericCustomTypeMapper(srcType, dstType, typeMapper, cacheKey);
+                }
+                return _customTypeMapperCache[cacheKey](src, dest);
+            }
+
             ITypeMapper mapper = null;
             var actualSrcType = src.GetType();
-            if (srcType != actualSrcType && actualSrcType.IsAssignableFrom(srcType))
+            if (srcType != actualSrcType && actualSrcType.GetInfo().IsAssignableFrom(srcType))
                 throw new InvalidCastException($"Your source object instance type '{actualSrcType.FullName}' is not assignable from source type you specified '{srcType}'.");
 
             var srcHash = actualSrcType.GetHashCode();
@@ -395,7 +409,7 @@ namespace ExpressMapper
             if (dest != null)
             {
                 var actualDstType = dest.GetType();
-                if (dstType != actualDstType && actualDstType.IsAssignableFrom(dstType))
+                if (dstType != actualDstType && actualDstType.GetInfo().IsAssignableFrom(dstType))
                     throw new InvalidCastException($"Your destination object instance type '{actualSrcType.FullName}' is not assignable from destination type you specified '{srcType}'.");
 
                 if (CustomMappingsBySource.ContainsKey(srcHash))
@@ -403,7 +417,8 @@ namespace ExpressMapper
                     var mappings = CustomMappingsBySource[srcHash];
 
                     mapper =
-                        mappings.Select(m => DestinationService.TypeMappers[m])
+                        mappings.Where(m => DestinationService.TypeMappers.ContainsKey(m))
+                            .Select(m => DestinationService.TypeMappers[m])
                             .FirstOrDefault(tm => tm.DestinationType == actualDstType);
                 }
             }
@@ -413,8 +428,9 @@ namespace ExpressMapper
                 {
                     var mappings = CustomMappingsBySource[srcHash];
                     var typeMappers =
-                        mappings.Select(m => SourceService.TypeMappers[m])
-                            .Where(m => dstType.IsAssignableFrom(m.DestinationType))
+                        mappings.Where(m => SourceService.TypeMappers.ContainsKey(m))
+                            .Select(m => SourceService.TypeMappers[m])
+                            .Where(m => dstType.GetInfo().IsAssignableFrom(m.DestinationType))
                             .ToList();
                     if (typeMappers.Count > 1)
                     {
@@ -430,18 +446,6 @@ namespace ExpressMapper
                         mapper = typeMappers.First();
                     }
                 }
-            }
-
-            var cacheKey = CalculateCacheKey(srcType, dstType);
-            if (CustomMappers.ContainsKey(cacheKey))
-            {
-                var customTypeMapper = CustomMappers[cacheKey];
-                var typeMapper = customTypeMapper();
-                if (!_customTypeMapperCache.ContainsKey(cacheKey))
-                {
-                    CompileNonGenericCustomTypeMapper(srcType, dstType, typeMapper, cacheKey);
-                }
-                return _customTypeMapperCache[cacheKey](src, dest);
             }
 
             var mappingService = dest == null ? SourceService : DestinationService;

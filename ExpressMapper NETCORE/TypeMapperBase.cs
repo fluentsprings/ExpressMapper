@@ -121,7 +121,7 @@ namespace ExpressMapper
                 catch (Exception ex)
                 {
                     throw new ExpressmapperException(
-                        $"Error error occured trying to compile mapping for: source {typeof(T).FullName}, destination {typeof(TN).FullName}. See the inner exception for details.",
+                        $"Error error occured trying to compile mapping for: source {typeof (T).FullName}, destination {typeof (TN).FullName}. See the inner exception for details.",
                         ex);
                 }
             }
@@ -291,9 +291,9 @@ namespace ExpressMapper
 
             var stringComparison = GetStringCase();
 
-//            var comparer = CultureInfo.CurrentCulture.CompareInfo.GetStringComparer(CompareOptions.OrdinalIgnoreCase);
-            var comparer = StringComparer.Create(CultureInfo.CurrentCulture,
-                stringComparison == StringComparison.OrdinalIgnoreCase);
+            var comparer = CultureInfo.CurrentCulture.CompareInfo.GetStringComparer(CompareOptions.OrdinalIgnoreCase);
+            //var comparer = StringComparer.Create(CultureInfo.CurrentCulture,
+//                stringComparison == StringComparison.OrdinalIgnoreCase);
 
             foreach (var prop in sourceMembers)
             {
@@ -527,7 +527,7 @@ namespace ExpressMapper
 
         protected override Expression VisitMember(MemberExpression node)
         {
-            return node.Member.DeclaringType.IsAssignableFrom(_replacementType)
+            return node.Member.DeclaringType.GetInfo().IsAssignableFrom(_replacementType)
                 ? Expression.PropertyOrField(_instanceExp, node.Member.Name)
                 : base.VisitMember(node);
         }
