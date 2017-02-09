@@ -276,7 +276,7 @@ namespace ExpressMapper
 
         public TN Map<T, TN>(T src)
         {
-            if (src.GetType() == typeof(T))
+            if (src == null || src.GetType() == typeof(T))
             {
                 return MapInternal<T, TN>(src);
             }
@@ -285,7 +285,7 @@ namespace ExpressMapper
 
         public TN Map<T, TN>(T src, TN dest)
         {
-            if (src.GetType() == typeof(T) && (dest.GetType() == typeof(TN)))
+            if ((src == null || src.GetType() == typeof(T)) && (dest == null || dest.GetType() == typeof(TN)))
             {
                 return MapInternal<T, TN>(src, dest);
             }
