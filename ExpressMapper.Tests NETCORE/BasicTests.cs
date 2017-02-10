@@ -1397,5 +1397,15 @@ namespace ExpressMapper.Tests
             Assert.AreEqual(uiViewModel.ControlViewModel.name_ctrl, textBox.Name);
             Assert.AreEqual(((TextBoxViewModel)uiViewModel.ControlViewModel).Text, textBox.Text);
         }
+
+        [Test]
+        public void MapNullSourceReturnNullDest()
+        {
+            Mapper.Register<object, object>();
+            Mapper.Compile();
+
+            Assert.IsNull(Mapper.Map<object, object>(null));
+            Assert.IsNull(Mapper.Map<object, object>(null, (object)null));
+        }
     }
 }
