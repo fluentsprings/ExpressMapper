@@ -179,18 +179,18 @@ namespace ExpressMapper
             var dstAssigned = Expression.Assign(dstTypedExp, dstConverted);
 
             var customGenericType = typeof(ITypeMapper<,>).MakeGenericType(typeof(T), typeof(TN));
-            var castToCustomGeneric = Expression.Convert(Expression.Constant((ITypeMapper) this), customGenericType);
+            var castToCustomGeneric = Expression.Convert(Expression.Constant((ITypeMapper)this), customGenericType);
             var genVariable = Expression.Variable(customGenericType);
             var assignExp = Expression.Assign(genVariable, castToCustomGeneric);
-            var methodInfo = customGenericType.GetInfo().GetMethod("MapTo", new[] {typeof(T), typeof(TN)});
+            var methodInfo = customGenericType.GetInfo().GetMethod("MapTo", new[] { typeof(T), typeof(TN) });
 
             var mapCall = Expression.Call(genVariable, methodInfo, srcTypedExp, dstTypedExp);
             var resultVarExp = Expression.Variable(typeof(object), "result");
             var convertToObj = Expression.Convert(mapCall, typeof(object));
             var assignResult = Expression.Assign(resultVarExp, convertToObj);
 
-            var blockExpression = Expression.Block(new[] {srcTypedExp, dstTypedExp, genVariable, resultVarExp},
-                new Expression[] {srcAssigned, dstAssigned, assignExp, assignResult, resultVarExp});
+            var blockExpression = Expression.Block(new[] { srcTypedExp, dstTypedExp, genVariable, resultVarExp },
+                new Expression[] { srcAssigned, dstAssigned, assignExp, assignResult, resultVarExp });
             var lambda =
                 Expression.Lambda<Func<object, object, object>>(blockExpression, parameterExpression, destParameterExp);
             NonGenericMapFunc = lambda.Compile();
@@ -200,8 +200,8 @@ namespace ExpressMapper
 
         protected void AutoMapProperty(MemberInfo propertyGet, MemberInfo propertySet)
         {
-            var callSetPropMethod = Expression.PropertyOrField(DestFakeParameter, propertySet.Name);
-            var callGetPropMethod = Expression.PropertyOrField(SourceParameter, propertyGet.Name);
+            var callSetPropMethod = propertySet.MemberType == MemberTypes.Field ? Expression.Field(DestFakeParameter, propertySet as FieldInfo) : Expression.Property(DestFakeParameter, propertySet as PropertyInfo);
+            var callGetPropMethod = propertyGet.MemberType == MemberTypes.Field ? Expression.Field(SourceParameter, propertyGet as FieldInfo) : Expression.Property(SourceParameter, propertyGet as PropertyInfo);
 
             MapMember(callSetPropMethod, callGetPropMethod);
         }
@@ -282,6 +282,7 @@ namespace ExpressMapper
             var getProps =
                 typeof(T).GetInfo()
                     .GetProperties(BindingFlags.FlattenHierarchy | BindingFlags.Instance | BindingFlags.Public);
+
             var setProps =
                 typeof(TN).GetInfo()
                     .GetProperties(BindingFlags.FlattenHierarchy | BindingFlags.Instance | BindingFlags.Public);
@@ -291,7 +292,7 @@ namespace ExpressMapper
 
             var stringComparison = GetStringCase();
 
-//            var comparer = CultureInfo.CurrentCulture.CompareInfo.GetStringComparer(CompareOptions.OrdinalIgnoreCase);
+            //var comparer = CultureInfo.CurrentCulture.CompareInfo.GetStringComparer(CompareOptions.OrdinalIgnoreCase);
             var comparer = StringComparer.Create(CultureInfo.CurrentCulture,
                 stringComparison == StringComparison.OrdinalIgnoreCase);
 
@@ -302,18 +303,48 @@ namespace ExpressMapper
                 {
                     continue;
                 }
-                var setprop = destMembers.FirstOrDefault(x => string.Equals(x.Name, prop.Name, stringComparison));
+
+                var notUniqueDestMembers = destMembers.Where(x => string.Equals(x.Name, prop.Name, stringComparison));
+                var notUniqueSrcMembers = sourceMembers.Where(x => string.Equals(x.Name, prop.Name, stringComparison));
+
+                var getprop = GetTopMostMemberOfHierarchy(notUniqueSrcMembers);
+                if (AutoMembers.ContainsKey(getprop))
+                {
+                    continue;
+                }
+
+                var setprop = GetTopMostMemberOfHierarchy(notUniqueDestMembers);
 
                 var propertyInfo = setprop as PropertyInfo;
                 if ((propertyInfo == null && setprop == null) ||
                     (propertyInfo != null && (!propertyInfo.CanWrite || !propertyInfo.GetSetMethod(true).IsPublic)))
                 {
-                    IgnoreMemberList.Add(prop.Name);
+                    IgnoreMemberList.Add(getprop.Name);
                     continue;
                 }
-                AutoMembers[prop] = setprop;
-                AutoMapProperty(prop, setprop);
+                AutoMembers[getprop] = setprop;
+                AutoMapProperty(getprop, setprop);
             }
+        }
+
+        private static MemberInfo GetTopMostMemberOfHierarchy(IEnumerable<MemberInfo> notUniqueMembers)
+        {
+            MemberInfo chosen = null;
+
+            foreach (var notUniqueMember in notUniqueMembers)
+            {
+                if (chosen == null)
+                {
+                    chosen = notUniqueMember;
+                }
+                else
+                {
+                    chosen = chosen.DeclaringType.GetInfo().IsAssignableFrom(notUniqueMember.DeclaringType)
+                        ? notUniqueMember
+                        : chosen;
+                }
+            }
+            return chosen;
         }
 
         internal StringComparison GetStringCase()

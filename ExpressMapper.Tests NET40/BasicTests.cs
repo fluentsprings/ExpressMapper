@@ -31,7 +31,7 @@ namespace ExpressMapper.Tests
             };
 
             var unitOfWorkViewModel = unitOfWork.Map<UnitOfWork, UnitOfWorkViewModel>();
-            Assert.AreEqual((int)unitOfWork.State, (int)unitOfWorkViewModel.State);
+            Assert.AreEqual((int) unitOfWork.State, (int) unitOfWorkViewModel.State);
             Assert.AreEqual(unitOfWork.Id, unitOfWorkViewModel.Id);
         }
 
@@ -60,7 +60,7 @@ namespace ExpressMapper.Tests
                 .Member(dest => dest.TestString, src => src.TestDecimal);
             Mapper.RegisterCustom<decimal, string>(src => src.ToString("#0.00", CultureInfo.InvariantCulture));
             Mapper.Compile();
-            var test = new TestDefaultDecimal() { TestDecimal = default(decimal) };
+            var test = new TestDefaultDecimal() {TestDecimal = default(decimal)};
             test.TestDecimal = default(decimal);
             var result = Mapper.Map<TestDefaultDecimal, TestDefaultDecimalToStringViewModel>(test);
             //This is where the mapping fails
@@ -74,9 +74,9 @@ namespace ExpressMapper.Tests
                 .Member(t => t.Enabled, s => s.enabled == "Y");
             Mapper.Compile();
 
-           var source = new Source { enabled = "N" };
-           var result = Mapper.Map<Source, TargetViewModel>(source);
-           Assert.AreEqual(result.Enabled, false);
+            var source = new Source {enabled = "N"};
+            var result = Mapper.Map<Source, TargetViewModel>(source);
+            Assert.AreEqual(result.Enabled, false);
         }
 
         [Test]
@@ -293,7 +293,7 @@ namespace ExpressMapper.Tests
             Assert.AreEqual(result, srcDst.Value);
         }
 
-        private void MapBaseMember<T, TN>(IMemberConfiguration<T,TN> mapConfig) 
+        private void MapBaseMember<T, TN>(IMemberConfiguration<T, TN> mapConfig)
             where T : Gift
             where TN : GiftViewModel
         {
@@ -421,7 +421,8 @@ namespace ExpressMapper.Tests
                 .Before((src, dest) => dest.Name = src.Name)
                 .Before((src, dest) => dest.Name = src.Name)
                 .Ignore(dest => dest.Name));
-            Assert.That(exception.Message, Is.EqualTo("BeforeMap already registered for ExpressMapper.Tests.Model.Models.Size"));
+            Assert.That(exception.Message,
+                Is.EqualTo("BeforeMap already registered for ExpressMapper.Tests.Model.Models.Size"));
 
             var sizeResult = Functional.BeforeMap();
             var result = Mapper.Map<Size, SizeViewModel>(sizeResult.Key);
@@ -445,7 +446,8 @@ namespace ExpressMapper.Tests
             var exception = Assert.Throws<InvalidOperationException>(() => Mapper.Register<Size, SizeViewModel>()
                 .After((src, dest) => dest.Name = "OVERRIDE BY AFTER MAP")
                 .After((src, dest) => dest.Name = "Duplicate map"));
-            Assert.That(exception.Message, Is.EqualTo("AfterMap already registered for ExpressMapper.Tests.Model.Models.Size"));
+            Assert.That(exception.Message,
+                Is.EqualTo("AfterMap already registered for ExpressMapper.Tests.Model.Models.Size"));
             var sizeResult = Functional.AfterMap();
             var result = Mapper.Map<Size, SizeViewModel>(sizeResult.Key);
             Assert.AreEqual(result, sizeResult.Value);
@@ -754,7 +756,8 @@ namespace ExpressMapper.Tests
             var test = Functional.AutoMemberMap();
 
             var resultInstanceHash = test.Value.GetHashCode();
-            var testViewModel = Mapper.Map(test.Key, test.Value, typeof(TestModel), typeof(TestViewModel)) as TestViewModel;
+            var testViewModel =
+                Mapper.Map(test.Key, test.Value, typeof(TestModel), typeof(TestViewModel)) as TestViewModel;
 
             Assert.AreEqual(testViewModel.GetHashCode(), resultInstanceHash);
             Assert.AreEqual(testViewModel, test.Value);
@@ -873,7 +876,7 @@ namespace ExpressMapper.Tests
             var testItemHash = testResult.Item2.GetHashCode();
             var arrayHash = testResult.Item2.Array.GetHashCode();
             var testArr = new List<int?>(testResult.Item2.Array.Length);
-            testArr.AddRange(testResult.Item2.Array.Select(tc => tc == null ? (int?)null : tc.GetHashCode()));
+            testArr.AddRange(testResult.Item2.Array.Select(tc => tc == null ? (int?) null : tc.GetHashCode()));
 
             var result = Mapper.Map(testResult.Item1, testResult.Item2);
             Assert.AreEqual(result, testResult.Item2);
@@ -950,7 +953,7 @@ namespace ExpressMapper.Tests
                 Assert.AreEqual(result.Collection.ElementAt(i), testResult.Item3.Collection.ElementAt(i));
             }
         }
-        
+
         [Test]
         public void ExistingDestDestCollGreater()
         {
@@ -1086,15 +1089,20 @@ namespace ExpressMapper.Tests
             for (var i = 0; i < result.SubItems.Length; i++)
             {
                 Assert.AreEqual(result.SubItems[i].GetHashCode(), subItemsHashes[i]);
-                Assert.AreEqual(result.SubItems[i].Units.GetHashCode(), subItemUnitsCollHashes[result.SubItems[i].GetHashCode()]);
+                Assert.AreEqual(result.SubItems[i].Units.GetHashCode(),
+                    subItemUnitsCollHashes[result.SubItems[i].GetHashCode()]);
 
                 for (var j = 0; j < 4; j++)
                 {
-                    Assert.AreEqual(result.SubItems[i].Units[j].GetHashCode(), subItemUnitsHashes[result.SubItems[i].GetHashCode()][j]);
-                    Assert.AreEqual(result.SubItems[i].Units[j].SubUnits.GetHashCode(), subItemUnitSubUnitCollHashes[result.SubItems[i].GetHashCode()][j]);
+                    Assert.AreEqual(result.SubItems[i].Units[j].GetHashCode(),
+                        subItemUnitsHashes[result.SubItems[i].GetHashCode()][j]);
+                    Assert.AreEqual(result.SubItems[i].Units[j].SubUnits.GetHashCode(),
+                        subItemUnitSubUnitCollHashes[result.SubItems[i].GetHashCode()][j]);
                     for (var k = 0; k < 3; k++)
                     {
-                        Assert.AreEqual(result.SubItems[i].Units[j].SubUnits[k].GetHashCode(), subItemUnitSubUnitsHashes[result.SubItems[i].GetHashCode()][result.SubItems[i].Units[j].GetHashCode()][k]);
+                        Assert.AreEqual(result.SubItems[i].Units[j].SubUnits[k].GetHashCode(),
+                            subItemUnitSubUnitsHashes[result.SubItems[i].GetHashCode()][
+                                result.SubItems[i].Units[j].GetHashCode()][k]);
                     }
                 }
             }
@@ -1144,7 +1152,7 @@ namespace ExpressMapper.Tests
 
             Assert.AreEqual(GenderTypes.Men, testViewModel.Gender);
             Assert.AreEqual(GenderTypes.Women.ToString(), testViewModel.NullableGender);
-            Assert.AreEqual((int)GenderTypes.Women, testViewModel.GenderIndex);
+            Assert.AreEqual((int) GenderTypes.Women, testViewModel.GenderIndex);
         }
 
         [Test]
@@ -1203,7 +1211,7 @@ namespace ExpressMapper.Tests
             };
 
             var typoCaseViewModel = Mapper.Map<TypoCase, TypoCaseViewModel>(typoCase);
-            
+
             Assert.AreEqual(typoCaseViewModel.Id, Guid.Empty);
             Assert.AreEqual(typoCaseViewModel.Name, null);
             Assert.AreEqual(typoCase.TestId, typoCaseViewModel.TestId);
@@ -1416,7 +1424,7 @@ namespace ExpressMapper.Tests
             Assert.AreEqual(uiViewModel.ControlViewModel.Description, textBox.Description);
             Assert.AreEqual(uiViewModel.ControlViewModel.id_ctrl, textBox.Id);
             Assert.AreEqual(uiViewModel.ControlViewModel.name_ctrl, textBox.Name);
-            Assert.AreEqual(((TextBoxViewModel)uiViewModel.ControlViewModel).Text, textBox.Text);
+            Assert.AreEqual(((TextBoxViewModel) uiViewModel.ControlViewModel).Text, textBox.Text);
         }
 
         [Test]
@@ -1426,7 +1434,70 @@ namespace ExpressMapper.Tests
             Mapper.Compile();
 
             Assert.IsNull(Mapper.Map<object, object>(null));
-            Assert.IsNull(Mapper.Map<object, object>(null, (object)null));
+            Assert.IsNull(Mapper.Map<object, object>(null, (object) null));
         }
+
+        #region Duplicate property names in the class hierarchy
+
+        [Test]
+        public void MapDuplicatePropertyNamesInHierarchyTest()
+        {
+            Mapper.Register<A, AN>();
+            Mapper.Register<AN, A>();
+
+            Mapper.Register<T, TNT>();
+            Mapper.Register<TNT, T>();
+            Mapper.Compile();
+
+
+            var tnt = new TNT
+            {
+                Foo = new AN
+                {
+                    Id = 4
+                }
+            };
+
+            var t = new T
+            {
+                Foo = new A
+                {
+                    Id = 5
+                }
+            };
+
+            var tntResult = t.Map<T, TNT>();
+            var tResult = tnt.Map<TNT, T>();
+
+            Assert.AreEqual(tntResult.Foo.Id, 5);
+            Assert.AreEqual(tResult.Foo.Id, 4);
+        }
+
+        class A
+        {
+            public int Id { get; set; }
+        }
+
+        class AN : A
+        {
+            public new int Id { get; set; }
+        }
+
+        class T
+        {
+            public A Foo { get; set; }
+        }
+
+        class TN : T
+        {
+            public new AN Foo { get; set; }
+        }
+
+        class TNT : TN
+        {
+            public new AN Foo { get; set; }
+        }
+
+        #endregion
     }
 }

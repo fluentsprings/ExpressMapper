@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+//using Moq;
 
 namespace ExpressMapper.Tests
 {
@@ -292,7 +293,7 @@ namespace ExpressMapper.Tests
             Assert.AreEqual(result, srcDst.Value);
         }
 
-        private void MapBaseMember<T, TN>(IMemberConfiguration<T,TN> mapConfig)
+        private void MapBaseMember<T, TN>(IMemberConfiguration<T, TN> mapConfig)
             where T : Gift
             where TN : GiftViewModel
         {
@@ -420,7 +421,8 @@ namespace ExpressMapper.Tests
                 .Before((src, dest) => dest.Name = src.Name)
                 .Before((src, dest) => dest.Name = src.Name)
                 .Ignore(dest => dest.Name));
-            Assert.That(exception.Message, Is.EqualTo("BeforeMap already registered for ExpressMapper.Tests.Model.Models.Size"));
+            Assert.That(exception.Message,
+                Is.EqualTo("BeforeMap already registered for ExpressMapper.Tests.Model.Models.Size"));
 
             var sizeResult = Functional.BeforeMap();
             var result = Mapper.Map<Size, SizeViewModel>(sizeResult.Key);
@@ -444,7 +446,8 @@ namespace ExpressMapper.Tests
             var exception = Assert.Throws<InvalidOperationException>(() => Mapper.Register<Size, SizeViewModel>()
                 .After((src, dest) => dest.Name = "OVERRIDE BY AFTER MAP")
                 .After((src, dest) => dest.Name = "Duplicate map"));
-            Assert.That(exception.Message, Is.EqualTo("AfterMap already registered for ExpressMapper.Tests.Model.Models.Size"));
+            Assert.That(exception.Message,
+                Is.EqualTo("AfterMap already registered for ExpressMapper.Tests.Model.Models.Size"));
             var sizeResult = Functional.AfterMap();
             var result = Mapper.Map<Size, SizeViewModel>(sizeResult.Key);
             Assert.AreEqual(result, sizeResult.Value);
@@ -753,7 +756,8 @@ namespace ExpressMapper.Tests
             var test = Functional.AutoMemberMap();
 
             var resultInstanceHash = test.Value.GetHashCode();
-            var testViewModel = Mapper.Map(test.Key, test.Value, typeof(TestModel), typeof(TestViewModel)) as TestViewModel;
+            var testViewModel =
+                Mapper.Map(test.Key, test.Value, typeof(TestModel), typeof(TestViewModel)) as TestViewModel;
 
             Assert.AreEqual(testViewModel.GetHashCode(), resultInstanceHash);
             Assert.AreEqual(testViewModel, test.Value);
@@ -774,7 +778,7 @@ namespace ExpressMapper.Tests
         {
             Mapper.Register<TestModel, TestViewModel>()
                 .Member(dest => dest.Name, src =>
-                    $"Test - {src.Country.Name} - and date: {DateTime.Now} plus {src.Country.Code}");
+                        $"Test - {src.Country.Name} - and date: {DateTime.Now} plus {src.Country.Code}");
             Mapper.Register<Country, CountryViewModel>();
             Mapper.Register<Size, SizeViewModel>();
 
@@ -791,7 +795,7 @@ namespace ExpressMapper.Tests
         {
             Mapper.Register<Trip, TripViewModel>()
                 .Member(dest => dest.Name, src =>
-                    $"Type: {src.Category.Catalog.TripType.Name}, Catalog: {src.Category.Catalog.Name}, Category: {src.Category.Name}")
+                        $"Type: {src.Category.Catalog.TripType.Name}, Catalog: {src.Category.Catalog.Name}, Category: {src.Category.Name}")
                 .Ignore(dest => dest.Category);
 
             Mapper.Compile();
@@ -1085,15 +1089,20 @@ namespace ExpressMapper.Tests
             for (var i = 0; i < result.SubItems.Length; i++)
             {
                 Assert.AreEqual(result.SubItems[i].GetHashCode(), subItemsHashes[i]);
-                Assert.AreEqual(result.SubItems[i].Units.GetHashCode(), subItemUnitsCollHashes[result.SubItems[i].GetHashCode()]);
+                Assert.AreEqual(result.SubItems[i].Units.GetHashCode(),
+                    subItemUnitsCollHashes[result.SubItems[i].GetHashCode()]);
 
                 for (var j = 0; j < 4; j++)
                 {
-                    Assert.AreEqual(result.SubItems[i].Units[j].GetHashCode(), subItemUnitsHashes[result.SubItems[i].GetHashCode()][j]);
-                    Assert.AreEqual(result.SubItems[i].Units[j].SubUnits.GetHashCode(), subItemUnitSubUnitCollHashes[result.SubItems[i].GetHashCode()][j]);
+                    Assert.AreEqual(result.SubItems[i].Units[j].GetHashCode(),
+                        subItemUnitsHashes[result.SubItems[i].GetHashCode()][j]);
+                    Assert.AreEqual(result.SubItems[i].Units[j].SubUnits.GetHashCode(),
+                        subItemUnitSubUnitCollHashes[result.SubItems[i].GetHashCode()][j]);
                     for (var k = 0; k < 3; k++)
                     {
-                        Assert.AreEqual(result.SubItems[i].Units[j].SubUnits[k].GetHashCode(), subItemUnitSubUnitsHashes[result.SubItems[i].GetHashCode()][result.SubItems[i].Units[j].GetHashCode()][k]);
+                        Assert.AreEqual(result.SubItems[i].Units[j].SubUnits[k].GetHashCode(),
+                            subItemUnitSubUnitsHashes[result.SubItems[i].GetHashCode()][
+                                result.SubItems[i].Units[j].GetHashCode()][k]);
                     }
                 }
             }
@@ -1342,6 +1351,26 @@ namespace ExpressMapper.Tests
             Assert.False(Mapper.MapExists(typeof(FlattenFatherSonGrandsonDto), typeof(Father)));
         }
 
+        //[Test]
+        //public void DoNotUpdateUnchangedPropertyValuesTest()
+        //{
+        //    var srcBrand = new Brand
+        //    {
+        //        Id = Guid.NewGuid(),
+        //        Name = "brand"
+        //    };
+
+        //    var existingBrandMock = new Mock<Brand>().SetupAllProperties();
+        //    existingBrandMock.Object.Name = "brand";
+
+        //    var destBrand = Mapper.Map(srcBrand, existingBrandMock.Object);
+        //    existingBrandMock.VerifySet(x => x.Name = It.IsAny<string>(), Times.Once());
+
+        //    Assert.AreEqual(destBrand.Id, srcBrand.Id);
+        //    Assert.AreEqual(destBrand.Name, srcBrand.Name);
+        //}
+
+
         [Test]
         public void InheritanceIncludeTest()
         {
@@ -1407,5 +1436,68 @@ namespace ExpressMapper.Tests
             Assert.IsNull(Mapper.Map<object, object>(null));
             Assert.IsNull(Mapper.Map<object, object>(null, (object)null));
         }
+
+        #region Duplicate property names in the class hierarchy
+
+        [Test]
+        public void MapDuplicatePropertyNamesInHierarchyTest()
+        {
+            Mapper.Register<A, AN>();
+            Mapper.Register<AN, A>();
+
+            Mapper.Register<T, TNT>();
+            Mapper.Register<TNT, T>();
+            Mapper.Compile();
+
+
+            var tnt = new TNT
+            {
+                Foo = new AN
+                {
+                    Id = 4
+                }
+            };
+
+            var t = new T
+            {
+                Foo = new A
+                {
+                    Id = 5
+                }
+            };
+
+            var tntResult = t.Map<T, TNT>();
+            var tResult = tnt.Map<TNT, T>();
+
+            Assert.AreEqual(tntResult.Foo.Id, 5);
+            Assert.AreEqual(tResult.Foo.Id, 4);
+        }
+
+        class A
+        {
+            public int Id { get; set; }
+        }
+
+        class AN : A
+        {
+            public new int Id { get; set; }
+        }
+
+        class T
+        {
+            public A Foo { get; set; }
+        }
+
+        class TN : T
+        {
+            public new AN Foo { get; set; }
+        }
+
+        class TNT : TN
+        {
+            public new AN Foo { get; set; }
+        }
+
+        #endregion
     }
 }
