@@ -27,7 +27,7 @@ namespace ExpressMapper.Tests.Model.ViewModels
             }
 
             return Id == other.Id && Name == other.Name && Description == other.Description && optionsEquals &&
-                   CreatedOn == other.CreatedOn && WarehouseOn == other.WarehouseOn && Ean == Ean &&
+                   CreatedOn == other.CreatedOn && WarehouseOn == other.WarehouseOn && Ean == other.Ean &&
                    OptionalGender == other.OptionalGender &&
                    ((Brand == null && other.Brand == null) || Brand.Equals(other.Brand)) &&
                    ((Supplier == null && other.Supplier == null) || Supplier.Equals(other.Supplier));
