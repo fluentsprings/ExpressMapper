@@ -36,6 +36,27 @@ namespace ExpressMapper.Tests
         }
 
         [Test]
+        public void EnumToAnotherEnumByNameMapTest()
+        {
+            Mapper.MapEnumsByName();
+            Mapper.Register<Canvas, CanvasViewModel>();
+            Mapper.Compile();
+
+            var canvas = new Canvas
+            {
+                Id = Guid.NewGuid(),
+                Color = Colors.Blue
+            };
+
+            var canvasViewModel = canvas.Map<Canvas, CanvasViewModel>();
+            var expectedColor = Enum.GetName(typeof(Colors), canvas.Color);
+            var actualColor = Enum.GetName(typeof(AnotherColors), canvasViewModel.Color);
+
+            Assert.AreEqual(expectedColor, actualColor);
+            Assert.AreEqual(canvas.Id, canvasViewModel.Id);
+        }
+
+        [Test]
         public void ParallelPrecompileCollectionTest()
         {
             Mapper.Register<Composition, CompositionViewModel>()

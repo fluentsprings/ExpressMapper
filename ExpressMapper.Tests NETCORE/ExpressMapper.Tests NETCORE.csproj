@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp1.6</TargetFramework>
+    <AssemblyName>ExpressMapper.Tests NETCORE</AssemblyName>
+    <OutputType>Exe</OutputType>
+    <PackageId>ExpressMapper.Tests NETCORE</PackageId>
+    <RuntimeFrameworkVersion>1.0.4</RuntimeFrameworkVersion>
+    <PackageTargetFallback>$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ExpressMapper NETCORE\ExpressMapper NETCORE.csproj" />
+    <ProjectReference Include="..\ExpressMapper.Tests.Model NETCORE\ExpressMapper.Tests.Model NETCORE.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentAssertions" Version="4.14.0" />
+    <PackageReference Include="NUnit" Version="3.4.1" />
+    <PackageReference Include="NUnitLite" Version="3.4.1" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.6' ">
+    <PackageReference Include="System.Threading.Tasks.Parallel" Version="4.0.1" />
+  </ItemGroup>
+
+</Project>

@@ -93,5 +93,10 @@ namespace ExpressMapper
         {
             Instance.CaseSensetiveMemberMap = caseSensitive;
         }
+
+        public static void MapEnumsByName()
+        {
+            Instance.MapEnumsByName = true;
+        }
     }
 }

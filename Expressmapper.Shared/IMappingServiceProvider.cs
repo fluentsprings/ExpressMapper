@@ -27,5 +27,6 @@ namespace ExpressMapper
         Dictionary<int, IList<long>> CustomMappingsBySource { get; }
         IQueryable<TN> Project<T, TN>(IQueryable<T> source);
         bool CaseSensetiveMemberMap { get; set; }
+        bool MapEnumsByName { get; set; }
     }
 }

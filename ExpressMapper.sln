@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.271
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpressMapper.Tests.Model", "ExpressMapper.Tests.Model\ExpressMapper.Tests.Model.csproj", "{9170A04C-8D4B-47A7-A6E3-7FC0F24244DD}"
 EndProject
@@ -19,11 +19,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpressMapper PCL NET45", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpressMapper.Tests.Projections", "ExpressMapper.Tests.Projections\ExpressMapper.Tests.Projections.csproj", "{DD8BFECA-7F00-4AB2-B904-64682EA1C713}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ExpressMapper NETCORE", "ExpressMapper NETCORE\ExpressMapper NETCORE.xproj", "{969E6614-0489-4174-A735-CC66F51D8746}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExpressMapper NETCORE", "ExpressMapper NETCORE\ExpressMapper NETCORE.csproj", "{969E6614-0489-4174-A735-CC66F51D8746}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ExpressMapper.Tests.Model NETCORE", "ExpressMapper.Tests.Model NETCORE\ExpressMapper.Tests.Model NETCORE.xproj", "{4A70832D-08CA-4937-A64B-D0E010242838}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExpressMapper.Tests.Model NETCORE", "ExpressMapper.Tests.Model NETCORE\ExpressMapper.Tests.Model NETCORE.csproj", "{4A70832D-08CA-4937-A64B-D0E010242838}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ExpressMapper.Tests NETCORE", "ExpressMapper.Tests NETCORE\ExpressMapper.Tests NETCORE.xproj", "{58FDAB09-42F6-44C2-BC01-EBAFF4EBF765}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExpressMapper.Tests NETCORE", "ExpressMapper.Tests NETCORE\ExpressMapper.Tests NETCORE.csproj", "{58FDAB09-42F6-44C2-BC01-EBAFF4EBF765}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpressMapper NET45", "ExpressMapper NET45\ExpressMapper NET45.csproj", "{5E211506-6D4E-4CD8-B454-D02672CF948A}"
 EndProject
@@ -93,5 +93,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1FBBD383-CD01-4A22-B0F1-382AD1A049EE}
 	EndGlobalSection
 EndGlobal

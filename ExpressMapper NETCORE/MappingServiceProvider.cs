@@ -59,6 +59,7 @@ namespace ExpressMapper
         }
 
         public bool CaseSensetiveMemberMap { get; set; }
+        public bool MapEnumsByName { get; set; }
 
         public IMemberConfiguration<T, TN> Register<T, TN>()
         {
@@ -225,6 +226,7 @@ namespace ExpressMapper
                     mappingService.Reset();
                 }
                 CaseSensetiveMemberMap = false;
+                MapEnumsByName = false;
             }
         }
 
