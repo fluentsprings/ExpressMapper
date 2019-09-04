@@ -41,6 +41,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Enums\AnotherStates.cs" />
+    <Compile Include="Enums\AnotherColors.cs" />
+    <Compile Include="Enums\Colors.cs" />
     <Compile Include="Enums\GenderTypes.cs" />
     <Compile Include="Enums\States.cs" />
     <Compile Include="Generator\Complex.cs" />
@@ -50,6 +52,7 @@
     <Compile Include="Models\BaseControl.cs" />
     <Compile Include="Models\Booking.cs" />
     <Compile Include="Models\Brand.cs" />
+    <Compile Include="Models\Canvas.cs" />
     <Compile Include="Models\CategoryTrip.cs" />
     <Compile Include="Models\City.cs" />
     <Compile Include="Models\ComboBox.cs" />
@@ -73,6 +76,7 @@
     <Compile Include="Models\TextBox.cs" />
     <Compile Include="Models\UserInterface.cs" />
     <Compile Include="ViewModels\BaseControlViewModel.cs" />
+    <Compile Include="ViewModels\CanvasViewModel.cs" />
     <Compile Include="ViewModels\ComboBoxViewModel.cs" />
     <Compile Include="ViewModels\FlattenCircularReferenceDto.cs" />
     <Compile Include="ViewModels\FlattenFatherSonDtoForGrandsonDto.cs" />

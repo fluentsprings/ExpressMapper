@@ -169,7 +169,7 @@ namespace ExpressMapper
 
                 if (destType.GetInfo().IsEnum && sourceType.GetInfo().IsEnum)
                 {
-                    return Expression.Assign(left, Expression.Convert(Expression.Convert(right, _enumImplicitConversionType), destType));
+                    return GetEnumMappingExpression(left, right, sourceType, destType);
                 }
 
                 if (typeof(IConvertible).GetInfo().IsAssignableFrom(destType) &&
@@ -200,6 +200,30 @@ namespace ExpressMapper
             var conditionalExpression = nullCheckNestedMemberVisitor.CheckNullExpression != null ? Expression.Condition(nullCheckNestedMemberVisitor.CheckNullExpression, Expression.Assign(left, Expression.Default(left.Type)), binaryExpression) : (Expression)binaryExpression;
 
             return conditionalExpression;
+        }
+
+        private Expression GetEnumMappingExpression(Expression left, Expression right, Type sourceType, Type destType)
+        {
+            if (!MappingServiceProvider.MapEnumsByName)
+            {
+                return Expression.Assign(left, Expression.Convert(Expression.Convert(right, _enumImplicitConversionType), destType));
+            }
+
+            var getNameTypeParam = Expression.Parameter(typeof(Type));
+            var getNameObjectParam = Expression.Parameter(typeof(object));
+            var getNameCall = Expression.Call(typeof(Enum), nameof(Enum.GetName), null, getNameTypeParam, getNameObjectParam);
+            var getNameLambda = Expression.Lambda(getNameCall, getNameTypeParam, getNameObjectParam);
+
+            var parseTypeParam = Expression.Parameter(typeof(Type));
+            var parseStringParam = Expression.Parameter(typeof(string));
+            var parseCall = Expression.Call(typeof(Enum), nameof(Enum.Parse), null, parseTypeParam, parseStringParam);
+            var parseLambda = Expression.Lambda(parseCall, parseTypeParam, parseStringParam);
+
+            var rightAsObject = Expression.Convert(right, typeof(object));
+            var getNameInvoke = Expression.Invoke(getNameLambda, Expression.Constant(sourceType), rightAsObject);
+            var parseInvoke = Expression.Invoke(parseLambda, Expression.Constant(destType), getNameInvoke);
+
+            return Expression.Assign(left, Expression.Convert(parseInvoke, destType));
         }
 
         private static Expression CreateAssignExpression(Expression setMethod, Expression getMethod, Type setType, Type setNullableType, Type getNullableType)
