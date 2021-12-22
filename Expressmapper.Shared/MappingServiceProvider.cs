@@ -272,8 +272,7 @@ namespace ExpressMapper
 
                 var newExpression = Expression.New(typeof(TMapper));
                 var newLambda = Expression.Lambda<Func<ICustomTypeMapper<T, TN>>>(newExpression);
-                var compile = newLambda.Compile();
-                CustomMappers[cacheKey] = compile;
+                AddToDictionary(ref _customMappers, cacheKey, newLambda.Compile());
             }
         }
 
