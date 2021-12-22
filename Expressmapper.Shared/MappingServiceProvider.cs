@@ -252,8 +252,7 @@ namespace ExpressMapper
                         delegateMapperType.GetInfo().GetConstructor(new Type[] { typeof(Func<,>).MakeGenericType(src, dest) }),
                         Expression.Constant(mapFunc));
                 var newLambda = Expression.Lambda<Func<ICustomTypeMapper<T, TN>>>(newExpression);
-                var compile = newLambda.Compile();
-                CustomMappers.Add(cacheKey, compile);
+                AddToDictionary(ref _customMappers, cacheKey, newLambda.Compile());
             }
         }
 
@@ -400,24 +399,7 @@ namespace ExpressMapper
                 if (!exists)
                 {
                     materializer = CompileNonGenericCustomTypeMapper(srcType, dstType, typeMapper);
-                    bool updateSucceeded = false;
-                    do
-                    {
-                        var snapshot = _customTypeMapperCache;
-                        var candidateCopy = new Dictionary<long, Func<object, object, object>>(snapshot);
-                        if (candidateCopy.TryGetValue(cacheKey, out var alreadySetByAnotherThread))
-                        {
-                            materializer = alreadySetByAnotherThread;
-                            updateSucceeded = true;
-                        }
-                        else
-                        {
-                            candidateCopy[cacheKey] = materializer;
-                            var original = Interlocked.CompareExchange(ref _customTypeMapperCache, candidateCopy, comparand: snapshot);
-                            updateSucceeded = original == snapshot; // fails if updated by another thread.
-                        }
-
-                    } while (updateSucceeded == false);
+                    materializer = AddToDictionary(ref _customTypeMapperCache, cacheKey, materializer);
                 }
 
                 return materializer(src, dest);
@@ -599,5 +581,28 @@ namespace ExpressMapper
         }
 
         #endregion
+
+        private static TValue AddToDictionary<TValue>(ref Dictionary<long, TValue> dictionary, long cacheKey, TValue value)
+        {
+            bool added = false;
+            do
+            {
+                var snapshot = dictionary;
+                var candidateCopy = new Dictionary<long, TValue>(snapshot);
+                if (candidateCopy.TryGetValue(cacheKey, out var alreadySetByAnotherThread))
+                {
+                    return alreadySetByAnotherThread;
+                }
+                else
+                {
+                    candidateCopy.Add(cacheKey, value);
+                    var original = Interlocked.CompareExchange(ref dictionary, candidateCopy, comparand: snapshot);
+                    added = original == snapshot; // fails if updated by another thread.
+                }
+            }
+            while (added == false);
+
+            return value;
+        }
     }
 }
