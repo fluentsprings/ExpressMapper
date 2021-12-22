@@ -13,7 +13,9 @@ namespace ExpressMapper
     {
         private readonly object _lock = new object();
 
-        public Dictionary<long, Func<ICustomTypeMapper>> CustomMappers { get; set; }
+        private Dictionary<long, Func<ICustomTypeMapper>> _customMappers;
+        public Dictionary<long, Func<ICustomTypeMapper>> CustomMappers { get => _customMappers; set => _customMappers = value; }
+
         public Dictionary<int, IList<long>> CustomMappingsBySource { get; set; }
         private volatile Dictionary<long, Func<object, object, object>> _customTypeMapperCache = new Dictionary<long, Func<object, object, object>>();
         private readonly List<long> _nonGenericCollectionMappingCache = new List<long>();
@@ -39,7 +41,7 @@ namespace ExpressMapper
                 new SourceMappingService(this),
                 new DestinationMappingService(this)
             };
-            CustomMappers = new Dictionary<long, Func<ICustomTypeMapper>>();
+            _customMappers = new Dictionary<long, Func<ICustomTypeMapper>>();
             CustomMappingsBySource = new Dictionary<int, IList<long>>();
         }
 
