@@ -17,7 +17,7 @@ namespace ExpressMapper
         public Dictionary<long, Func<ICustomTypeMapper>> CustomMappers { get => _customMappers; set => _customMappers = value; }
 
         public Dictionary<int, IList<long>> CustomMappingsBySource { get; set; }
-        private volatile Dictionary<long, Func<object, object, object>> _customTypeMapperCache = new Dictionary<long, Func<object, object, object>>();
+        private Dictionary<long, Func<object, object, object>> _customTypeMapperCache = new Dictionary<long, Func<object, object, object>>();
         private readonly List<long> _nonGenericCollectionMappingCache = new List<long>();
 
         private static readonly Type GenericEnumerableType = typeof(IEnumerable<>);
