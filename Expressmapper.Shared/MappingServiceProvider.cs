@@ -5,6 +5,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading;
 
 namespace ExpressMapper
 {
@@ -14,7 +15,7 @@ namespace ExpressMapper
 
         public Dictionary<long, Func<ICustomTypeMapper>> CustomMappers { get; set; }
         public Dictionary<int, IList<long>> CustomMappingsBySource { get; set; }
-        private readonly Dictionary<long, Func<object, object, object>> _customTypeMapperCache = new Dictionary<long, Func<object, object, object>>();
+        private volatile Dictionary<long, Func<object, object, object>> _customTypeMapperCache = new Dictionary<long, Func<object, object, object>>();
         private readonly List<long> _nonGenericCollectionMappingCache = new List<long>();
 
         private static readonly Type GenericEnumerableType = typeof(IEnumerable<>);
@@ -397,7 +398,24 @@ namespace ExpressMapper
                 if (!exists)
                 {
                     materializer = CompileNonGenericCustomTypeMapper(srcType, dstType, typeMapper);
-                    _customTypeMapperCache[cacheKey] = materializer;
+                    bool updateSucceeded = false;
+                    do
+                    {
+                        var snapshot = _customTypeMapperCache;
+                        var candidateCopy = new Dictionary<long, Func<object, object, object>>(snapshot);
+                        if (candidateCopy.TryGetValue(cacheKey, out var alreadySetByAnotherThread))
+                        {
+                            materializer = alreadySetByAnotherThread;
+                            updateSucceeded = true;
+                        }
+                        else
+                        {
+                            candidateCopy[cacheKey] = materializer;
+                            var original = Interlocked.CompareExchange(ref _customTypeMapperCache, candidateCopy, comparand: snapshot);
+                            updateSucceeded = original == snapshot; // fails if updated by another thread.
+                        }
+
+                    } while (updateSucceeded == false);
                 }
 
                 return materializer(src, dest);
