@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -392,11 +393,14 @@ namespace ExpressMapper
             {
                 var customTypeMapper = CustomMappers[cacheKey];
                 var typeMapper = customTypeMapper();
-                if (!_customTypeMapperCache.ContainsKey(cacheKey))
+                var exists = _customTypeMapperCache.TryGetValue(cacheKey, out var materializer);
+                if (!exists)
                 {
-                    CompileNonGenericCustomTypeMapper(srcType, dstType, typeMapper, cacheKey);
+                    materializer = CompileNonGenericCustomTypeMapper(srcType, dstType, typeMapper);
+                    _customTypeMapperCache[cacheKey] = materializer;
                 }
-                return _customTypeMapperCache[cacheKey](src, dest);
+
+                return materializer(src, dest);
             }
 
             ITypeMapper mapper = null;
@@ -512,7 +516,8 @@ namespace ExpressMapper
             action();
         }
 
-        private Func<object, object, object> CompileNonGenericCustomTypeMapper(Type srcType, Type dstType, ICustomTypeMapper typeMapper, long cacheKey)
+        [Pure]
+        private Func<object, object, object> CompileNonGenericCustomTypeMapper(Type srcType, Type dstType, ICustomTypeMapper typeMapper)
         {
             var sourceExpression = Expression.Parameter(typeof(object), "src");
             var destinationExpression = Expression.Parameter(typeof(object), "dst");
@@ -556,8 +561,6 @@ namespace ExpressMapper
 
             var lambda = Expression.Lambda<Func<object, object, object>>(blockExpression, sourceExpression, destinationExpression);
             var result = lambda.Compile();
-
-            _customTypeMapperCache[cacheKey] = result;
 
             return result;
         }
