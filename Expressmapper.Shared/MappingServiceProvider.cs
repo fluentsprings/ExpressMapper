@@ -512,7 +512,7 @@ namespace ExpressMapper
             action();
         }
 
-        private void CompileNonGenericCustomTypeMapper(Type srcType, Type dstType, ICustomTypeMapper typeMapper, long cacheKey)
+        private Func<object, object, object> CompileNonGenericCustomTypeMapper(Type srcType, Type dstType, ICustomTypeMapper typeMapper, long cacheKey)
         {
             var sourceExpression = Expression.Parameter(typeof(object), "src");
             var destinationExpression = Expression.Parameter(typeof(object), "dst");
@@ -555,7 +555,11 @@ namespace ExpressMapper
                 srcAssigned, dstAssigned, assignExp, assignContextExp, sourceAssignedExp, destAssignedExp, /*destinationAssignedExp,*/ resultAssignExp, resultVarExp);
 
             var lambda = Expression.Lambda<Func<object, object, object>>(blockExpression, sourceExpression, destinationExpression);
-            _customTypeMapperCache[cacheKey] = lambda.Compile();
+            var result = lambda.Compile();
+
+            _customTypeMapperCache[cacheKey] = result;
+
+            return result;
         }
 
         internal static Type GetCollectionElementType(Type type)
