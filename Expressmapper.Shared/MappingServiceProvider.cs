@@ -415,10 +415,8 @@ namespace ExpressMapper
                 if (dstType != actualDstType && actualDstType.GetInfo().IsAssignableFrom(dstType))
                     throw new InvalidCastException($"Your destination object instance type '{actualSrcType.FullName}' is not assignable from destination type you specified '{srcType}'.");
 
-                if (CustomMappingsBySource.ContainsKey(srcHash))
+                if (CustomMappingsBySource.TryGetValue(srcHash, out var mappings))
                 {
-                    var mappings = CustomMappingsBySource[srcHash];
-
                     mapper =
                         mappings.Where(m => DestinationService.TypeMappers.ContainsKey(m))
                             .Select(m => DestinationService.TypeMappers[m])
