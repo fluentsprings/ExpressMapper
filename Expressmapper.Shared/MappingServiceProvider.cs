@@ -300,9 +300,8 @@ namespace ExpressMapper
             var destType = typeof(TN);
             var cacheKey = CalculateCacheKey(srcType, destType);
 
-            if (CustomMappers.ContainsKey(cacheKey))
+            if (CustomMappers.TryGetValue(cacheKey, out var customTypeMapper))
             {
-                var customTypeMapper = CustomMappers[cacheKey];
                 var typeMapper = customTypeMapper() as ICustomTypeMapper<T, TN>;
                 var context = new DefaultMappingContext<T, TN> { Source = src, Destination = dest };
                 return typeMapper.Map(context);
@@ -390,9 +389,8 @@ namespace ExpressMapper
             }
 
             var cacheKey = CalculateCacheKey(srcType, dstType);
-            if (CustomMappers.ContainsKey(cacheKey))
+            if (CustomMappers.TryGetValue(cacheKey, out var customTypeMapper))
             {
-                var customTypeMapper = CustomMappers[cacheKey];
                 var typeMapper = customTypeMapper();
                 var exists = _customTypeMapperCache.TryGetValue(cacheKey, out var materializer);
                 if (!exists)
@@ -429,9 +427,8 @@ namespace ExpressMapper
             }
             else
             {
-                if (CustomMappingsBySource.ContainsKey(srcHash))
+                if (CustomMappingsBySource.TryGetValue(srcHash, out var mappings))
                 {
-                    var mappings = CustomMappingsBySource[srcHash];
                     var typeMappers =
                         mappings.Where(m => SourceService.TypeMappers.ContainsKey(m))
                             .Select(m => SourceService.TypeMappers[m])
@@ -460,9 +457,8 @@ namespace ExpressMapper
                 return nonGenericMapFunc(src, dest);
             }
 
-            if (mappingService.TypeMappers.ContainsKey(cacheKey))
+            if (mappingService.TypeMappers.TryGetValue(cacheKey, out mapper))
             {
-                mapper = mappingService.TypeMappers[cacheKey];
                 var nonGenericMapFunc = mapper.GetNonGenericMapFunc();
                 return nonGenericMapFunc(src, dest);
             }
